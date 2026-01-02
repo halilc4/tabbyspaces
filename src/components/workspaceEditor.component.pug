@@ -1,0 +1,84 @@
+.workspace-editor-overlay((click)='onCancel()')
+  .workspace-editor-modal((click)='$event.stopPropagation()')
+    .modal-header
+      h4 {{ workspace.id ? 'Edit' : 'New' }} Workspace
+      button.btn.btn-link.close-btn(type='button', (click)='onCancel()')
+        i.fas.fa-times
+
+    .modal-body
+      .form-row
+        .form-group.flex-grow
+          label Name
+          input.form-control(
+            type='text',
+            [(ngModel)]='workspace.name',
+            placeholder='Workspace name'
+          )
+
+      .form-row
+        .form-group
+          label Icon
+          .icon-selector
+            button.icon-option(
+              *ngFor='let icon of availableIcons',
+              type='button',
+              [class.selected]='workspace.icon === icon',
+              (click)='workspace.icon = icon'
+            )
+              i.fas([class]='"fa-" + icon')
+
+        .form-group
+          label Color
+          input.form-control.color-input(
+            type='color',
+            [(ngModel)]='workspace.color'
+          )
+
+      .form-row
+        .form-group
+          label
+            input(type='checkbox', [(ngModel)]='workspace.isDefault')
+            |  Launch on startup
+
+      .form-section
+        .section-header
+          h5 Layout Preview
+          .orientation-toggle
+            button.btn.btn-sm(
+              type='button',
+              [class.btn-primary]='workspace.root.orientation === "horizontal"',
+              [class.btn-outline-secondary]='workspace.root.orientation !== "horizontal"',
+              (click)='setOrientation("horizontal")'
+            )
+              i.fas.fa-arrows-alt-h
+              |  Horizontal
+            button.btn.btn-sm(
+              type='button',
+              [class.btn-primary]='workspace.root.orientation === "vertical"',
+              [class.btn-outline-secondary]='workspace.root.orientation !== "vertical"',
+              (click)='setOrientation("vertical")'
+            )
+              i.fas.fa-arrows-alt-v
+              |  Vertical
+
+        split-preview(
+          [split]='workspace.root',
+          (paneClick)='selectPane($event)',
+          (splitHorizontal)='splitPane($event, "horizontal")',
+          (splitVertical)='splitPane($event, "vertical")',
+          (removePane)='removePane($event)'
+        )
+
+    .modal-footer
+      button.btn.btn-secondary(type='button', (click)='onCancel()') Cancel
+      button.btn.btn-primary(type='button', (click)='onSave()', [disabled]='!workspace.name?.trim()')
+        i.fas.fa-save
+        |  Save Workspace
+
+pane-editor(
+  *ngIf='showPaneEditor && selectedPane',
+  [pane]='selectedPane',
+  [profiles]='getAvailableProfiles()',
+  (save)='onPaneSave($event)',
+  (cancel)='closePaneEditor()'
+)

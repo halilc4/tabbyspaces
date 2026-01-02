@@ -1,0 +1,56 @@
+{
+  "name": "tabby-workspace-editor",
+  "version": "1.0.0",
+  "description": "Visual editor for Tabby split-layout workspace profiles",
+  "keywords": [
+    "tabby-plugin"
+  ],
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch"
+  },
+  "peerDependencies": {
+    "@angular/common": "^15.0.0",
+    "@angular/core": "^15.0.0",
+    "@angular/forms": "^15.0.0",
+    "tabby-core": "*",
+    "tabby-local": "*",
+    "tabby-settings": "*",
+    "tabby-terminal": "*"
+  },
+  "devDependencies": {
+    "@angular/common": "^15.0.0",
+    "@angular/compiler": "^15.0.0",
+    "@angular/compiler-cli": "^15.0.0",
+    "@angular/core": "^15.0.0",
+    "@angular/forms": "^15.0.0",
+    "@ngtools/webpack": "^15.0.0",
+    "apply-loader": "^2.0.0",
+    "css-loader": "^6.8.0",
+    "pug": "^3.0.2",
+    "pug-loader": "^2.4.0",
+    "raw-loader": "^4.0.2",
+    "rxjs": "^7.8.0",
+    "sass": "^1.63.0",
+    "sass-loader": "^13.3.0",
+    "tabby-core": "^1.0.197-nightly.1",
+    "tabby-local": "^1.0.197-nightly.1",
+    "tabby-settings": "^1.0.197-nightly.1",
+    "tabby-terminal": "^1.0.197-nightly.1",
+    "to-string-loader": "^1.2.0",
+    "ts-loader": "^9.5.4",
+    "typescript": "~4.9.0",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0",
+    "zone.js": "^0.13.0"
+  },
+  "author": "Igor Halilovic",
+  "license": "MIT",
+  "tabbyPlugin": {
+    "name": "tabby-workspace-editor",
+    "displayName": "Workspace Editor",
+    "description": "Visual editor for split-layout workspace profiles"
+  }
+}

@@ -1,0 +1,45 @@
+.split-preview([class.horizontal]='split.orientation === "horizontal"', [class.vertical]='split.orientation === "vertical"')
+  ng-container(*ngFor='let child of split.children; let i = index')
+    //- Pane
+    .preview-pane(
+      *ngIf='isPane(child)',
+      [style.flex-basis]='getFlexStyle(i)',
+      (click)='onPaneClick(asPane(child))',
+      (contextmenu)='onContextMenu($event, asPane(child))'
+    )
+      .pane-content
+        .pane-label {{ getPaneLabel(asPane(child)) }}
+        .pane-hint Click to edit
+
+    //- Nested split
+    split-preview(
+      *ngIf='isSplit(child)',
+      [split]='asSplit(child)',
+      [depth]='depth + 1',
+      [style.flex-basis]='getFlexStyle(i)',
+      (paneClick)='onNestedPaneClick($event)',
+      (splitHorizontal)='onNestedSplitH($event)',
+      (splitVertical)='onNestedSplitV($event)',
+      (removePane)='onNestedRemove($event)'
+    )
+
+//- Context menu
+.context-menu-overlay(
+  *ngIf='contextMenuPane',
+  (click)='closeContextMenu()'
+)
+  .context-menu(
+    [style.left.px]='contextMenuPosition.x',
+    [style.top.px]='contextMenuPosition.y',
+    (click)='$event.stopPropagation()'
+  )
+    button.context-menu-item(type='button', (click)='onSplitH()')
+      i.fas.fa-arrows-alt-h
+      |  Split Horizontal
+    button.context-menu-item(type='button', (click)='onSplitV()')
+      i.fas.fa-arrows-alt-v
+      |  Split Vertical
+    .context-menu-divider
+    button.context-menu-item.danger(type='button', (click)='onRemove()')
+      i.fas.fa-trash
+      |  Remove Pane
