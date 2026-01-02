@@ -1,6 +1,7 @@
 const path = require('path')
+const webpack = require('webpack')
 
-module.exports = {
+module.exports = (env = {}) => ({
   target: 'node',
   entry: './src/index.ts',
   context: __dirname,
@@ -51,4 +52,11 @@ module.exports = {
     /^tabby-/,
     /^zone\.js/,
   ],
-}
+  plugins: [
+    new webpack.DefinePlugin({
+      __CONFIG_KEY__: JSON.stringify(env.dev ? 'tabbyspaces_dev' : 'tabbyspaces'),
+      __DISPLAY_NAME__: JSON.stringify(env.dev ? 'TabbySpaces DEV' : 'TabbySpaces'),
+      __IS_DEV__: env.dev ? 'true' : 'false',
+    }),
+  ],
+})

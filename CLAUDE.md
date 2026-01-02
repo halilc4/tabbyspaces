@@ -1,16 +1,16 @@
 # TabbySpaces
 
-Workspaces for Tabby - vizuelni editor za split-layout workspace profile.
+Visual split-layout workspace editor for Tabby.
 
 ## Tech Stack
 
-- **Framework**: Angular 15 (Tabby koristi Angular 15)
+- **Framework**: Angular 15 (Tabby uses Angular 15)
 - **Language**: TypeScript 4.9
 - **Templates**: Pug (.pug)
 - **Styles**: SCSS
 - **Build**: Webpack 5
 
-## Struktura
+## Structure
 
 ```
 src/
@@ -21,37 +21,19 @@ src/
 └── components/              # Angular components (.ts, .pug, .scss)
 ```
 
-## Build & Test
+## Build
 
 ```bash
-npm install            # .npmrc ima legacy-peer-deps=true
-npm run build          # Production build
-npm run watch          # Watch mode (samo webpack)
-npm run tabby          # Pokreni Tabby sa TABBY_PLUGINS=cwd
-npm run dev            # Build + pokreni Tabby
+npm install            # .npmrc has legacy-peer-deps=true
+npm run build          # Production build → dist/
+npm run build:dev      # Dev build → dist-dev/ (isolated package)
 ```
 
-### Setup
-
-Nema setup-a! Script koristi punu putanju do Tabby.exe.
-
-### Development workflow
-
-```bash
-# Terminal 1: Watch za rebuild
-npm run watch
-
-# Terminal 2: Pokreni Tabby (nakon svake promene restartuj)
-npm run tabby
-```
-
-Ili jednostavno `npm run dev` za build + run.
-
-Debug: `Ctrl+Shift+I` u Tabby-ju za DevTools.
+Debug: `Ctrl+Shift+I` in Tabby opens DevTools.
 
 ## Tabby Plugin Patterns
 
-### package.json (obavezno)
+### package.json (required)
 ```json
 {
   "keywords": ["tabby-plugin"],
@@ -96,35 +78,78 @@ export default class MyModule {}
 
 ## Data Model
 
-- `Workspace` - Glavni objekat sa name, icon, color, root split
-- `WorkspaceSplit` - Rekurzivna struktura sa orientation, ratios, children
-- `WorkspacePane` - Leaf node sa profileId, cwd, startupCommand, title
+- `Workspace` - Main object with name, icon, color, root split
+- `WorkspaceSplit` - Recursive structure with orientation, ratios, children
+- `WorkspacePane` - Leaf node with profileId, cwd, startupCommand, title
 
-## Konverzija u Tabby Format
+## Tabby Profile Generation
 
-Plugin čuva pojednostavljeni model u `config.store.tabbyspaces.workspaces` i automatski generiše verbose Tabby `split-layout` profile u `config.store.profiles`.
+Plugin stores a simplified model in `config.store.tabbyspaces.workspaces` and auto-generates verbose Tabby `split-layout` profiles in `config.store.profiles`.
 
 ## Nushell Startup Commands
 
-Za Nushell, startup komande se prosleđuju kao:
+For Nushell, startup commands are passed as:
 ```typescript
 options.args = ['-e', startupCommand]
 ```
 
-## Reference
+## References
 
 - tabby-workspace-manager: https://github.com/composer404/tabby-workspace-manager
 - tabby-clippy: https://github.com/Eugeny/tabby-clippy
 - Tabby docs: https://docs.tabby.sh/
 
-## Poznati Problemi
+## Installation
 
-### YAML escape sekvence u config.yaml
-Ako bazni profil u Tabby config-u koristi double-quoted string sa pogrešnim escape sekvencama (npr. `\t` umesto `\\t`), plugin će kopirati oštećenu putanju. Primer problema:
+### Plugin folder locations
+```
+Windows:  %APPDATA%\tabby\plugins
+macOS:    ~/Library/Application Support/tabby/plugins
+Linux:    ~/.config/tabby/plugins
+```
+
+### Production install
+```bash
+cd <plugins-folder>
+npm install tabby-tabbyspaces
+```
+
+## Development
+
+### Dev install (once)
+```bash
+npm run build:dev
+cd %APPDATA%\tabby\plugins
+npm install "<path-to-repo>/dist-dev"
+```
+
+### Dev workflow (after install)
+```bash
+npm run build:dev   # npm creates symlink, no reinstall needed
+# restart Tabby
+```
+
+npm auto-creates symlinks for local packages, so each build is immediately available.
+
+### Dev vs Prod Isolation
+
+| | Prod | Dev |
+|---|---|---|
+| Package | `tabby-tabbyspaces` | `tabby-tabbyspaces-dev` |
+| Config | `config.store.tabbyspaces` | `config.store.tabbyspaces_dev` |
+| Display | "TabbySpaces" | "TabbySpaces DEV" |
+
+Both plugins can be installed simultaneously.
+
+## Known Issues
+
+### YAML escape sequences in config.yaml
+If a base profile in Tabby config uses double-quoted strings with wrong escape sequences (e.g., `\t` instead of `\\t`), the plugin will copy the corrupted path.
+
 ```yaml
-# POGREŠNO - \t postaje TAB karakter
+# WRONG - \t becomes TAB character
 command: "C:\\Users\\...\\Program\ts\\nu\\bin\\nu.exe"
 
-# ISPRAVNO - unquoted string
+# CORRECT - unquoted string
 command: C:\Users\...\Programs\nu\bin\nu.exe
 ```

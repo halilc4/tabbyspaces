@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { ToolbarButtonProvider, ToolbarButton, ProfilesService, AppService } from 'tabby-core'
 import { WorkspaceEditorService } from '../services/workspaceEditor.service'
 import { SettingsTabComponent } from 'tabby-settings'
+import { CONFIG_KEY, DISPLAY_NAME } from '../build-config'
 
 @Injectable()
 export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
@@ -22,7 +23,7 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
           <rect x="14" y="14" width="7" height="7"/>
           <rect x="3" y="14" width="7" height="7"/>
         </svg>`,
-        title: 'Workspaces',
+        title: DISPLAY_NAME,
         weight: 5,
         click: () => this.showWorkspaceSelector()
       }
@@ -64,7 +65,7 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
   }
 
   private openSettings(): void {
-    this.app.openNewTabRaw({ type: SettingsTabComponent, inputs: { activeTab: 'tabbyspaces' } })
+    this.app.openNewTabRaw({ type: SettingsTabComponent, inputs: { activeTab: CONFIG_KEY } })
   }
 
   private countPanes(node: any): number {

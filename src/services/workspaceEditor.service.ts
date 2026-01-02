@@ -7,6 +7,7 @@ import {
   isWorkspaceSplit,
   generateUUID,
 } from '../models/workspace.model'
+import { CONFIG_KEY, DISPLAY_NAME } from '../build-config'
 
 @Injectable({ providedIn: 'root' })
 export class WorkspaceEditorService {
@@ -17,12 +18,12 @@ export class WorkspaceEditorService {
   ) {}
 
   getWorkspaces(): Workspace[] {
-    return this.config.store.tabbyspaces?.workspaces ?? []
+    return this.config.store[CONFIG_KEY]?.workspaces ?? []
   }
 
   saveWorkspaces(workspaces: Workspace[]): void {
-    this.config.store.tabbyspaces = {
-      ...this.config.store.tabbyspaces,
+    this.config.store[CONFIG_KEY] = {
+      ...this.config.store[CONFIG_KEY],
       workspaces,
     }
     this.config.save()
@@ -66,9 +67,9 @@ export class WorkspaceEditorService {
   private syncTabbyProfiles(workspaces: Workspace[]): void {
     const profiles = this.config.store.profiles ?? []
 
-    // Remove old tabbyspaces profiles
+    // Remove old plugin profiles
     const filteredProfiles = profiles.filter(
-      (p: any) => !p.id?.startsWith('split-layout:tabbyspaces:')
+      (p: any) => !p.id?.startsWith(`split-layout:${CONFIG_KEY}:`)
     )
 
     // Add new workspace profiles
@@ -89,9 +90,10 @@ export class WorkspaceEditorService {
 
   generateTabbyProfile(workspace: Workspace): any {
     return {
-      id: `split-layout:tabbyspaces:${workspace.name.toLowerCase().replace(/\s+/g, '-')}:${workspace.id}`,
+      id: `split-layout:${CONFIG_KEY}:${workspace.name.toLowerCase().replace(/\s+/g, '-')}:${workspace.id}`,
       type: 'split-layout',
       name: workspace.name,
+      group: DISPLAY_NAME,
       icon: workspace.icon,
       color: workspace.color,
       isBuiltin: false,
