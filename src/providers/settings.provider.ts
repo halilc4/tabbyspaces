@@ -4,9 +4,9 @@ import { WorkspaceListComponent } from '../components/workspaceList.component'
 
 @Injectable()
 export class WorkspaceEditorSettingsProvider extends SettingsTabProvider {
-  id = 'workspace-editor'
+  id = 'tabbyspaces'
   icon = 'columns'
-  title = 'Workspace Editor'
+  title = 'TabbySpaces'
 
   getComponentType(): any {
     return WorkspaceListComponent

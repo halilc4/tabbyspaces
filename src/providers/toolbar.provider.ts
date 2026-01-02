@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { ToolbarButtonProvider, ToolbarButton, ProfilesService, AppService } from 'tabby-core'
 import { WorkspaceEditorService } from '../services/workspaceEditor.service'
+import { SettingsTabComponent } from 'tabby-settings'
 
 @Injectable()
 export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
@@ -32,6 +33,7 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
     const workspaces = this.workspaceService.getWorkspaces()
 
     if (workspaces.length === 0) {
+      this.openSettings()
       return
     }
 
@@ -43,11 +45,26 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
       result: ws.id
     }))
 
+    // Add option to open settings
+    options.push({
+      name: 'Manage Workspaces...',
+      description: 'Create and edit workspaces',
+      icon: 'cog',
+      color: undefined as any,
+      result: '__settings__'
+    })
+
     const selectedId = await this.app.showSelector('Select Workspace', options)
 
-    if (selectedId) {
+    if (selectedId === '__settings__') {
+      this.openSettings()
+    } else if (selectedId) {
       this.openWorkspace(selectedId)
     }
+  }
+
+  private openSettings(): void {
+    this.app.openNewTabRaw({ type: SettingsTabComponent, inputs: { activeTab: 'tabbyspaces' } })
   }
 
   private countPanes(node: any): number {

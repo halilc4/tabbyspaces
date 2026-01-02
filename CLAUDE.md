@@ -1,6 +1,6 @@
-# Tabby Workspace Editor
+# TabbySpaces
 
-Tabby plugin za vizuelno editovanje split-layout workspace profila.
+Workspaces for Tabby - vizuelni editor za split-layout workspace profile.
 
 ## Tech Stack
 
@@ -26,18 +26,28 @@ src/
 ```bash
 npm install            # .npmrc ima legacy-peer-deps=true
 npm run build          # Production build
-npm run dev            # Watch mode
+npm run watch          # Watch mode (samo webpack)
+npm run tabby          # Pokreni Tabby sa TABBY_PLUGINS=cwd
+npm run dev            # Build + pokreni Tabby
 ```
 
-### Lokalno testiranje
+### Setup
 
-Plugin mora biti u `%APPDATA%\tabby\plugins\node_modules\`. Koristi junction link:
+Nema setup-a! Script koristi punu putanju do Tabby.exe.
 
-```cmd
-mklink /J "%APPDATA%\tabby\plugins\node_modules\tabby-workspace-editor" "C:\Users\halil\tabby-workspace-editor"
+### Development workflow
+
+```bash
+# Terminal 1: Watch za rebuild
+npm run watch
+
+# Terminal 2: Pokreni Tabby (nakon svake promene restartuj)
+npm run tabby
 ```
 
-Posle builda restartuj Tabby. Za debug: `tabby --debug`
+Ili jednostavno `npm run dev` za build + run.
+
+Debug: `Ctrl+Shift+I` u Tabby-ju za DevTools.
 
 ## Tabby Plugin Patterns
 
@@ -47,9 +57,9 @@ Posle builda restartuj Tabby. Za debug: `tabby --debug`
   "keywords": ["tabby-plugin"],
   "main": "dist/index.js",
   "tabbyPlugin": {
-    "name": "tabby-workspace-editor",
-    "displayName": "Workspace Editor",
-    "description": "Visual editor for split-layout workspace profiles"
+    "name": "tabbyspaces",
+    "displayName": "TabbySpaces",
+    "description": "Workspaces for Tabby - Visual split-layout workspace editor"
   }
 }
 ```
@@ -92,7 +102,7 @@ export default class MyModule {}
 
 ## Konverzija u Tabby Format
 
-Plugin čuva pojednostavljeni model u `config.store.workspaceEditor.workspaces` i automatski generiše verbose Tabby `split-layout` profile u `config.store.profiles`.
+Plugin čuva pojednostavljeni model u `config.store.tabbyspaces.workspaces` i automatski generiše verbose Tabby `split-layout` profile u `config.store.profiles`.
 
 ## Nushell Startup Commands
 

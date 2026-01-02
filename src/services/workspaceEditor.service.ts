@@ -17,12 +17,12 @@ export class WorkspaceEditorService {
   ) {}
 
   getWorkspaces(): Workspace[] {
-    return this.config.store.workspaceEditor?.workspaces ?? []
+    return this.config.store.tabbyspaces?.workspaces ?? []
   }
 
   saveWorkspaces(workspaces: Workspace[]): void {
-    this.config.store.workspaceEditor = {
-      ...this.config.store.workspaceEditor,
+    this.config.store.tabbyspaces = {
+      ...this.config.store.tabbyspaces,
       workspaces,
     }
     this.config.save()
@@ -66,9 +66,9 @@ export class WorkspaceEditorService {
   private syncTabbyProfiles(workspaces: Workspace[]): void {
     const profiles = this.config.store.profiles ?? []
 
-    // Remove old workspace-editor profiles
+    // Remove old tabbyspaces profiles
     const filteredProfiles = profiles.filter(
-      (p: any) => !p.id?.startsWith('split-layout:workspace-editor:')
+      (p: any) => !p.id?.startsWith('split-layout:tabbyspaces:')
     )
 
     // Add new workspace profiles
@@ -89,7 +89,7 @@ export class WorkspaceEditorService {
 
   generateTabbyProfile(workspace: Workspace): any {
     return {
-      id: `split-layout:workspace-editor:${workspace.name.toLowerCase().replace(/\s+/g, '-')}:${workspace.id}`,
+      id: `split-layout:tabbyspaces:${workspace.name.toLowerCase().replace(/\s+/g, '-')}:${workspace.id}`,
       type: 'split-layout',
       name: workspace.name,
       icon: workspace.icon,

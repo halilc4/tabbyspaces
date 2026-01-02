@@ -1,15 +1,24 @@
 {
-  "name": "tabby-workspace-editor",
+  "name": "tabbyspaces",
   "version": "1.0.0",
-  "description": "Visual editor for Tabby split-layout workspace profiles",
+  "description": "Workspaces for Tabby - Visual split-layout workspace editor",
   "keywords": [
+    "tabby",
     "tabby-plugin"
   ],
   "main": "dist/index.js",
+  "type": "commonjs",
+  "dependencies": {
+    "tabby-core": "^1.0.197-nightly.1",
+    "tabby-settings": "^1.0.197-nightly.1",
+    "tabby-terminal": "^1.0.197-nightly.1"
+  },
   "typings": "dist/index.d.ts",
   "scripts": {
     "build": "webpack --mode production",
-    "dev": "webpack --mode development --watch"
+    "watch": "webpack --mode development --watch",
+    "tabby": "powershell -Command \"$env:TABBY_PLUGINS=(Get-Location).Path; & 'C:/Program Files (x86)/Tabby/Tabby.exe' -d\"",
+    "dev": "npm run build && npm run tabby"
   },
   "peerDependencies": {
     "@angular/common": "^15.0.0",
@@ -49,8 +58,8 @@
   "author": "Igor Halilovic",
   "license": "MIT",
   "tabbyPlugin": {
-    "name": "tabby-workspace-editor",
-    "displayName": "Workspace Editor",
-    "description": "Visual editor for split-layout workspace profiles"
+    "name": "tabbyspaces",
+    "displayName": "TabbySpaces",
+    "description": "Workspaces for Tabby - Visual split-layout workspace editor"
   }
 }
