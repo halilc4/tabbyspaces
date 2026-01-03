@@ -4,6 +4,8 @@ node_modules/
 # Build output
 dist/
 dist-dev/
+*.tgz
+.env 
 
 # IDE
 .idea/
@@ -21,3 +23,5 @@ npm-debug.log*
 
 # Package manager locks (optional - uncomment if you want to ignore)
 # package-lock.json
+.npmrc
+.env
