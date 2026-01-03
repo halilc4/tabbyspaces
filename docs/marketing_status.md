@@ -84,9 +84,9 @@ Add entry when submitted. Update when results change.
 ### awesome-productivity - 2026-01-03
 - **PR**: https://github.com/jyguyomarch/awesome-productivity/pull/149
 - **Status**: submitted
-- **Notes**: Task Automation sekcija, nema star requirements
+- **Notes**: Task Automation section, no star requirements
 
 ### terminals-are-sexy - 2026-01-03
 - **PR**: https://github.com/k4m4/terminals-are-sexy/pull/346
 - **Status**: submitted
-- **Notes**: Čeka endorsement od community-ja
+- **Notes**: Waiting for community endorsement
