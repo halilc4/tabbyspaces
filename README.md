@@ -12,6 +12,14 @@ Visual workspace editor for [Tabby](https://tabby.sh). Create split-layout termi
 - Hotkey support for quick workspace switching
 - Works with any shell (Bash, Zsh, PowerShell, Nushell, etc.)
 
+## About this project
+
+This plugin was written 100% by [Claude Code](https://claude.ai/code).
+
+Igor Halilović had the idea and provided product direction. He hates Angular so much (19 years of web dev, wrote his own TypeScript framework) that he didn't look at this code. Not once. He told Claude Code what he wanted, Claude Code built it.
+
+Human provides the *what* and *why*. AI handles the *how*.
+
 ## Install
 
 **From Tabby Plugin Manager:**
@@ -40,14 +48,6 @@ Restart Tabby after installation.
 ### Pane configuration
 
 ![Edit Pane](screenshots/pane-edit.png)
-
-## About this project
-
-This plugin was written 100% by [Claude Code](https://claude.ai/code).
-
-Igor Halilović had the idea and provided product direction. He hates Angular so much (19 years of web dev, wrote his own TypeScript framework) that he didn't look at this code. Not once. He told Claude Code what he wanted, Claude Code built it.
-
-Human provides the *what* and *why*. AI handles the *how*.
 
 ## Tech
 
