@@ -27,6 +27,7 @@ src/
 npm install            # .npmrc has legacy-peer-deps=true
 npm run build          # Production build → dist/
 npm run build:dev      # Dev build → dist-dev/ (isolated package)
+npm run watch:dev      # Watch mode for dev build
 ```
 
 Debug: `Ctrl+Shift+I` in Tabby opens DevTools.
@@ -125,8 +126,9 @@ npm install "<path-to-repo>/dist-dev"
 
 ### Dev workflow (after install)
 ```bash
-npm run build:dev   # npm creates symlink, no reinstall needed
-# restart Tabby
+npm run build:dev   # Initial build (creates dist-dev/package.json)
+npm run watch:dev   # Watch mode - rebuilds on file changes
+# restart Tabby after each rebuild
 ```
 
 npm auto-creates symlinks for local packages, so each build is immediately available.

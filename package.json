@@ -17,7 +17,8 @@
   "scripts": {
     "build": "webpack --mode production",
     "build:dev": "node scripts/build-dev.js",
-    "watch": "webpack --mode development --watch"
+    "watch": "webpack --mode development --watch",
+    "watch:dev": "webpack --mode development --watch --env dev --output-path dist-dev"
   },
   "peerDependencies": {
     "@angular/common": "^15.0.0",
