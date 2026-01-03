@@ -1,60 +1,60 @@
 # TabbySpaces - Public Release Plan
 
-## Cilj
+## Goal
 
-Napraviti public repo koji omogućava:
-1. Korisnicima da instaliraju plugin iz Tabby Plugin Manager-a
-2. Developerima da doprinose (fork → develop → PR)
-3. Maintaineru (Igor) da testira i dev i production verziju istovremeno
+Create a public repo that enables:
+1. Users to install the plugin from Tabby Plugin Manager
+2. Developers to contribute (fork → develop → PR)
+3. Maintainer (Igor) to test both dev and production versions simultaneously
 
 ---
 
-## 1. Package.json izmene
+## 1. Package.json Changes
 
-- [x] Verzija: `1.0.0` → `0.0.1`
-- [x] Dodaj `repository` polje
-- [x] Dodaj `homepage` polje
-- [x] Dodaj `bugs` polje
-- [x] Sredi `scripts` sekciju - uklonjena TABBY_PLUGINS zavisnost
+- [x] Version: `1.0.0` → `0.0.1`
+- [x] Add `repository` field
+- [x] Add `homepage` field
+- [x] Add `bugs` field
+- [x] Clean up `scripts` section - removed TABBY_PLUGINS dependency
 
 ---
 
 ## 2. Dev Workflow
 
-**Pristup:** build:dev + instalacija u plugins folder
+**Approach:** build:dev + install to plugins folder
 
-**Radi:**
-- [x] `npm run build:dev` - kreira dist-dev/ sa izolovanim package-om
-- [x] Instalacija u plugins folder
+**Working:**
+- [x] `npm run build:dev` - creates dist-dev/ with isolated package
+- [x] Installation to plugins folder
 
-**Poznati problemi:**
-- [x] ~~Prod i dev plugin imaju isto ime u Tabby UI~~ (REŠENO)
+**Known issues:**
+- [x] ~~Prod and dev plugin have same name in Tabby UI~~ (FIXED)
 
 **TODO:**
-- [x] ~~Popraviti izolaciju imena u UI~~ (DONE - toolbar, settings, profile groups)
-- [ ] Testirati watch mode
-- [ ] Dokumentovati u README
+- [x] ~~Fix UI name isolation~~ (DONE - toolbar, settings, profile groups)
+- [ ] Test watch mode
+- [ ] Document in README
 
 ---
 
-## 3. Testiranje
+## 3. Testing
 
-**Koegzistencija (maintainer)** ✅ RADI
+**Coexistence (maintainer)** ✅ WORKS
 ```
-tabby-tabbyspaces (prod) + tabby-tabbyspaces-dev (dev) u plugins folderu
-Različiti config keys, različita imena u UI
+tabby-tabbyspaces (prod) + tabby-tabbyspaces-dev (dev) in plugins folder
+Different config keys, different names in UI
 ```
 
-**Napomene:**
-- Contributor workflow će biti dokumentovan u CONTRIBUTING.md
-- Production test će biti live npm publish
+**Notes:**
+- Contributor workflow will be documented in CONTRIBUTING.md
+- Production test will be live npm publish
 
 ---
 
-## 4. Potrebni fajlovi
+## 4. Required Files
 
-| Fajl | Status | Prioritet |
-|------|--------|-----------|
+| File | Status | Priority |
+|------|--------|----------|
 | `README.md` | DONE | P0 |
 | `LICENSE` | DONE | P0 |
 | `CHANGELOG.md` | DONE | P0 |
@@ -65,76 +65,113 @@ Različiti config keys, različita imena u UI
 
 ---
 
-## 5. Distribucija
+## 5. Distribution
 
-**Metod:** npm publish (jedini način da se pojavi u Tabby Plugin Manager-u)
+**Method:** npm publish (only way to appear in Tabby Plugin Manager)
 
-**Proces:**
+**Process:**
 ```bash
-# Setup (jednom)
+# Setup (once)
 npm login
 
 # Release
-npm version patch  # ili minor/major
+npm version patch  # or minor/major
 npm publish
 ```
 
 **Pre-publish checklist:**
-- [ ] Verzija bump-ovana
-- [ ] Build radi (`npm run build`)
-- [ ] README ažuriran
-- [ ] CHANGELOG ažuriran
+- [x] Version bumped
+- [x] Build works (`npm run build`)
+- [x] README updated
+- [x] CHANGELOG updated
+
+### Releases
+
+| Version | Date | Status |
+|---------|------|--------|
+| 0.0.1 | 2026-01-03 | ✅ Published to npm |
 
 ---
 
 ## 6. GitHub Repo Setup
 
-- [ ] Kreiraj repo: `github.com/halilc4/tabbyspaces`
-- [ ] Dodaj opis
-- [ ] Dodaj topics: `tabby`, `tabby-plugin`, `terminal`, `workspace`
-- [ ] Uključi Issues
-- [ ] Push koda
+- [x] Create repo: `github.com/halilc4/tabbyspaces`
+- [x] Add description
+- [x] Add topics: `tabby`, `tabby-plugin`, `terminal`, `workspace`
+- [x] Enable Issues
+- [x] Push code
 
 ---
 
-## 7. Redosled akcija
+## 7. Action Sequence
 
 ```
-1. [x] Reši dev workflow → build:dev pristup
-2. [x] Popravi dev vs prod izolaciju (ime u UI)
-3. [x] Testiraj koegzistenciju (maintainer scenario)
-4. [x] Napravi LICENSE (MIT, engleski)
-5. [x] Napravi README.md (engleski, Claude Code attribution, screenshots)
-6. [x] Napravi CHANGELOG.md
-7. [x] Napravi CONTRIBUTING.md
-8. [x] Napravi .github/ISSUE_TEMPLATE/*
-9. [x] Prevedi CLAUDE.md na engleski
-10. [ ] Kreiraj GitHub repo (halilc4/tabbyspaces)
-11. [ ] Push
-12. [ ] npm publish
-13. [ ] Testiraj instalaciju iz Tabby Plugin Manager-a
+1. [x] Solve dev workflow → build:dev approach
+2. [x] Fix dev vs prod isolation (name in UI)
+3. [x] Test coexistence (maintainer scenario)
+4. [x] Create LICENSE (MIT, English)
+5. [x] Create README.md (English, Claude Code attribution, screenshots)
+6. [x] Create CHANGELOG.md
+7. [x] Create CONTRIBUTING.md
+8. [x] Create .github/ISSUE_TEMPLATE/*
+9. [x] Translate CLAUDE.md to English
+10. [x] Create GitHub repo (halilc4/tabbyspaces)
+11. [x] Push
+12. [x] npm publish
+13. [ ] Test installation from Tabby Plugin Manager
 ```
 
 ---
 
-## Odluke
+## Decisions
 
 1. **GitHub username** - `halilc4` → `github.com/halilc4/tabbyspaces`
-2. **CHANGELOG** - DA, vodimo ga
-3. **Jezici** - README i LICENSE na engleskom
-4. **Attribution** - README mora jasno naglasiti:
-   - Kod 100% napisan od Claude Code-a
-   - Igor = ideja i product vision
-   - Igor toliko mrzi Angular da nije ni pogledao kod
+2. **CHANGELOG** - YES, we maintain it
+3. **Languages** - README and LICENSE in English
+4. **Attribution** - README must clearly state:
+   - Code 100% written by Claude Code
+   - Igor = idea and product vision
+   - Igor hates Angular so much he didn't even look at the code
 
 ---
 
-## Otvorena pitanja
+## Open Questions
 
-~~1. **CLAUDE.md jezik** - Prevesti na engleski za contributore?~~ → DA, engleski
+~~1. **CLAUDE.md language** - Translate to English for contributors?~~ → YES, English
 
-## Stil dokumentacije
+---
 
-- Bez mainstream GitHub corporate stila
-- Bez AI slop-a (generic, over-polished)
-- Direktno, iskreno, sa karakterom
+## 8. Final Review (2026-01-03)
+
+**Status:** ✅ PASS
+
+**Reviewed:**
+- [x] Project structure - clean, standard Angular pattern
+- [x] Code - typed, no `any`, readable
+- [x] README.md - clear, with screenshots
+- [x] LICENSE, CONTRIBUTING.md, CHANGELOG.md - complete
+- [x] package.json metadata - repo, bugs, homepage
+- [x] .github/ISSUE_TEMPLATE/* - bug report, feature request
+- [x] Dev/Prod isolation - works
+
+**Conclusion:** Project is ready for public release.
+
+---
+
+## 9. Release 0.0.1 (2026-01-03)
+
+**Status:** ✅ PUBLISHED
+
+- GitHub repo: https://github.com/halilc4/tabbyspaces
+- npm: https://www.npmjs.com/package/tabby-tabbyspaces
+
+**Remaining:**
+- [ ] Test installation from Tabby Plugin Manager
+
+---
+
+## Documentation Style
+
+- No mainstream GitHub corporate style
+- No AI slop (generic, over-polished)
+- Direct, honest, with character
