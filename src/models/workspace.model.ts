@@ -1,3 +1,58 @@
+// Tabby profile interfaces
+export interface TabbyProfileOptions {
+  command?: string
+  args?: string[]
+  cwd?: string
+  env?: Record<string, string>
+  restoreFromPTYID?: boolean
+  width?: number | null
+  height?: number | null
+  pauseAfterExit?: boolean
+  runAsAdministrator?: boolean
+}
+
+export interface TabbyProfile {
+  id: string
+  type: string
+  name: string
+  group?: string
+  icon?: string
+  color?: string
+  options?: TabbyProfileOptions
+  isBuiltin?: boolean
+  isTemplate?: boolean
+  weight?: number
+  disableDynamicTitle?: boolean
+  terminalColorScheme?: string | null
+  behaviorOnSessionEnd?: string
+}
+
+export interface TabbyRecoveryToken {
+  type: string
+  orientation?: 'h' | 'v'
+  ratios?: number[]
+  children?: TabbyRecoveryToken[]
+  profile?: Partial<TabbyProfile>
+  savedState?: boolean
+  tabTitle?: string
+  tabCustomTitle?: string
+  disableDynamicTitle?: boolean
+}
+
+export interface TabbySplitLayoutProfile {
+  id: string
+  type: 'split-layout'
+  name: string
+  group: string
+  icon?: string
+  color?: string
+  isBuiltin: boolean
+  options: {
+    recoveryToken: TabbyRecoveryToken
+  }
+}
+
+// Workspace interfaces
 export interface WorkspacePane {
   id: string
   profileId: string

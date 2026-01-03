@@ -80,9 +80,7 @@ export class SplitPreviewComponent {
   }
 
   getProfileName(profileId: string): string {
-    const profiles = this.workspaceService.getAvailableProfiles()
-    const profile = profiles.find((p) => p.id === profileId)
-    return profile?.name ?? 'Select profile'
+    return this.workspaceService.getProfileName(profileId) ?? 'Select profile'
   }
 
   getPaneLabel(pane: WorkspacePane): string {

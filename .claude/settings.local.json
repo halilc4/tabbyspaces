@@ -6,7 +6,9 @@
       "Bash(gh search:*)",
       "WebSearch",
       "WebFetch(domain:deepwiki.com)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(npm run build:dev:*)",
+      "Bash(wc:*)"
     ]
   }
 }

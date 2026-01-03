@@ -3,6 +3,7 @@ import { ToolbarButtonProvider, ToolbarButton, ProfilesService, AppService } fro
 import { WorkspaceEditorService } from '../services/workspaceEditor.service'
 import { SettingsTabComponent } from 'tabby-settings'
 import { CONFIG_KEY, DISPLAY_NAME } from '../build-config'
+import { countPanes } from '../models/workspace.model'
 
 @Injectable()
 export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
@@ -40,7 +41,7 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
 
     const options = workspaces.map((ws) => ({
       name: ws.name,
-      description: `${this.countPanes(ws.root)} panes`,
+      description: `${countPanes(ws.root)} panes`,
       icon: ws.icon || 'grid',
       color: ws.color,
       result: ws.id
@@ -51,7 +52,7 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
       name: 'Manage Workspaces...',
       description: 'Create and edit workspaces',
       icon: 'cog',
-      color: undefined as any,
+      color: undefined,
       result: '__settings__'
     })
 
@@ -66,13 +67,6 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
 
   private openSettings(): void {
     this.app.openNewTabRaw({ type: SettingsTabComponent, inputs: { activeTab: CONFIG_KEY } })
-  }
-
-  private countPanes(node: any): number {
-    if (node.children) {
-      return node.children.reduce((sum: number, child: any) => sum + this.countPanes(child), 0)
-    }
-    return 1
   }
 
   private openWorkspace(workspaceId: string): void {

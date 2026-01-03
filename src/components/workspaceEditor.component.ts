@@ -3,6 +3,7 @@ import {
   Workspace,
   WorkspacePane,
   WorkspaceSplit,
+  TabbyProfile,
   isWorkspaceSplit,
   createDefaultPane,
   generateUUID,
@@ -21,6 +22,7 @@ export class WorkspaceEditorComponent implements OnInit {
 
   selectedPane: WorkspacePane | null = null
   showPaneEditor = false
+  profiles: TabbyProfile[] = []
   availableIcons = [
     'columns', 'terminal', 'code', 'folder', 'home', 'briefcase',
     'cog', 'database', 'server', 'cloud', 'rocket', 'flask',
@@ -29,7 +31,8 @@ export class WorkspaceEditorComponent implements OnInit {
 
   constructor(private workspaceService: WorkspaceEditorService) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    this.profiles = await this.workspaceService.getAvailableProfiles()
     if (!this.workspace.root) {
       this.workspace.root = {
         orientation: 'horizontal',
@@ -96,10 +99,12 @@ export class WorkspaceEditorComponent implements OnInit {
           return true
         }
       } else if (child.id === targetPane.id) {
+        const newPane = createDefaultPane()
+        newPane.profileId = child.profileId // Copy profile from source pane
         const newSplit: WorkspaceSplit = {
           orientation,
           ratios: [0.5, 0.5],
-          children: [child, createDefaultPane()],
+          children: [child, newPane],
         }
         node.children[i] = newSplit
         this.recalculateRatios(node)
@@ -173,7 +178,4 @@ export class WorkspaceEditorComponent implements OnInit {
     this.workspace.root.ratios = ratios
   }
 
-  getAvailableProfiles(): any[] {
-    return this.workspaceService.getAvailableProfiles()
-  }
 }

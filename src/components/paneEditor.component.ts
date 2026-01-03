@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core'
-import { WorkspacePane } from '../models/workspace.model'
+import { WorkspacePane, TabbyProfile } from '../models/workspace.model'
 
 @Component({
   selector: 'pane-editor',
@@ -8,7 +8,7 @@ import { WorkspacePane } from '../models/workspace.model'
 })
 export class PaneEditorComponent implements OnInit {
   @Input() pane!: WorkspacePane
-  @Input() profiles: any[] = []
+  @Input() profiles: TabbyProfile[] = []
   @Output() save = new EventEmitter<WorkspacePane>()
   @Output() cancel = new EventEmitter<void>()
 
@@ -29,10 +29,5 @@ export class PaneEditorComponent implements OnInit {
   getProfileName(profileId: string): string {
     const profile = this.profiles.find((p) => p.id === profileId)
     return profile?.name ?? 'Unknown'
-  }
-
-  browseDirectory(): void {
-    // Note: In a full implementation, this would use Electron's dialog
-    // For now, users can type the path manually
   }
 }

@@ -78,7 +78,7 @@
 pane-editor(
   *ngIf='showPaneEditor && selectedPane',
   [pane]='selectedPane',
-  [profiles]='getAvailableProfiles()',
+  [profiles]='profiles',
   (save)='onPaneSave($event)',
   (cancel)='closePaneEditor()'
 )

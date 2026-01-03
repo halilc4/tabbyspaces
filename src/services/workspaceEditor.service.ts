@@ -6,6 +6,9 @@ import {
   WorkspaceSplit,
   isWorkspaceSplit,
   generateUUID,
+  TabbyProfile,
+  TabbyRecoveryToken,
+  TabbySplitLayoutProfile,
 } from '../models/workspace.model'
 import { CONFIG_KEY, DISPLAY_NAME } from '../build-config'
 
@@ -21,76 +24,67 @@ export class WorkspaceEditorService {
     return this.config.store[CONFIG_KEY]?.workspaces ?? []
   }
 
-  saveWorkspaces(workspaces: Workspace[]): void {
-    this.config.store[CONFIG_KEY] = {
-      ...this.config.store[CONFIG_KEY],
-      workspaces,
-    }
-    this.config.save()
+  async saveWorkspaces(workspaces: Workspace[]): Promise<boolean> {
+    this.config.store[CONFIG_KEY].workspaces = workspaces
     this.syncTabbyProfiles(workspaces)
+    return await this.saveConfig()
   }
 
-  addWorkspace(workspace: Workspace): void {
+  async addWorkspace(workspace: Workspace): Promise<void> {
     const workspaces = this.getWorkspaces()
     workspaces.push(workspace)
-    this.saveWorkspaces(workspaces)
+    await this.saveWorkspaces(workspaces)
     this.notifications.info(`Workspace "${workspace.name}" created`)
   }
 
-  updateWorkspace(workspace: Workspace): void {
+  async updateWorkspace(workspace: Workspace): Promise<void> {
     const workspaces = this.getWorkspaces()
     const index = workspaces.findIndex((w) => w.id === workspace.id)
     if (index !== -1) {
       workspaces[index] = workspace
-      this.saveWorkspaces(workspaces)
+      await this.saveWorkspaces(workspaces)
       this.notifications.info(`Workspace "${workspace.name}" updated`)
     }
   }
 
-  deleteWorkspace(workspaceId: string): void {
+  async deleteWorkspace(workspaceId: string): Promise<void> {
     const workspaces = this.getWorkspaces()
     const workspace = workspaces.find((w) => w.id === workspaceId)
     const filtered = workspaces.filter((w) => w.id !== workspaceId)
-    this.saveWorkspaces(filtered)
-    this.removeTabbyProfile(workspaceId)
+    await this.saveWorkspaces(filtered)
     if (workspace) {
       this.notifications.info(`Workspace "${workspace.name}" deleted`)
     }
   }
 
-  getAvailableProfiles(): any[] {
-    return this.config.store.profiles?.filter(
-      (p: any) => p.type === 'local'
-    ) ?? []
+  async getAvailableProfiles(): Promise<TabbyProfile[]> {
+    const allProfiles = await this.profilesService.getProfiles()
+    return allProfiles.filter(
+      (p) => p.type === 'local' && !p.id?.startsWith('split-layout:')
+    ) as TabbyProfile[]
   }
 
   private syncTabbyProfiles(workspaces: Workspace[]): void {
-    const profiles = this.config.store.profiles ?? []
+    const profiles: (TabbyProfile | TabbySplitLayoutProfile)[] = this.config.store.profiles ?? []
 
-    // Remove old plugin profiles
-    const filteredProfiles = profiles.filter(
-      (p: any) => !p.id?.startsWith(`split-layout:${CONFIG_KEY}:`)
-    )
+    // Remove old plugin profiles (mutate in place)
+    for (let i = profiles.length - 1; i >= 0; i--) {
+      if (profiles[i].id?.startsWith(`split-layout:${CONFIG_KEY}:`)) {
+        profiles.splice(i, 1)
+      }
+    }
 
     // Add new workspace profiles
     for (const workspace of workspaces) {
       const tabbyProfile = this.generateTabbyProfile(workspace)
-      filteredProfiles.push(tabbyProfile)
+      profiles.push(tabbyProfile)
     }
-
-    this.config.store.profiles = filteredProfiles
   }
 
-  private removeTabbyProfile(workspaceId: string): void {
-    const profiles = this.config.store.profiles ?? []
-    this.config.store.profiles = profiles.filter(
-      (p: any) => !p.id?.includes(workspaceId)
-    )
-  }
-
-  generateTabbyProfile(workspace: Workspace): any {
+  generateTabbyProfile(workspace: Workspace): TabbySplitLayoutProfile {
+    const safeName = this.sanitizeForProfileId(workspace.name)
     return {
-      id: `split-layout:${CONFIG_KEY}:${workspace.name.toLowerCase().replace(/\s+/g, '-')}:${workspace.id}`,
+      id: `split-layout:${CONFIG_KEY}:${safeName}:${workspace.id}`,
       type: 'split-layout',
       name: workspace.name,
       group: DISPLAY_NAME,
@@ -103,7 +97,7 @@ export class WorkspaceEditorService {
     }
   }
 
-  private generateRecoveryToken(split: WorkspaceSplit): any {
+  private generateRecoveryToken(split: WorkspaceSplit): TabbyRecoveryToken {
     return {
       type: 'app:split-tab',
       orientation: split.orientation === 'horizontal' ? 'h' : 'v',
@@ -117,10 +111,8 @@ export class WorkspaceEditorService {
     }
   }
 
-  private generatePaneToken(pane: WorkspacePane): any {
-    const baseProfile = this.getAvailableProfiles().find(
-      (p) => p.id === pane.profileId
-    )
+  private generatePaneToken(pane: WorkspacePane): TabbyRecoveryToken {
+    const baseProfile = this.getProfileById(pane.profileId)
 
     if (!baseProfile) {
       return {
@@ -202,6 +194,35 @@ export class WorkspaceEditorService {
       }
     } else {
       node.id = generateUUID()
+    }
+  }
+
+  private sanitizeForProfileId(name: string): string {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      || 'workspace'
+  }
+
+  private getProfileById(profileId: string): TabbyProfile | undefined {
+    const profiles: TabbyProfile[] = this.config.store.profiles ?? []
+    return profiles.find((p) => p.id === profileId && p.type === 'local')
+  }
+
+  getProfileName(profileId: string): string | undefined {
+    return this.getProfileById(profileId)?.name
+  }
+
+  private async saveConfig(): Promise<boolean> {
+    try {
+      await this.config.save()
+      return true
+    } catch (error) {
+      this.notifications.error('Failed to save configuration')
+      console.error('TabbySpaces save error:', error)
+      return false
     }
   }
 }

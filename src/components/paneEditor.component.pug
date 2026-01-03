@@ -15,14 +15,11 @@
 
       .form-group
         label Working Directory
-        .input-with-button
-          input.form-control(
-            type='text',
-            [(ngModel)]='editedPane.cwd',
-            placeholder='C:\\path\\to\\project'
-          )
-          //- button.btn.btn-secondary(type='button', (click)='browseDirectory()')
-          //-   i.fas.fa-folder-open
+        input.form-control(
+          type='text',
+          [(ngModel)]='editedPane.cwd',
+          placeholder='C:\\path\\to\\project'
+        )
 
       .form-group
         label Startup Command
