@@ -2,6 +2,25 @@
 
 Visual split-layout workspace editor for Tabby.
 
+## Git Workflow
+
+- **main** - Stable releases only. Do not commit directly.
+- **dev** - Active development. All work happens here.
+
+```bash
+# Normal workflow
+git checkout dev        # Work on dev
+# ... make changes ...
+git commit
+
+# Release workflow
+git checkout main
+git merge dev
+git tag v0.x.0
+git push --tags
+git checkout dev        # Back to work
+```
+
 ## Tech Stack
 
 - **Framework**: Angular 15 (Tabby uses Angular 15)
