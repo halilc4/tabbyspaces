@@ -18,8 +18,9 @@ import {
 })
 export class WorkspaceListComponent implements OnInit, OnDestroy {
   workspaces: Workspace[] = []
+  selectedWorkspace: Workspace | null = null
   editingWorkspace: Workspace | null = null
-  showEditor = false
+  isCreatingNew = false
   private configSubscription: Subscription | null = null
 
   constructor(
@@ -30,9 +31,26 @@ export class WorkspaceListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadWorkspaces()
+    this.autoSelectFirst()
     this.configSubscription = this.config.changed$.subscribe(() => {
       this.loadWorkspaces()
     })
+  }
+
+  private autoSelectFirst(): void {
+    if (this.workspaces.length > 0 && !this.selectedWorkspace) {
+      this.selectWorkspace(this.workspaces[0])
+    }
+  }
+
+  selectWorkspace(workspace: Workspace): void {
+    this.isCreatingNew = false
+    this.selectedWorkspace = workspace
+    this.editingWorkspace = JSON.parse(JSON.stringify(workspace))
+  }
+
+  isSelected(workspace: Workspace): boolean {
+    return this.selectedWorkspace?.id === workspace.id
   }
 
   ngOnDestroy(): void {
@@ -49,8 +67,9 @@ export class WorkspaceListComponent implements OnInit, OnDestroy {
     const defaultProfileId = profiles[0]?.id || ''
     const workspace = createDefaultWorkspace()
     this.setProfileForAllPanes(workspace.root, defaultProfileId)
+    this.selectedWorkspace = null
     this.editingWorkspace = workspace
-    this.showEditor = true
+    this.isCreatingNew = true
   }
 
   private setProfileForAllPanes(node: WorkspacePane | WorkspaceSplit, profileId: string): void {
@@ -62,8 +81,7 @@ export class WorkspaceListComponent implements OnInit, OnDestroy {
   }
 
   editWorkspace(workspace: Workspace): void {
-    this.editingWorkspace = JSON.parse(JSON.stringify(workspace))
-    this.showEditor = true
+    this.selectWorkspace(workspace)
   }
 
   async duplicateWorkspace(workspace: Workspace): Promise<void> {
@@ -73,38 +91,55 @@ export class WorkspaceListComponent implements OnInit, OnDestroy {
   }
 
   async deleteWorkspace(workspace: Workspace): Promise<void> {
-    console.log('[TabbySpaces] deleteWorkspace called', workspace.id)
     if (confirm(`Delete workspace "${workspace.name}"?`)) {
-      console.log('[TabbySpaces] confirm = true, calling service.deleteWorkspace')
+      const currentIndex = this.workspaces.findIndex((w) => w.id === workspace.id)
       await this.workspaceService.deleteWorkspace(workspace.id)
-      console.log('[TabbySpaces] service.deleteWorkspace done, calling loadWorkspaces')
       this.loadWorkspaces()
-      console.log('[TabbySpaces] loadWorkspaces done, workspaces:', this.workspaces.length)
+
+      // Select next workspace after deletion
+      if (this.workspaces.length > 0) {
+        const nextIndex = Math.min(currentIndex, this.workspaces.length - 1)
+        this.selectWorkspace(this.workspaces[nextIndex])
+      } else {
+        this.selectedWorkspace = null
+        this.editingWorkspace = null
+        this.isCreatingNew = false
+      }
     }
   }
 
   async onEditorSave(workspace: Workspace): Promise<void> {
-    console.log('[TabbySpaces] onEditorSave called', workspace.id, workspace.name)
-    const existing = this.workspaces.find((w) => w.id === workspace.id)
-    console.log('[TabbySpaces] existing workspace?', !!existing)
-    if (existing) {
-      await this.workspaceService.updateWorkspace(workspace)
-    } else {
+    const isNew = !this.workspaces.find((w) => w.id === workspace.id)
+    if (isNew) {
       await this.workspaceService.addWorkspace(workspace)
+    } else {
+      await this.workspaceService.updateWorkspace(workspace)
     }
-    console.log('[TabbySpaces] save done, calling loadWorkspaces')
     this.loadWorkspaces()
-    console.log('[TabbySpaces] calling closeEditor')
-    this.closeEditor()
-    console.log('[TabbySpaces] closeEditor done, showEditor:', this.showEditor)
+    this.isCreatingNew = false
+
+    // Select the saved workspace
+    const saved = this.workspaces.find((w) => w.id === workspace.id)
+    if (saved) {
+      this.selectWorkspace(saved)
+    }
   }
 
-  closeEditor(): void {
-    console.log('[TabbySpaces] closeEditor called, showEditor before:', this.showEditor)
-    this.showEditor = false
-    this.editingWorkspace = null
+  onEditorCancel(): void {
+    if (this.isCreatingNew) {
+      // Cancel new workspace creation - go back to first workspace or empty
+      this.isCreatingNew = false
+      if (this.workspaces.length > 0) {
+        this.selectWorkspace(this.workspaces[0])
+      } else {
+        this.selectedWorkspace = null
+        this.editingWorkspace = null
+      }
+    } else if (this.selectedWorkspace) {
+      // Reset to original workspace data
+      this.editingWorkspace = JSON.parse(JSON.stringify(this.selectedWorkspace))
+    }
     this.cdr.detectChanges()
-    console.log('[TabbySpaces] closeEditor done, showEditor after:', this.showEditor)
   }
 
   getPaneCount(workspace: Workspace): number {

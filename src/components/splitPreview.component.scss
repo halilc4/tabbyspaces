@@ -1,9 +1,9 @@
 .split-preview {
   display: flex;
   width: 100%;
-  min-height: 200px;
+  height: 140px;
   gap: 4px;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
   background: var(--theme-bg-more);
   border: 1px solid var(--theme-border);
@@ -26,7 +26,7 @@
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
-  min-height: 80px;
+  min-height: 50px;
 
   &:hover {
     background: var(--theme-primary);
@@ -43,18 +43,18 @@
 
 .pane-content {
   text-align: center;
-  padding: 12px;
+  padding: 8px;
   color: var(--theme-fg);
 }
 
 .pane-label {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .pane-hint {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   opacity: 0.5;
   transition: opacity 0.2s;
 }

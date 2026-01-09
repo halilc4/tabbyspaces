@@ -29,10 +29,18 @@
   background: var(--theme-bg-more);
   border-radius: 8px;
   border: 1px solid var(--theme-border);
-  transition: background 0.2s;
+  transition: background 0.2s, border-color 0.2s;
+  cursor: pointer;
 
   &:hover {
     background: var(--theme-bg-more-more);
+  }
+
+  &.selected {
+    border-color: var(--theme-primary);
+    border-left-width: 3px;
+    background: var(--theme-bg-more-more);
+    box-shadow: 0 0 0 1px var(--theme-primary) inset;
   }
 }
 

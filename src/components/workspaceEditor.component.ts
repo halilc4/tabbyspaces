@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core'
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, HostListener, ElementRef } from '@angular/core'
 import {
   Workspace,
   WorkspacePane,
@@ -15,8 +15,9 @@ import { WorkspaceEditorService } from '../services/workspaceEditor.service'
   template: require('./workspaceEditor.component.pug'),
   styles: [require('./workspaceEditor.component.scss')],
 })
-export class WorkspaceEditorComponent implements OnInit {
+export class WorkspaceEditorComponent implements OnInit, OnChanges {
   @Input() workspace!: Workspace
+  @Input() inline = false
   @Output() save = new EventEmitter<Workspace>()
   @Output() cancel = new EventEmitter<void>()
 
@@ -28,11 +29,46 @@ export class WorkspaceEditorComponent implements OnInit {
     'cog', 'database', 'server', 'cloud', 'rocket', 'flask',
     'bug', 'wrench', 'cube', 'layer-group', 'sitemap', 'project-diagram'
   ]
+  iconDropdownOpen = false
 
-  constructor(private workspaceService: WorkspaceEditorService) {}
+  constructor(
+    private workspaceService: WorkspaceEditorService,
+    private elementRef: ElementRef
+  ) {}
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const iconPicker = this.elementRef.nativeElement.querySelector('.icon-picker')
+    if (iconPicker && !iconPicker.contains(event.target as Node)) {
+      this.iconDropdownOpen = false
+    }
+  }
+
+  toggleIconDropdown(): void {
+    this.iconDropdownOpen = !this.iconDropdownOpen
+  }
+
+  selectIcon(icon: string): void {
+    this.workspace.icon = icon
+    this.iconDropdownOpen = false
+  }
 
   async ngOnInit(): Promise<void> {
     this.profiles = await this.workspaceService.getAvailableProfiles()
+    this.initializeWorkspace()
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['workspace'] && !changes['workspace'].firstChange) {
+      // Reset component state when workspace input changes
+      this.selectedPane = null
+      this.showPaneEditor = false
+      this.iconDropdownOpen = false
+      this.initializeWorkspace()
+    }
+  }
+
+  private initializeWorkspace(): void {
     if (!this.workspace.root) {
       this.workspace.root = {
         orientation: 'horizontal',

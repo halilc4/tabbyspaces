@@ -1,4 +1,5 @@
-.workspace-editor-overlay((click)='onCancel()')
+//- Modal mode (overlay)
+.workspace-editor-overlay(*ngIf='!inline', (click)='onCancel()')
   .workspace-editor-modal((click)='$event.stopPropagation()')
     .modal-header
       h4 {{ workspace.id ? 'Edit' : 'New' }} Workspace
@@ -6,68 +7,7 @@
         i.fas.fa-times
 
     .modal-body
-      .form-row
-        .form-group.flex-grow
-          label Name
-          input.form-control(
-            type='text',
-            [(ngModel)]='workspace.name',
-            placeholder='Workspace name'
-          )
-
-      .form-row
-        .form-group
-          label Icon
-          .icon-selector
-            button.icon-option(
-              *ngFor='let icon of availableIcons',
-              type='button',
-              [class.selected]='workspace.icon === icon',
-              (click)='workspace.icon = icon'
-            )
-              i.fas([class]='"fa-" + icon')
-
-        .form-group
-          label Color
-          input.form-control.color-input(
-            type='color',
-            [(ngModel)]='workspace.color'
-          )
-
-      .form-row
-        .form-group
-          label
-            input(type='checkbox', [(ngModel)]='workspace.isDefault')
-            |  Launch on startup
-
-      .form-section
-        .section-header
-          h5 Layout Preview
-          .orientation-toggle
-            button.btn.btn-sm(
-              type='button',
-              [class.btn-primary]='workspace.root.orientation === "horizontal"',
-              [class.btn-outline-secondary]='workspace.root.orientation !== "horizontal"',
-              (click)='setOrientation("horizontal")'
-            )
-              i.fas.fa-arrows-alt-h
-              |  Horizontal
-            button.btn.btn-sm(
-              type='button',
-              [class.btn-primary]='workspace.root.orientation === "vertical"',
-              [class.btn-outline-secondary]='workspace.root.orientation !== "vertical"',
-              (click)='setOrientation("vertical")'
-            )
-              i.fas.fa-arrows-alt-v
-              |  Vertical
-
-        split-preview(
-          [split]='workspace.root',
-          (paneClick)='selectPane($event)',
-          (splitHorizontal)='splitPane($event, "horizontal")',
-          (splitVertical)='splitPane($event, "vertical")',
-          (removePane)='removePane($event)'
-        )
+      ng-container(*ngTemplateOutlet='editorContent')
 
     .modal-footer
       button.btn.btn-secondary(type='button', (click)='onCancel()') Cancel
@@ -75,6 +15,87 @@
         i.fas.fa-save
         |  Save Workspace
 
+//- Inline mode
+.workspace-editor-inline(*ngIf='inline')
+  .editor-body
+    ng-container(*ngTemplateOutlet='editorContent')
+
+  .editor-footer
+    label.startup-checkbox
+      input(type='checkbox', [(ngModel)]='workspace.isDefault')
+      |  Launch on startup
+    .editor-actions
+      button.btn.btn-secondary.btn-sm(type='button', (click)='onCancel()') Cancel
+      button.btn.btn-primary.btn-sm(type='button', (click)='onSave()', [disabled]='!workspace.name?.trim()')
+        i.fas.fa-save
+        |  Save
+
+//- Shared editor content
+ng-template(#editorContent)
+  //- Top row: Color picker, Name input, Icon grid
+  .editor-top-row
+    .color-picker
+      input.color-input(
+        type='color',
+        [(ngModel)]='workspace.color',
+        title='Workspace color'
+      )
+
+    input.name-input(
+      type='text',
+      [(ngModel)]='workspace.name',
+      placeholder='Workspace name'
+    )
+
+    .icon-picker
+      button.icon-trigger(
+        type='button',
+        [style.color]='workspace.color',
+        (click)='toggleIconDropdown()',
+        title='Select icon'
+      )
+        i.fas([class]='"fa-" + workspace.icon')
+
+      .icon-dropdown(*ngIf='iconDropdownOpen')
+        button.icon-option(
+          *ngFor='let icon of availableIcons',
+          type='button',
+          [class.selected]='workspace.icon === icon',
+          [style.color]='workspace.icon === icon ? workspace.color : null',
+          (click)='selectIcon(icon)'
+        )
+          i.fas([class]='"fa-" + icon')
+
+  //- Layout section
+  .layout-section
+    .layout-header
+      span.layout-title Layout
+      .orientation-toggle
+        button.btn.btn-xs(
+          type='button',
+          [class.active]='workspace.root.orientation === "horizontal"',
+          (click)='setOrientation("horizontal")',
+          title='Horizontal split'
+        )
+          i.fas.fa-arrows-alt-h
+        button.btn.btn-xs(
+          type='button',
+          [class.active]='workspace.root.orientation === "vertical"',
+          (click)='setOrientation("vertical")',
+          title='Vertical split'
+        )
+          i.fas.fa-arrows-alt-v
+
+    .layout-preview-container
+      split-preview(
+        [split]='workspace.root',
+        (paneClick)='selectPane($event)',
+        (splitHorizontal)='splitPane($event, "horizontal")',
+        (splitVertical)='splitPane($event, "vertical")',
+        (removePane)='removePane($event)'
+      )
+
+//- Pane editor (always modal)
 pane-editor(
   *ngIf='showPaneEditor && selectedPane',
   [pane]='selectedPane',

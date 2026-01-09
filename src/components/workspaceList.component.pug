@@ -5,8 +5,22 @@
       i.fas.fa-plus
       |  New Workspace
 
+  //- Inline editor (above list)
+  workspace-editor(
+    *ngIf='editingWorkspace',
+    [workspace]='editingWorkspace',
+    [inline]='true',
+    (save)='onEditorSave($event)',
+    (cancel)='onEditorCancel()'
+  )
+
+  //- Workspace list
   .workspace-list(*ngIf='workspaces.length > 0')
-    .workspace-item(*ngFor='let workspace of workspaces')
+    .workspace-item(
+      *ngFor='let workspace of workspaces',
+      [class.selected]='isSelected(workspace)',
+      (click)='selectWorkspace(workspace)'
+    )
       .workspace-info
         .workspace-icon([style.color]='workspace.color')
           i.fas([class]='"fa-" + (workspace.icon || "columns")')
@@ -23,24 +37,16 @@
         button.btn.btn-link(
           type='button',
           title='Set as default',
-          (click)='setAsDefault(workspace)',
+          (click)='setAsDefault(workspace); $event.stopPropagation()',
           [class.active]='workspace.isDefault'
         )
           i.fas.fa-star
-        button.btn.btn-link(type='button', title='Duplicate', (click)='duplicateWorkspace(workspace)')
+        button.btn.btn-link(type='button', title='Duplicate', (click)='duplicateWorkspace(workspace); $event.stopPropagation()')
           i.fas.fa-copy
-        button.btn.btn-link(type='button', title='Edit', (click)='editWorkspace(workspace)')
-          i.fas.fa-edit
-        button.btn.btn-link.text-danger(type='button', title='Delete', (click)='deleteWorkspace(workspace)')
+        button.btn.btn-link.text-danger(type='button', title='Delete', (click)='deleteWorkspace(workspace); $event.stopPropagation()')
           i.fas.fa-trash
 
-  .workspace-empty(*ngIf='workspaces.length === 0')
+  //- Empty state
+  .workspace-empty(*ngIf='workspaces.length === 0 && !isCreatingNew')
     p No workspaces configured yet.
     p Click "New Workspace" to create your first split-layout workspace.
-
-workspace-editor(
-  *ngIf='showEditor',
-  [workspace]='editingWorkspace',
-  (save)='onEditorSave($event)',
-  (cancel)='closeEditor()'
-)
