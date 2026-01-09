@@ -8,14 +8,9 @@
   ],
   "main": "dist/index.js",
   "type": "commonjs",
-  "dependencies": {
-    "tabby-core": "^1.0.197-nightly.1",
-    "tabby-settings": "^1.0.197-nightly.1",
-    "tabby-terminal": "^1.0.197-nightly.1"
-  },
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "webpack --mode production",
+    "build": "node scripts/build-prod.js",
     "build:dev": "node scripts/build-dev.js",
     "watch": "webpack --mode development --watch",
     "watch:dev": "webpack --mode development --watch --env dev --output-path dist-dev"
