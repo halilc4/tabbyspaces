@@ -130,8 +130,18 @@ Linux:    ~/.config/tabby/plugins
 
 ### Production install
 ```bash
+# Via Tabby Plugin Manager (Settings → Plugins → search "tabbyspaces")
+# Or via npm:
 cd <plugins-folder>
 npm install tabby-tabbyspaces
+```
+
+### Production uninstall
+```bash
+# Via Tabby Plugin Manager
+# Or via npm:
+cd <plugins-folder>
+npm uninstall tabby-tabbyspaces
 ```
 
 ## Development
@@ -141,16 +151,24 @@ npm install tabby-tabbyspaces
 npm run build:dev
 cd %APPDATA%\tabby\plugins
 npm install "<path-to-repo>/dist-dev"
+# Restart Tabby
+```
+
+### Dev uninstall
+```bash
+cd %APPDATA%\tabby\plugins
+npm uninstall tabby-tabbyspaces-dev
+# Restart Tabby
 ```
 
 ### Dev workflow (after install)
 ```bash
-npm run build:dev   # Initial build (creates dist-dev/package.json)
+npm run build:dev   # Rebuild
 npm run watch:dev   # Watch mode - rebuilds on file changes
-# restart Tabby after each rebuild
+# Restart Tabby after each rebuild
 ```
 
-npm auto-creates symlinks for local packages, so each build is immediately available.
+npm creates symlinks for local packages, so each build is immediately available.
 
 ### Dev vs Prod Isolation
 
