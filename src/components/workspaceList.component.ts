@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core'
+import { Component, OnInit, OnDestroy, AfterViewInit, ChangeDetectorRef, ElementRef } from '@angular/core'
 import { ConfigService, ProfilesService } from 'tabby-core'
 import { Subscription } from 'rxjs'
 import { StartupCommandService } from '../services/startupCommand.service'
@@ -17,7 +17,7 @@ import {
   template: require('./workspaceList.component.pug'),
   styles: [require('./workspaceList.component.scss')],
 })
-export class WorkspaceListComponent implements OnInit, OnDestroy {
+export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit {
   workspaces: Workspace[] = []
   selectedWorkspace: Workspace | null = null
   editingWorkspace: Workspace | null = null
@@ -30,7 +30,8 @@ export class WorkspaceListComponent implements OnInit, OnDestroy {
     private workspaceService: WorkspaceEditorService,
     private profilesService: ProfilesService,
     private startupService: StartupCommandService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
@@ -39,6 +40,16 @@ export class WorkspaceListComponent implements OnInit, OnDestroy {
     this.configSubscription = this.config.changed$.subscribe(() => {
       this.loadWorkspaces()
     })
+  }
+
+  ngAfterViewInit(): void {
+    // Hack: Override Tabby's settings-tab-body max-width restriction
+    setTimeout(() => {
+      const parent = this.elementRef.nativeElement.closest('settings-tab-body') as HTMLElement
+      if (parent) {
+        parent.style.maxWidth = '1024px'
+      }
+    }, 0)
   }
 
   private autoSelectFirst(): void {
