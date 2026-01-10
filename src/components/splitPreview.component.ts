@@ -14,10 +14,16 @@ import { WorkspaceEditorService } from '../services/workspaceEditor.service'
 export class SplitPreviewComponent {
   @Input() split!: WorkspaceSplit
   @Input() depth = 0
-  @Output() paneClick = new EventEmitter<WorkspacePane>()
+  @Input() selectedPaneId: string | null = null
+  @Output() paneSelect = new EventEmitter<WorkspacePane>()
+  @Output() paneEdit = new EventEmitter<WorkspacePane>()
   @Output() splitHorizontal = new EventEmitter<WorkspacePane>()
   @Output() splitVertical = new EventEmitter<WorkspacePane>()
   @Output() removePane = new EventEmitter<WorkspacePane>()
+  @Output() addLeft = new EventEmitter<WorkspacePane>()
+  @Output() addRight = new EventEmitter<WorkspacePane>()
+  @Output() addTop = new EventEmitter<WorkspacePane>()
+  @Output() addBottom = new EventEmitter<WorkspacePane>()
 
   contextMenuPane: WorkspacePane | null = null
   contextMenuPosition = { x: 0, y: 0 }
@@ -45,7 +51,18 @@ export class SplitPreviewComponent {
   }
 
   onPaneClick(pane: WorkspacePane): void {
-    this.paneClick.emit(pane)
+    this.paneSelect.emit(pane)
+  }
+
+  onEditClick(event: MouseEvent, pane: WorkspacePane): void {
+    event.stopPropagation()
+    this.paneEdit.emit(pane)
+  }
+
+  truncate(text: string, maxLength: number): string {
+    return text.length > maxLength
+      ? text.substring(0, maxLength) + '...'
+      : text
   }
 
   onContextMenu(event: MouseEvent, pane: WorkspacePane): void {
@@ -58,6 +75,13 @@ export class SplitPreviewComponent {
     this.contextMenuPane = null
   }
 
+  onEdit(): void {
+    if (this.contextMenuPane) {
+      this.paneEdit.emit(this.contextMenuPane)
+      this.closeContextMenu()
+    }
+  }
+
   onSplitH(): void {
     if (this.contextMenuPane) {
       this.splitHorizontal.emit(this.contextMenuPane)
@@ -68,6 +92,34 @@ export class SplitPreviewComponent {
   onSplitV(): void {
     if (this.contextMenuPane) {
       this.splitVertical.emit(this.contextMenuPane)
+      this.closeContextMenu()
+    }
+  }
+
+  onAddLeft(): void {
+    if (this.contextMenuPane) {
+      this.addLeft.emit(this.contextMenuPane)
+      this.closeContextMenu()
+    }
+  }
+
+  onAddRight(): void {
+    if (this.contextMenuPane) {
+      this.addRight.emit(this.contextMenuPane)
+      this.closeContextMenu()
+    }
+  }
+
+  onAddTop(): void {
+    if (this.contextMenuPane) {
+      this.addTop.emit(this.contextMenuPane)
+      this.closeContextMenu()
+    }
+  }
+
+  onAddBottom(): void {
+    if (this.contextMenuPane) {
+      this.addBottom.emit(this.contextMenuPane)
       this.closeContextMenu()
     }
   }
@@ -93,8 +145,12 @@ export class SplitPreviewComponent {
   }
 
   // Pass-through events from nested splits
-  onNestedPaneClick(pane: WorkspacePane): void {
-    this.paneClick.emit(pane)
+  onNestedPaneSelect(pane: WorkspacePane): void {
+    this.paneSelect.emit(pane)
+  }
+
+  onNestedPaneEdit(pane: WorkspacePane): void {
+    this.paneEdit.emit(pane)
   }
 
   onNestedSplitH(pane: WorkspacePane): void {
@@ -103,6 +159,22 @@ export class SplitPreviewComponent {
 
   onNestedSplitV(pane: WorkspacePane): void {
     this.splitVertical.emit(pane)
+  }
+
+  onNestedAddLeft(pane: WorkspacePane): void {
+    this.addLeft.emit(pane)
+  }
+
+  onNestedAddRight(pane: WorkspacePane): void {
+    this.addRight.emit(pane)
+  }
+
+  onNestedAddTop(pane: WorkspacePane): void {
+    this.addTop.emit(pane)
+  }
+
+  onNestedAddBottom(pane: WorkspacePane): void {
+    this.addBottom.emit(pane)
   }
 
   onNestedRemove(pane: WorkspacePane): void {

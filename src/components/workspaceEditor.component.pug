@@ -57,35 +57,97 @@ ng-template(#editorContent)
   .layout-section
     .layout-header
       span.layout-title Layout
-      .orientation-toggle
-        button.btn.btn-xs(
+
+    .layout-toolbar
+      .toolbar-group
+        button.toolbar-btn(
           type='button',
-          [class.active]='workspace.root.orientation === "horizontal"',
-          (click)='setOrientation("horizontal")',
-          title='Horizontal split'
+          [disabled]='!selectedPaneId',
+          (click)='editSelectedPane()',
+          title='Edit pane'
+        )
+          i.fas.fa-pen
+
+      .toolbar-divider
+
+      .toolbar-group.split-group
+        button.toolbar-btn(
+          type='button',
+          [disabled]='!selectedPaneId',
+          (click)='splitSelectedPane("horizontal")',
+          title='Split Horizontal'
         )
           i.fas.fa-arrows-alt-h
-        button.btn.btn-xs(
+        button.toolbar-btn(
           type='button',
-          [class.active]='workspace.root.orientation === "vertical"',
-          (click)='setOrientation("vertical")',
-          title='Vertical split'
+          [disabled]='!selectedPaneId',
+          (click)='splitSelectedPane("vertical")',
+          title='Split Vertical'
         )
           i.fas.fa-arrows-alt-v
 
-    .layout-preview-container
+      .toolbar-divider
+
+      .toolbar-group.add-group
+        button.toolbar-btn(
+          type='button',
+          [disabled]='!selectedPaneId',
+          (click)='addPane("left")',
+          title='Add Left'
+        )
+          i.fas.fa-caret-left
+        button.toolbar-btn(
+          type='button',
+          [disabled]='!selectedPaneId',
+          (click)='addPane("right")',
+          title='Add Right'
+        )
+          i.fas.fa-caret-right
+        button.toolbar-btn(
+          type='button',
+          [disabled]='!selectedPaneId',
+          (click)='addPane("top")',
+          title='Add Top'
+        )
+          i.fas.fa-caret-up
+        button.toolbar-btn(
+          type='button',
+          [disabled]='!selectedPaneId',
+          (click)='addPane("bottom")',
+          title='Add Bottom'
+        )
+          i.fas.fa-caret-down
+
+      .toolbar-divider
+
+      .toolbar-group
+        button.toolbar-btn.danger(
+          type='button',
+          [disabled]='!selectedPaneId || !canRemovePane()',
+          (click)='removeSelectedPane()',
+          title='Remove pane'
+        )
+          i.fas.fa-trash
+
+    .layout-preview-container((click)='onPreviewBackgroundClick()')
       split-preview(
         [split]='workspace.root',
-        (paneClick)='selectPane($event)',
+        [selectedPaneId]='selectedPaneId',
+        (paneSelect)='selectPane($event)',
+        (paneEdit)='editPane($event)',
         (splitHorizontal)='splitPane($event, "horizontal")',
         (splitVertical)='splitPane($event, "vertical")',
+        (addLeft)='addPaneFromEvent($event, "left")',
+        (addRight)='addPaneFromEvent($event, "right")',
+        (addTop)='addPaneFromEvent($event, "top")',
+        (addBottom)='addPaneFromEvent($event, "bottom")',
         (removePane)='removePane($event)'
       )
 
 //- Pane editor (always modal)
 pane-editor(
-  *ngIf='showPaneEditor && selectedPane',
-  [pane]='selectedPane',
+  *ngIf='showPaneEditor && editingPane',
+  [pane]='editingPane',
   [profiles]='profiles',
   (save)='onPaneSave($event)',
   (cancel)='closePaneEditor()'

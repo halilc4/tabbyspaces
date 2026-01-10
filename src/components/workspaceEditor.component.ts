@@ -25,7 +25,8 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
 
   @ViewChild('nameInput') nameInput!: ElementRef<HTMLInputElement>
 
-  selectedPane: WorkspacePane | null = null
+  selectedPaneId: string | null = null
+  editingPane: WorkspacePane | null = null
   showPaneEditor = false
   profiles: TabbyProfile[] = []
   availableIcons = [
@@ -74,7 +75,8 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['workspace'] && !changes['workspace'].firstChange) {
       // Reset component state when workspace input changes
-      this.selectedPane = null
+      this.selectedPaneId = null
+      this.editingPane = null
       this.showPaneEditor = false
       this.iconDropdownOpen = false
       this.initializeWorkspace()
@@ -110,18 +112,63 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
   }
 
   selectPane(pane: WorkspacePane): void {
-    this.selectedPane = pane
+    this.selectedPaneId = pane.id
+  }
+
+  deselectPane(): void {
+    this.selectedPaneId = null
+  }
+
+  onPreviewBackgroundClick(): void {
+    this.deselectPane()
+  }
+
+  editPane(pane: WorkspacePane): void {
+    this.editingPane = pane
     this.showPaneEditor = true
+  }
+
+  editSelectedPane(): void {
+    if (!this.selectedPaneId) return
+    const pane = this.findPaneById(this.selectedPaneId)
+    if (pane) this.editPane(pane)
   }
 
   closePaneEditor(): void {
     this.showPaneEditor = false
-    this.selectedPane = null
+    this.editingPane = null
   }
 
   onPaneSave(pane: WorkspacePane): void {
     this.updatePaneInTree(this.workspace.root, pane)
     this.closePaneEditor()
+  }
+
+  // Helper functions
+  private findPaneById(id: string): WorkspacePane | null {
+    return this.findPaneInNode(this.workspace.root, id)
+  }
+
+  private findPaneInNode(node: WorkspaceSplit, id: string): WorkspacePane | null {
+    for (const child of node.children) {
+      if (isWorkspaceSplit(child)) {
+        const found = this.findPaneInNode(child, id)
+        if (found) return found
+      } else if (child.id === id) {
+        return child
+      }
+    }
+    return null
+  }
+
+  canRemovePane(): boolean {
+    return this.countPanes(this.workspace.root) > 1
+  }
+
+  private countPanes(node: WorkspaceSplit): number {
+    return node.children.reduce((count, child) => {
+      return count + (isWorkspaceSplit(child) ? this.countPanes(child) : 1)
+    }, 0)
   }
 
   private updatePaneInTree(node: WorkspaceSplit, updatedPane: WorkspacePane): boolean {
@@ -141,6 +188,12 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
 
   splitPane(pane: WorkspacePane, orientation: 'horizontal' | 'vertical'): void {
     this.splitPaneInTree(this.workspace.root, pane, orientation)
+  }
+
+  splitSelectedPane(orientation: 'horizontal' | 'vertical'): void {
+    if (!this.selectedPaneId) return
+    const pane = this.findPaneById(this.selectedPaneId)
+    if (pane) this.splitPane(pane, orientation)
   }
 
   private splitPaneInTree(
@@ -171,7 +224,16 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
   }
 
   removePane(pane: WorkspacePane): void {
+    if (this.selectedPaneId === pane.id) {
+      this.selectedPaneId = null
+    }
     this.removePaneFromTree(this.workspace.root, pane)
+  }
+
+  removeSelectedPane(): void {
+    if (!this.selectedPaneId || !this.canRemovePane()) return
+    const pane = this.findPaneById(this.selectedPaneId)
+    if (pane) this.removePane(pane)
   }
 
   private removePaneFromTree(node: WorkspaceSplit, targetPane: WorkspacePane): boolean {
@@ -232,6 +294,70 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
     })
 
     this.workspace.root.ratios = ratios
+  }
+
+  // Add pane operations
+  addPane(direction: 'left' | 'right' | 'top' | 'bottom'): void {
+    if (!this.selectedPaneId) return
+    const pane = this.findPaneById(this.selectedPaneId)
+    if (!pane) return
+    this.addPaneInTree(this.workspace.root, pane, direction, null)
+  }
+
+  addPaneFromEvent(pane: WorkspacePane, direction: 'left' | 'right' | 'top' | 'bottom'): void {
+    this.addPaneInTree(this.workspace.root, pane, direction, null)
+  }
+
+  private addPaneInTree(
+    node: WorkspaceSplit,
+    targetPane: WorkspacePane,
+    direction: 'left' | 'right' | 'top' | 'bottom',
+    parentNode: WorkspaceSplit | null
+  ): boolean {
+    const isHorizontalAdd = direction === 'left' || direction === 'right'
+    const isBefore = direction === 'left' || direction === 'top'
+    const targetOrientation = isHorizontalAdd ? 'horizontal' : 'vertical'
+
+    for (let i = 0; i < node.children.length; i++) {
+      const child = node.children[i]
+
+      if (isWorkspaceSplit(child)) {
+        if (this.addPaneInTree(child, targetPane, direction, node)) return true
+      } else if (child.id === targetPane.id) {
+        const newPane = createDefaultPane()
+        newPane.profileId = child.profileId
+
+        if (node.orientation === targetOrientation) {
+          // Same orientation: add as sibling
+          const insertIndex = isBefore ? i : i + 1
+          node.children.splice(insertIndex, 0, newPane)
+          this.recalculateRatios(node)
+        } else {
+          // Different orientation: wrap entire node in new split
+          const nodeCopy: WorkspaceSplit = {
+            orientation: node.orientation,
+            ratios: [...node.ratios],
+            children: [...node.children]
+          }
+          const wrapper: WorkspaceSplit = {
+            orientation: targetOrientation,
+            ratios: [0.5, 0.5],
+            children: isBefore ? [newPane, nodeCopy] : [nodeCopy, newPane]
+          }
+
+          if (node === this.workspace.root) {
+            this.workspace.root = wrapper
+          } else if (parentNode) {
+            const nodeIndex = parentNode.children.indexOf(node)
+            if (nodeIndex !== -1) {
+              parentNode.children[nodeIndex] = wrapper
+            }
+          }
+        }
+        return true
+      }
+    }
+    return false
   }
 
 }

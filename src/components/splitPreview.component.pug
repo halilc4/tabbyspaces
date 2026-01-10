@@ -1,25 +1,49 @@
-.split-preview([class.horizontal]='split.orientation === "horizontal"', [class.vertical]='split.orientation === "vertical"')
+.split-preview([class.horizontal]='split.orientation === "horizontal"', [class.vertical]='split.orientation === "vertical"', [class.nested]='depth > 0')
   ng-container(*ngFor='let child of split.children; let i = index')
     //- Pane
     .preview-pane(
       *ngIf='isPane(child)',
       [style.flex-basis]='getFlexStyle(i)',
-      (click)='onPaneClick(asPane(child))',
+      [class.selected]='asPane(child).id === selectedPaneId',
+      (click)='onPaneClick(asPane(child)); $event.stopPropagation()',
       (contextmenu)='onContextMenu($event, asPane(child))'
     )
       .pane-content
-        .pane-label {{ getPaneLabel(asPane(child)) }}
-        .pane-hint Click to edit
+        .pane-title(*ngIf='asPane(child).title')
+          | {{ asPane(child).title }}
+        .pane-profile(*ngIf='!asPane(child).title')
+          | {{ getProfileName(asPane(child).profileId) }}
+        .pane-details
+          .pane-detail(*ngIf='asPane(child).cwd', [title]='asPane(child).cwd')
+            i.fas.fa-folder
+            span {{ truncate(asPane(child).cwd, 20) }}
+          .pane-detail(*ngIf='asPane(child).startupCommand', [title]='asPane(child).startupCommand')
+            i.fas.fa-terminal
+            span {{ truncate(asPane(child).startupCommand, 20) }}
+
+      button.pane-edit-btn(
+        *ngIf='asPane(child).id === selectedPaneId',
+        type='button',
+        (click)='onEditClick($event, asPane(child))',
+        title='Edit pane'
+      )
+        i.fas.fa-pen
 
     //- Nested split
     split-preview(
       *ngIf='isSplit(child)',
       [split]='asSplit(child)',
       [depth]='depth + 1',
+      [selectedPaneId]='selectedPaneId',
       [style.flex-basis]='getFlexStyle(i)',
-      (paneClick)='onNestedPaneClick($event)',
+      (paneSelect)='onNestedPaneSelect($event)',
+      (paneEdit)='onNestedPaneEdit($event)',
       (splitHorizontal)='onNestedSplitH($event)',
       (splitVertical)='onNestedSplitV($event)',
+      (addLeft)='onNestedAddLeft($event)',
+      (addRight)='onNestedAddRight($event)',
+      (addTop)='onNestedAddTop($event)',
+      (addBottom)='onNestedAddBottom($event)',
       (removePane)='onNestedRemove($event)'
     )
 
@@ -33,12 +57,29 @@
     [style.top.px]='contextMenuPosition.y',
     (click)='$event.stopPropagation()'
   )
+    button.context-menu-item(type='button', (click)='onEdit()')
+      i.fas.fa-pen
+      |  Edit
+    .context-menu-divider
     button.context-menu-item(type='button', (click)='onSplitH()')
       i.fas.fa-arrows-alt-h
       |  Split Horizontal
     button.context-menu-item(type='button', (click)='onSplitV()')
       i.fas.fa-arrows-alt-v
       |  Split Vertical
+    .context-menu-divider
+    button.context-menu-item(type='button', (click)='onAddLeft()')
+      i.fas.fa-caret-left
+      |  Add Left
+    button.context-menu-item(type='button', (click)='onAddRight()')
+      i.fas.fa-caret-right
+      |  Add Right
+    button.context-menu-item(type='button', (click)='onAddTop()')
+      i.fas.fa-caret-up
+      |  Add Top
+    button.context-menu-item(type='button', (click)='onAddBottom()')
+      i.fas.fa-caret-down
+      |  Add Bottom
     .context-menu-divider
     button.context-menu-item.danger(type='button', (click)='onRemove()')
       i.fas.fa-trash
