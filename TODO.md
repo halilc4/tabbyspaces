@@ -2,11 +2,11 @@
 
 ## Workspace Editor - Layout Editing
 
-- [ ] Skloniti dva dugmeta layout vert/hor iz toolbara (kao i horizontal/vertical tekst iz liste)
-- [ ] Omogućiti selekciju u toolbaru, dodati dugme za edit pane-a (da ne bude na klik)
-- [ ] Kada je selektovan item u toolbaru - prikazati opcije slične context meniju
-- [ ] Context menu od pane-a: add to left/right/top/bottom pored split opcija + edit pane
-- [ ] Umesto "click to edit" - ikonica za edit u ćošku pane-a
+- [x] Skloniti dva dugmeta layout vert/hor iz toolbara (kao i horizontal/vertical tekst iz liste)
+- [x] Omogućiti selekciju u toolbaru, dodati dugme za edit pane-a (da ne bude na klik)
+- [x] Kada je selektovan item u toolbaru - prikazati opcije slične context meniju
+- [x] Context menu od pane-a: add to left/right/top/bottom pored split opcija + edit pane
+- [x] Umesto "click to edit" - ikonica za edit u ćošku pane-a
 - [ ] Title bug - bolje handleati
 - [ ] Srediti design
 
@@ -31,6 +31,7 @@
 ## Bugs
 
 - [ ] Migracija i brisanje profila ne radi
+- [ ] Layout preview responsive - nested splits se ne prilagođavaju dobro na manje veličine
 - [x] Built-in shells (PowerShell, cmd, WSL) nisu radili - filter tražio `type === 'local'` umesto `type.startsWith('local:')`
 - [x] Fallback za built-in profile lookup (keširanje svih profila pre otvaranja workspace-a)
 

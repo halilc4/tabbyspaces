@@ -34,10 +34,21 @@ git checkout dev        # Back to work
 ```
 src/
 ├── index.ts                 # NgModule entry point
+├── build-config.ts          # Build-time constants (CONFIG_KEY, DISPLAY_NAME)
 ├── models/                  # TypeScript interfaces
+│   └── workspace.model.ts
 ├── services/                # Business logic
-├── providers/               # Tabby config/settings providers
+│   ├── workspaceEditor.service.ts
+│   └── startupCommand.service.ts
+├── providers/               # Tabby config/settings/toolbar providers
+│   ├── config.provider.ts
+│   ├── settings.provider.ts
+│   └── toolbar.provider.ts
 └── components/              # Angular components (.ts, .pug, .scss)
+    ├── workspaceList        # Main settings UI
+    ├── workspaceEditor      # Single workspace editor
+    ├── paneEditor           # Pane configuration
+    └── splitPreview         # Visual split preview
 ```
 
 ## Build
@@ -56,7 +67,7 @@ Debug: `Ctrl+Shift+I` in Tabby opens DevTools.
 ### package.json (required)
 ```json
 {
-  "keywords": ["tabby-plugin"],
+  "keywords": ["tabby", "tabby-plugin"],
   "main": "dist/index.js",
   "tabbyPlugin": {
     "name": "tabbyspaces",
