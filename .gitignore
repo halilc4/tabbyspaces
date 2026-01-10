@@ -28,3 +28,7 @@ npm-debug.log*
 
 # Internal
 marketing/
+
+# Local config
+.mcp.json
+nul

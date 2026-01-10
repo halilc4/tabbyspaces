@@ -37,6 +37,7 @@ export interface TabbyRecoveryToken {
   tabTitle?: string
   tabCustomTitle?: string
   disableDynamicTitle?: boolean
+  cwd?: string
 }
 
 export interface TabbySplitLayoutProfile {
@@ -74,7 +75,6 @@ export interface Workspace {
   color?: string
   root: WorkspaceSplit
   isDefault?: boolean
-  hotkey?: string
 }
 
 export function isWorkspaceSplit(node: WorkspacePane | WorkspaceSplit): node is WorkspaceSplit {
@@ -99,12 +99,39 @@ export function createDefaultSplit(orientation: 'horizontal' | 'vertical' = 'hor
   }
 }
 
+// Color palette for workspaces
+const WORKSPACE_COLORS = [
+  '#3b82f6', // blue
+  '#10b981', // emerald
+  '#f59e0b', // amber
+  '#ef4444', // red
+  '#8b5cf6', // violet
+  '#ec4899', // pink
+  '#06b6d4', // cyan
+  '#f97316', // orange
+]
+
+// Icon list for workspaces
+const WORKSPACE_ICONS = [
+  'columns', 'terminal', 'code', 'folder', 'home', 'briefcase',
+  'cog', 'database', 'server', 'cloud', 'rocket', 'flask',
+  'bug', 'wrench', 'cube', 'layer-group', 'sitemap', 'project-diagram'
+]
+
+export function getRandomColor(): string {
+  return WORKSPACE_COLORS[Math.floor(Math.random() * WORKSPACE_COLORS.length)]
+}
+
+export function getRandomIcon(): string {
+  return WORKSPACE_ICONS[Math.floor(Math.random() * WORKSPACE_ICONS.length)]
+}
+
 export function createDefaultWorkspace(name: string = 'New Workspace'): Workspace {
   return {
     id: generateUUID(),
     name,
-    icon: 'columns',
-    color: '#3b82f6',
+    icon: getRandomIcon(),
+    color: getRandomColor(),
     root: createDefaultSplit(),
     isDefault: false,
   }

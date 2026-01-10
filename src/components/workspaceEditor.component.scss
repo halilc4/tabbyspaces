@@ -1,67 +1,4 @@
-// Modal mode
-.workspace-editor-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.workspace-editor-modal {
-  background: var(--theme-bg);
-  border-radius: 12px;
-  width: 90%;
-  max-width: 700px;
-  max-height: 90vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--theme-border);
-
-  h4 {
-    margin: 0;
-    font-size: 1.25rem;
-  }
-
-  .close-btn {
-    font-size: 1.25rem;
-    color: var(--theme-fg-more);
-    padding: 4px 8px;
-
-    &:hover {
-      color: var(--theme-fg);
-    }
-  }
-}
-
-.modal-body {
-  padding: 20px;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 16px 20px;
-  border-top: 1px solid var(--theme-border);
-}
-
-// Inline mode
+// Workspace editor (inline)
 .workspace-editor-inline {
   background: var(--theme-bg-more);
   border-radius: 8px;
@@ -97,6 +34,17 @@
     .editor-actions {
       display: flex;
       gap: 8px;
+
+      .btn-success {
+        background: #10b981;
+        border-color: #10b981;
+        color: white;
+
+        &:hover {
+          background: #059669;
+          border-color: #059669;
+        }
+      }
     }
   }
 }

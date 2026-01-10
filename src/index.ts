@@ -8,6 +8,7 @@ import { WorkspaceEditorConfigProvider } from './providers/config.provider'
 import { WorkspaceEditorSettingsProvider } from './providers/settings.provider'
 import { WorkspaceToolbarProvider } from './providers/toolbar.provider'
 import { WorkspaceEditorService } from './services/workspaceEditor.service'
+import { StartupCommandService } from './services/startupCommand.service'
 
 import { WorkspaceListComponent } from './components/workspaceList.component'
 import { WorkspaceEditorComponent } from './components/workspaceEditor.component'
@@ -21,6 +22,7 @@ import { SplitPreviewComponent } from './components/splitPreview.component'
     { provide: SettingsTabProvider, useClass: WorkspaceEditorSettingsProvider, multi: true },
     { provide: ToolbarButtonProvider, useClass: WorkspaceToolbarProvider, multi: true },
     WorkspaceEditorService,
+    StartupCommandService,
   ],
   declarations: [
     WorkspaceListComponent,

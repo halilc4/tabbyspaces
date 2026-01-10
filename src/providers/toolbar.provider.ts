@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { ToolbarButtonProvider, ToolbarButton, ProfilesService, AppService } from 'tabby-core'
 import { WorkspaceEditorService } from '../services/workspaceEditor.service'
+import { StartupCommandService } from '../services/startupCommand.service'
 import { SettingsTabComponent } from 'tabby-settings'
 import { CONFIG_KEY, DISPLAY_NAME } from '../build-config'
 import { countPanes } from '../models/workspace.model'
@@ -10,9 +11,12 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
   constructor(
     private workspaceService: WorkspaceEditorService,
     private profilesService: ProfilesService,
-    private app: AppService
+    private app: AppService,
+    private startupService: StartupCommandService
   ) {
     super()
+    // Cleanup orphaned profiles from previous plugin versions (one-time migration)
+    this.workspaceService.cleanupOrphanedProfiles()
   }
 
   provide(): ToolbarButton[] {
@@ -69,13 +73,20 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
     this.app.openNewTabRaw({ type: SettingsTabComponent, inputs: { activeTab: CONFIG_KEY } })
   }
 
-  private openWorkspace(workspaceId: string): void {
+  private async openWorkspace(workspaceId: string): Promise<void> {
     const workspaces = this.workspaceService.getWorkspaces()
     const workspace = workspaces.find((w) => w.id === workspaceId)
 
     if (!workspace) return
 
-    const profile = this.workspaceService.generateTabbyProfile(workspace)
+    // Register startup commands BEFORE opening the workspace
+    // Commands will be sent via sendInput() when terminals open
+    const commands = this.workspaceService.collectStartupCommands(workspace)
+    if (commands.length > 0) {
+      this.startupService.registerCommands(commands)
+    }
+
+    const profile = await this.workspaceService.generateTabbyProfile(workspace)
     this.profilesService.openNewTabForProfile(profile)
   }
 }

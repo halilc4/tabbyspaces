@@ -5,13 +5,15 @@
       i.fas.fa-plus
       |  New Workspace
 
-  //- Inline editor (above list)
+  //- Editor (above list)
   workspace-editor(
     *ngIf='editingWorkspace',
     [workspace]='editingWorkspace',
-    [inline]='true',
+    [autoFocus]='isCreatingNew',
+    [isRunning]='isRunning',
     (save)='onEditorSave($event)',
-    (cancel)='onEditorCancel()'
+    (cancel)='onEditorCancel()',
+    (run)='onEditorRun($event)'
   )
 
   //- Workspace list

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, HostListener, ElementRef } from '@angular/core'
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, AfterViewInit, SimpleChanges, HostListener, ElementRef, ViewChild } from '@angular/core'
 import {
   Workspace,
   WorkspacePane,
@@ -15,11 +15,15 @@ import { WorkspaceEditorService } from '../services/workspaceEditor.service'
   template: require('./workspaceEditor.component.pug'),
   styles: [require('./workspaceEditor.component.scss')],
 })
-export class WorkspaceEditorComponent implements OnInit, OnChanges {
+export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() workspace!: Workspace
-  @Input() inline = false
+  @Input() autoFocus = false
+  @Input() isRunning = false
   @Output() save = new EventEmitter<Workspace>()
   @Output() cancel = new EventEmitter<void>()
+  @Output() run = new EventEmitter<Workspace>()
+
+  @ViewChild('nameInput') nameInput!: ElementRef<HTMLInputElement>
 
   selectedPane: WorkspacePane | null = null
   showPaneEditor = false
@@ -58,6 +62,15 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges {
     this.initializeWorkspace()
   }
 
+  ngAfterViewInit(): void {
+    if (this.autoFocus && this.nameInput) {
+      setTimeout(() => {
+        this.nameInput.nativeElement.focus()
+        this.nameInput.nativeElement.select()
+      }, 0)
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['workspace'] && !changes['workspace'].firstChange) {
       // Reset component state when workspace input changes
@@ -87,6 +100,13 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges {
 
   onCancel(): void {
     this.cancel.emit()
+  }
+
+  onRun(): void {
+    if (!this.workspace.name?.trim()) {
+      return
+    }
+    this.run.emit(this.workspace)
   }
 
   selectPane(pane: WorkspacePane): void {

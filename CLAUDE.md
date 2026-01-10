@@ -100,18 +100,30 @@ export default class MyModule {}
 
 - `Workspace` - Main object with name, icon, color, root split
 - `WorkspaceSplit` - Recursive structure with orientation, ratios, children
-- `WorkspacePane` - Leaf node with profileId, cwd, startupCommand, title
+- `WorkspacePane` - Leaf node with profileId (reference to existing Tabby profile), cwd, startupCommand, title
 
-## Tabby Profile Generation
+## Architecture
 
-Plugin stores a simplified model in `config.store.tabbyspaces.workspaces` and auto-generates verbose Tabby `split-layout` profiles in `config.store.profiles`.
+### Storage
+Plugin stores workspaces in `config.store.tabbyspaces.workspaces`. No profiles are generated in `config.store.profiles`.
 
-## Nushell Startup Commands
+### Opening Workspaces
+1. Generate temporary `split-layout` recovery token from workspace model (includes `options.cwd`)
+2. Open via `ProfilesService.openNewTabForProfile()`
+3. `StartupCommandService` listens for `tabOpened$` events
+4. Match terminal tabs by pane ID (passed via `tabCustomTitle`)
+5. Send startup command via `sendInput()` (if defined)
 
-For Nushell, startup commands are passed as:
-```typescript
-options.args = ['-e', startupCommand]
-```
+### CWD Handling
+CWD is set via native `options.cwd` in the recovery token. The shell spawns directly in the target directory - no visible `cd` commands.
+
+### Profile Support
+Plugin supports both user-defined profiles (`type: 'local'`) and built-in shells (`type: 'local:cmd'`, `'local:powershell'`, `'local:wsl'`, etc.). Profile lookup uses a two-stage approach:
+1. First checks user profiles in `config.store.profiles`
+2. Falls back to cached profiles from `profilesService.getProfiles()` (includes built-ins)
+
+### Migration
+`cleanupOrphanedProfiles()` removes any leftover profiles from previous plugin versions (prefix `split-layout:tabbyspaces:`).
 
 ## References
 
@@ -180,10 +192,47 @@ npm creates symlinks for local packages, so each build is immediately available.
 
 Both plugins can be installed simultaneously.
 
+## CDP Debugging (via tabby-mcp)
+
+Automatizovan način za testiranje plugina kroz Chrome DevTools Protocol.
+
+### Workflow
+1. **Pokreni Tabby** sa remote debugging:
+   ```bash
+   cmd.exe /c start "" "C:\Program Files (x86)\Tabby\Tabby.exe" --remote-debugging-port=9222
+   ```
+2. **Izlistaj targets** sa `mcp__tabby__list_targets`
+3. **Koristi poslednji target** (index -1 ili najveći index) - to je glavni Tabby prozor
+4. **Debug** sa `query` i `execute_js`
+
+**VAŽNO:** Debug-uj NOVI Tabby instance, ne onaj u kojem radiš!
+
+### MCP Tools
+| Tool | Opis |
+|------|------|
+| `mcp__tabby__list_targets` | Lista CDP targets (tabs) sa URL i WebSocket |
+| `mcp__tabby__query` | CSS selector → lista elemenata |
+| `mcp__tabby__execute_js` | Izvrši JS u Tabby kontekstu |
+
+### Primeri
+```javascript
+// Query elemente
+mcp__tabby__query(target: -1, selector: '.list-group-item')
+
+// Klikni na element po indexu
+document.querySelectorAll('.list-group-item')[5].click()
+
+// Dobij sve linkove
+Array.from(document.querySelectorAll('a')).map(a => a.innerText)
+
+// Proveri body content
+document.body.innerText
+```
+
 ## Known Issues
 
 ### YAML escape sequences in config.yaml
-If a base profile in Tabby config uses double-quoted strings with wrong escape sequences (e.g., `\t` instead of `\\t`), the plugin will copy the corrupted path.
+If a base profile in Tabby config uses double-quoted strings with wrong escape sequences (e.g., `\t` instead of `\\t`), shell detection will fail and CWD commands may not work correctly.
 
 ```yaml
 # WRONG - \t becomes TAB character

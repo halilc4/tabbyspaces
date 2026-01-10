@@ -1,22 +1,5 @@
-//- Modal mode (overlay)
-.workspace-editor-overlay(*ngIf='!inline', (click)='onCancel()')
-  .workspace-editor-modal((click)='$event.stopPropagation()')
-    .modal-header
-      h4 {{ workspace.id ? 'Edit' : 'New' }} Workspace
-      button.btn.btn-link.close-btn(type='button', (click)='onCancel()')
-        i.fas.fa-times
-
-    .modal-body
-      ng-container(*ngTemplateOutlet='editorContent')
-
-    .modal-footer
-      button.btn.btn-secondary(type='button', (click)='onCancel()') Cancel
-      button.btn.btn-primary(type='button', (click)='onSave()', [disabled]='!workspace.name?.trim()')
-        i.fas.fa-save
-        |  Save Workspace
-
-//- Inline mode
-.workspace-editor-inline(*ngIf='inline')
+//- Inline workspace editor
+.workspace-editor-inline
   .editor-body
     ng-container(*ngTemplateOutlet='editorContent')
 
@@ -29,6 +12,9 @@
       button.btn.btn-primary.btn-sm(type='button', (click)='onSave()', [disabled]='!workspace.name?.trim()')
         i.fas.fa-save
         |  Save
+      button.btn.btn-success.btn-sm(type='button', (click)='onRun()', [disabled]='!workspace.name?.trim() || isRunning')
+        i.fas([class]='isRunning ? "fa-spinner fa-spin" : "fa-play"')
+        |  {{ isRunning ? 'Running...' : 'Run' }}
 
 //- Shared editor content
 ng-template(#editorContent)
@@ -42,6 +28,7 @@ ng-template(#editorContent)
       )
 
     input.name-input(
+      #nameInput,
       type='text',
       [(ngModel)]='workspace.name',
       placeholder='Workspace name'

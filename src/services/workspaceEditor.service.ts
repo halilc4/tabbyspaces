@@ -11,22 +11,31 @@ import {
   TabbySplitLayoutProfile,
 } from '../models/workspace.model'
 import { CONFIG_KEY, DISPLAY_NAME } from '../build-config'
+import { PendingCommand } from './startupCommand.service'
 
 @Injectable({ providedIn: 'root' })
 export class WorkspaceEditorService {
+  private cachedProfiles: TabbyProfile[] = []
+
   constructor(
     private config: ConfigService,
     private notifications: NotificationsService,
     private profilesService: ProfilesService
   ) {}
 
+  private async cacheProfiles(): Promise<void> {
+    this.cachedProfiles = (await this.profilesService.getProfiles()) as TabbyProfile[]
+  }
+
   getWorkspaces(): Workspace[] {
-    return this.config.store[CONFIG_KEY]?.workspaces ?? []
+    return this.config.store?.[CONFIG_KEY]?.workspaces ?? []
   }
 
   async saveWorkspaces(workspaces: Workspace[]): Promise<boolean> {
+    if (!this.config.store?.[CONFIG_KEY]) {
+      return false
+    }
     this.config.store[CONFIG_KEY].workspaces = workspaces
-    this.syncTabbyProfiles(workspaces)
     return await this.saveConfig()
   }
 
@@ -60,28 +69,32 @@ export class WorkspaceEditorService {
   async getAvailableProfiles(): Promise<TabbyProfile[]> {
     const allProfiles = await this.profilesService.getProfiles()
     return allProfiles.filter(
-      (p) => p.type === 'local' && !p.id?.startsWith('split-layout:')
+      (p) =>
+        (p.type === 'local' || p.type?.startsWith('local:')) &&
+        !p.id?.startsWith('split-layout:')
     ) as TabbyProfile[]
   }
 
-  private syncTabbyProfiles(workspaces: Workspace[]): void {
-    const profiles: (TabbyProfile | TabbySplitLayoutProfile)[] = this.config.store.profiles ?? []
-
-    // Remove old plugin profiles (mutate in place)
-    for (let i = profiles.length - 1; i >= 0; i--) {
-      if (profiles[i].id?.startsWith(`split-layout:${CONFIG_KEY}:`)) {
-        profiles.splice(i, 1)
-      }
+  /**
+   * Cleanup orphaned profiles from previous plugin versions.
+   * Call this once on plugin init.
+   */
+  cleanupOrphanedProfiles(): void {
+    if (!this.config.store?.profiles) {
+      return
     }
-
-    // Add new workspace profiles
-    for (const workspace of workspaces) {
-      const tabbyProfile = this.generateTabbyProfile(workspace)
-      profiles.push(tabbyProfile)
+    const profiles: TabbyProfile[] = this.config.store.profiles
+    const prefix = `split-layout:${CONFIG_KEY}:`
+    const filtered = profiles.filter((p) => !p.id?.startsWith(prefix))
+    if (filtered.length !== profiles.length) {
+      this.config.store.profiles = filtered
+      this.config.save()
+      console.log(`[TabbySpaces] Cleaned up ${profiles.length - filtered.length} orphaned profiles`)
     }
   }
 
-  generateTabbyProfile(workspace: Workspace): TabbySplitLayoutProfile {
+  async generateTabbyProfile(workspace: Workspace): Promise<TabbySplitLayoutProfile> {
+    await this.cacheProfiles()
     const safeName = this.sanitizeForProfileId(workspace.name)
     return {
       id: `split-layout:${CONFIG_KEY}:${safeName}:${workspace.id}`,
@@ -138,19 +151,8 @@ export class WorkspaceEditorService {
       runAsAdministrator: false,
     }
 
-    // Handle startup command for different shells
-    if (pane.startupCommand) {
-      const cmd = baseProfile.options?.command || ''
-      if (cmd.includes('nu.exe') || baseProfile.name?.toLowerCase().includes('nushell')) {
-        options.args = ['-e', pane.startupCommand]
-      } else if (cmd.includes('powershell') || cmd.includes('pwsh')) {
-        options.args = ['-NoExit', '-Command', pane.startupCommand]
-      } else if (cmd.includes('cmd.exe')) {
-        options.args = ['/K', pane.startupCommand]
-      } else {
-        options.args = ['-c', pane.startupCommand]
-      }
-    }
+    // Note: startupCommand is handled via sendInput() in StartupCommandService
+    // to avoid re-execution when Tabby splits the pane
 
     const profile = {
       id: baseProfile.id,
@@ -168,13 +170,17 @@ export class WorkspaceEditorService {
       behaviorOnSessionEnd: 'auto',
     }
 
+    // Use pane.id for matching in StartupCommandService
+    // Original title will be restored after command execution
+    const cwd = pane.cwd || baseProfile.options?.cwd || ''
     return {
       type: 'app:local-tab',
       profile,
       savedState: false,
-      tabTitle: pane.title || '',
-      tabCustomTitle: pane.title || '',
-      disableDynamicTitle: !!pane.title,
+      tabTitle: pane.id,
+      tabCustomTitle: pane.id,
+      disableDynamicTitle: false,
+      cwd,
     }
   }
 
@@ -207,12 +213,42 @@ export class WorkspaceEditorService {
   }
 
   private getProfileById(profileId: string): TabbyProfile | undefined {
-    const profiles: TabbyProfile[] = this.config.store.profiles ?? []
-    return profiles.find((p) => p.id === profileId && p.type === 'local')
+    const isLocalType = (type: string) => type === 'local' || type?.startsWith('local:')
+
+    // First: check user profiles in config
+    const userProfiles: TabbyProfile[] = this.config.store?.profiles ?? []
+    const found = userProfiles.find((p) => p.id === profileId && isLocalType(p.type))
+    if (found) return found
+
+    // Fallback: check cached profiles (includes built-ins)
+    return this.cachedProfiles.find((p) => p.id === profileId && isLocalType(p.type))
   }
 
   getProfileName(profileId: string): string | undefined {
     return this.getProfileById(profileId)?.name
+  }
+
+  collectStartupCommands(workspace: Workspace): PendingCommand[] {
+    const commands: PendingCommand[] = []
+    this.collectCommandsFromNode(workspace.root, commands)
+    return commands
+  }
+
+  private collectCommandsFromNode(
+    node: WorkspacePane | WorkspaceSplit,
+    commands: PendingCommand[]
+  ): void {
+    if (isWorkspaceSplit(node)) {
+      for (const child of node.children) {
+        this.collectCommandsFromNode(child, commands)
+      }
+    } else if (node.startupCommand) {
+      commands.push({
+        paneId: node.id,
+        command: node.startupCommand,
+        originalTitle: node.title || '',
+      })
+    }
   }
 
   private async saveConfig(): Promise<boolean> {

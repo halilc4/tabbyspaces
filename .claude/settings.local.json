@@ -8,7 +8,23 @@
       "WebFetch(domain:deepwiki.com)",
       "WebFetch(domain:github.com)",
       "Bash(npm run build:dev:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "WebFetch(domain:docs.tabby.sh)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(ls -la \"C:\\\\Users\\\\halil\\\\tabbyspaces\\\\dist\"\" | grep -E \"package)",
+      "Bash(.json \")",
+      "Bash(dir /s /b \"C:\\\\Users\\\\halil\\\\AppData\\\\Local\\\\Programs\\\\tabby\")",
+      "WebFetch(domain:localhost)",
+      "Bash(curl:*)",
+      "mcp__tabby__query",
+      "mcp__tabby__execute_js",
+      "Bash(start \"\" \"C:\\\\Program Files \\(x86\\)\\\\Tabby\\\\Tabby.exe\" --remote-debugging-port=9222)",
+      "mcp__tabby__list_targets"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "tabby"
+  ]
 }

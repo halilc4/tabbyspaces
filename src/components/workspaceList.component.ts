@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core'
-import { ConfigService } from 'tabby-core'
+import { ConfigService, ProfilesService } from 'tabby-core'
 import { Subscription } from 'rxjs'
+import { StartupCommandService } from '../services/startupCommand.service'
 import { WorkspaceEditorService } from '../services/workspaceEditor.service'
 import {
   Workspace,
@@ -21,11 +22,14 @@ export class WorkspaceListComponent implements OnInit, OnDestroy {
   selectedWorkspace: Workspace | null = null
   editingWorkspace: Workspace | null = null
   isCreatingNew = false
+  isRunning = false
   private configSubscription: Subscription | null = null
 
   constructor(
     public config: ConfigService,
     private workspaceService: WorkspaceEditorService,
+    private profilesService: ProfilesService,
+    private startupService: StartupCommandService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -122,6 +126,27 @@ export class WorkspaceListComponent implements OnInit, OnDestroy {
     const saved = this.workspaces.find((w) => w.id === workspace.id)
     if (saved) {
       this.selectWorkspace(saved)
+    }
+  }
+
+  async onEditorRun(workspace: Workspace): Promise<void> {
+    if (this.isRunning) return
+    this.isRunning = true
+
+    try {
+      // Save first
+      await this.onEditorSave(workspace)
+
+      // Then open the workspace
+      const commands = this.workspaceService.collectStartupCommands(workspace)
+      if (commands.length > 0) {
+        this.startupService.registerCommands(commands)
+      }
+
+      const profile = await this.workspaceService.generateTabbyProfile(workspace)
+      this.profilesService.openNewTabForProfile(profile)
+    } finally {
+      this.isRunning = false
     }
   }
 
