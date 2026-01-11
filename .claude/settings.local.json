@@ -20,7 +20,11 @@
       "mcp__tabby__query",
       "mcp__tabby__execute_js",
       "Bash(start \"\" \"C:\\\\Program Files \\(x86\\)\\\\Tabby\\\\Tabby.exe\" --remote-debugging-port=9222)",
-      "mcp__tabby__list_targets"
+      "mcp__tabby__list_targets",
+      "Bash(tree:*)",
+      "Bash(dir \"C:\\\\Users\\\\halil\\\\tabbyspaces\\\\node_modules\" /B)",
+      "Bash(findstr:*)",
+      "mcp__tabby__screenshot"
     ]
   },
   "enableAllProjectMcpServers": true,
