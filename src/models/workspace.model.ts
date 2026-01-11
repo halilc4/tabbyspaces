@@ -74,7 +74,7 @@ export interface Workspace {
   icon?: string
   color?: string
   root: WorkspaceSplit
-  isDefault?: boolean
+  launchOnStartup?: boolean
 }
 
 export function isWorkspaceSplit(node: WorkspacePane | WorkspaceSplit): node is WorkspaceSplit {
@@ -126,14 +126,14 @@ export function getRandomIcon(): string {
   return WORKSPACE_ICONS[Math.floor(Math.random() * WORKSPACE_ICONS.length)]
 }
 
-export function createDefaultWorkspace(name: string = 'New Workspace'): Workspace {
+export function createDefaultWorkspace(name: string = ''): Workspace {
   return {
     id: generateUUID(),
     name,
     icon: getRandomIcon(),
     color: getRandomColor(),
     root: createDefaultSplit(),
-    isDefault: false,
+    launchOnStartup: false,
   }
 }
 

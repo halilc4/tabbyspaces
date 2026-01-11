@@ -5,16 +5,14 @@
 
   .editor-footer
     label.startup-checkbox
-      input(type='checkbox', [(ngModel)]='workspace.isDefault')
+      input(type='checkbox', [(ngModel)]='workspace.launchOnStartup')
       |  Launch on startup
     .editor-actions
       button.btn.btn-secondary.btn-sm(type='button', (click)='onCancel()') Cancel
-      button.btn.btn-primary.btn-sm(type='button', (click)='onSave()', [disabled]='!workspace.name?.trim()')
+      button.btn.btn-primary.btn-sm(type='button', (click)='onSave()', [disabled]='!workspace.name?.trim() || !hasUnsavedChanges')
         i.fas.fa-save
         |  Save
-      button.btn.btn-success.btn-sm(type='button', (click)='onRun()', [disabled]='!workspace.name?.trim() || isRunning')
-        i.fas([class]='isRunning ? "fa-spinner fa-spin" : "fa-play"')
-        |  {{ isRunning ? 'Running...' : 'Run' }}
+        span.unsaved-indicator(*ngIf='hasUnsavedChanges') *
 
 //- Shared editor content
 ng-template(#editorContent)
@@ -31,7 +29,7 @@ ng-template(#editorContent)
       #nameInput,
       type='text',
       [(ngModel)]='workspace.name',
-      placeholder='Workspace name'
+      placeholder='Name your workspace'
     )
 
     .icon-picker
@@ -133,6 +131,7 @@ ng-template(#editorContent)
       split-preview(
         [split]='workspace.root',
         [selectedPaneId]='selectedPaneId',
+        [profiles]='profiles',
         (paneSelect)='selectPane($event)',
         (paneEdit)='editPane($event)',
         (splitHorizontal)='splitPane($event, "horizontal")',

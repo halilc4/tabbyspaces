@@ -2,9 +2,9 @@ import { Component, Input, Output, EventEmitter } from '@angular/core'
 import {
   WorkspaceSplit,
   WorkspacePane,
+  TabbyProfile,
   isWorkspaceSplit,
 } from '../models/workspace.model'
-import { WorkspaceEditorService } from '../services/workspaceEditor.service'
 
 @Component({
   selector: 'split-preview',
@@ -15,6 +15,7 @@ export class SplitPreviewComponent {
   @Input() split!: WorkspaceSplit
   @Input() depth = 0
   @Input() selectedPaneId: string | null = null
+  @Input() profiles: TabbyProfile[] = []
   @Output() paneSelect = new EventEmitter<WorkspacePane>()
   @Output() paneEdit = new EventEmitter<WorkspacePane>()
   @Output() splitHorizontal = new EventEmitter<WorkspacePane>()
@@ -27,8 +28,6 @@ export class SplitPreviewComponent {
 
   contextMenuPane: WorkspacePane | null = null
   contextMenuPosition = { x: 0, y: 0 }
-
-  constructor(private workspaceService: WorkspaceEditorService) {}
 
   isPane(child: WorkspacePane | WorkspaceSplit): boolean {
     return !isWorkspaceSplit(child)
@@ -131,17 +130,25 @@ export class SplitPreviewComponent {
     }
   }
 
-  getProfileName(profileId: string): string {
-    return this.workspaceService.getProfileName(profileId) ?? 'Select profile'
-  }
-
   getPaneLabel(pane: WorkspacePane): string {
-    if (pane.title) return pane.title
+    let baseLabel = ''
+
     if (pane.startupCommand) {
-      const cmd = pane.startupCommand
-      return cmd.length > 20 ? cmd.substring(0, 17) + '...' : cmd
+      baseLabel = this.truncate(pane.startupCommand, 20)
+    } else if (pane.cwd) {
+      const folderName = pane.cwd.split(/[/\\]/).filter(Boolean).pop()
+      baseLabel = folderName || pane.cwd
+    } else if (pane.profileId) {
+      const profile = this.profiles.find(p => p.id === pane.profileId)
+      if (profile?.name) baseLabel = profile.name
     }
-    return this.getProfileName(pane.profileId)
+
+    if (!baseLabel) baseLabel = 'Select profile'
+
+    if (pane.title) {
+      return `${pane.title} - ${baseLabel}`
+    }
+    return baseLabel
   }
 
   // Pass-through events from nested splits

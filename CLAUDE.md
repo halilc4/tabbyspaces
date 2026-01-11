@@ -109,9 +109,19 @@ export default class MyModule {}
 
 ## Data Model
 
-- `Workspace` - Main object with name, icon, color, root split
+- `Workspace` - Main object with name, icon, color, root split, launchOnStartup
 - `WorkspaceSplit` - Recursive structure with orientation, ratios, children
 - `WorkspacePane` - Leaf node with profileId (reference to existing Tabby profile), cwd, startupCommand, title
+
+### Workspace Fields
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | UUID |
+| `name` | string | Display name |
+| `icon` | string | FontAwesome icon name (without fa- prefix) |
+| `color` | string | Hex color |
+| `root` | WorkspaceSplit | Root split node |
+| `launchOnStartup` | boolean | Auto-open when Tabby starts (multiple allowed) |
 
 ## Architecture
 
@@ -132,6 +142,9 @@ CWD is set via native `options.cwd` in the recovery token. The shell spawns dire
 Plugin supports both user-defined profiles (`type: 'local'`) and built-in shells (`type: 'local:cmd'`, `'local:powershell'`, `'local:wsl'`, etc.). Profile lookup uses a two-stage approach:
 1. First checks user profiles in `config.store.profiles`
 2. Falls back to cached profiles from `profilesService.getProfiles()` (includes built-ins)
+
+### Launch on Startup
+Workspaces with `launchOnStartup: true` are automatically opened when Tabby starts. Multiple workspaces can be marked. Logic is in `toolbar.provider.ts` constructor with 500ms delay to ensure Tabby is ready.
 
 ### Migration
 `cleanupOrphanedProfiles()` removes any leftover profiles from previous plugin versions (prefix `split-layout:tabbyspaces:`).

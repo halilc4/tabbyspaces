@@ -10,10 +10,9 @@
     *ngIf='editingWorkspace',
     [workspace]='editingWorkspace',
     [autoFocus]='isCreatingNew',
-    [isRunning]='isRunning',
+    [hasUnsavedChanges]='hasUnsavedChanges',
     (save)='onEditorSave($event)',
-    (cancel)='onEditorCancel()',
-    (run)='onEditorRun($event)'
+    (cancel)='onEditorCancel()'
   )
 
   //- Workspace list
@@ -32,20 +31,24 @@
             span {{ getPaneCount(workspace) }} panes
             span.separator &middot;
             span {{ getOrientationLabel(workspace) }}
-            span.separator(*ngIf='workspace.isDefault') &middot;
-            span.badge.badge-primary(*ngIf='workspace.isDefault') default
+            span.separator(*ngIf='workspace.launchOnStartup') &middot;
+            span.badge.badge-primary(*ngIf='workspace.launchOnStartup') startup
 
       .workspace-actions
-        button.btn.btn-link(
+        button.btn.btn-link.open-btn(
           type='button',
-          title='Set as default',
-          (click)='setAsDefault(workspace); $event.stopPropagation()',
-          [class.active]='workspace.isDefault'
+          title='Open',
+          [disabled]='openingWorkspaceId === workspace.id',
+          (click)='openWorkspace($event, workspace)'
         )
-          i.fas.fa-star
-        button.btn.btn-link(type='button', title='Duplicate', (click)='duplicateWorkspace(workspace); $event.stopPropagation()')
+          i.fas(
+            [class.fa-external-link-alt]='openingWorkspaceId !== workspace.id',
+            [class.fa-spinner]='openingWorkspaceId === workspace.id',
+            [class.fa-spin]='openingWorkspaceId === workspace.id'
+          )
+        button.btn.btn-link(type='button', title='Duplicate', (click)='duplicateWorkspace($event, workspace)')
           i.fas.fa-copy
-        button.btn.btn-link.text-danger(type='button', title='Delete', (click)='deleteWorkspace(workspace); $event.stopPropagation()')
+        button.btn.btn-link.text-danger(type='button', title='Delete', (click)='deleteWorkspace($event, workspace)')
           i.fas.fa-trash
 
   //- Empty state

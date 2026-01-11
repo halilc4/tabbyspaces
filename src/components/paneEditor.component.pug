@@ -1,5 +1,5 @@
-.pane-editor-overlay((click)='onCancel()')
-  .pane-editor-modal((click)='$event.stopPropagation()')
+.pane-editor-overlay((click)='onOverlayClick($event)')
+  .pane-editor-modal(#modal)
     .modal-header
       h4 Edit Pane
       button.btn.btn-link.close-btn(type='button', (click)='onCancel()')

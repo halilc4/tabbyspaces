@@ -28,6 +28,18 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
     super()
     // Cleanup orphaned profiles from previous plugin versions (one-time migration)
     this.workspaceService.cleanupOrphanedProfiles()
+
+    // Launch workspaces marked for startup (with delay to ensure Tabby is ready)
+    setTimeout(() => this.launchStartupWorkspaces(), 500)
+  }
+
+  private async launchStartupWorkspaces(): Promise<void> {
+    const workspaces = this.workspaceService.getWorkspaces()
+    const startupWorkspaces = workspaces.filter(w => w.launchOnStartup)
+
+    for (const workspace of startupWorkspaces) {
+      await this.openWorkspace(workspace.id)
+    }
   }
 
   provide(): ToolbarButton[] {

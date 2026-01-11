@@ -9,10 +9,8 @@
       (contextmenu)='onContextMenu($event, asPane(child))'
     )
       .pane-content
-        .pane-title(*ngIf='asPane(child).title')
-          | {{ asPane(child).title }}
-        .pane-profile(*ngIf='!asPane(child).title')
-          | {{ getProfileName(asPane(child).profileId) }}
+        .pane-label
+          | {{ getPaneLabel(asPane(child)) }}
         .pane-details
           .pane-detail(*ngIf='asPane(child).cwd', [title]='asPane(child).cwd')
             i.fas.fa-folder
@@ -22,7 +20,6 @@
             span {{ truncate(asPane(child).startupCommand, 20) }}
 
       button.pane-edit-btn(
-        *ngIf='asPane(child).id === selectedPaneId',
         type='button',
         (click)='onEditClick($event, asPane(child))',
         title='Edit pane'
@@ -35,6 +32,7 @@
       [split]='asSplit(child)',
       [depth]='depth + 1',
       [selectedPaneId]='selectedPaneId',
+      [profiles]='profiles',
       [style.flex-basis]='getFlexStyle(i)',
       (paneSelect)='onNestedPaneSelect($event)',
       (paneEdit)='onNestedPaneEdit($event)',

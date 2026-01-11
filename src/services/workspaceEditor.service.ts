@@ -188,7 +188,7 @@ export class WorkspaceEditorService {
     const clone = JSON.parse(JSON.stringify(workspace)) as Workspace
     clone.id = generateUUID()
     clone.name = `${workspace.name} (Copy)`
-    clone.isDefault = false
+    clone.launchOnStartup = false
     this.regenerateIds(clone.root)
     return clone
   }
@@ -222,10 +222,6 @@ export class WorkspaceEditorService {
 
     // Fallback: check cached profiles (includes built-ins)
     return this.cachedProfiles.find((p) => p.id === profileId && isLocalType(p.type))
-  }
-
-  getProfileName(profileId: string): string | undefined {
-    return this.getProfileById(profileId)?.name
   }
 
   collectStartupCommands(workspace: Workspace): PendingCommand[] {

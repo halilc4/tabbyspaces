@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ChangeDetectorRef, ElementRef } from '@angular/core'
+import { Component, OnInit, OnDestroy, AfterViewInit, ChangeDetectorRef, ElementRef, NgZone } from '@angular/core'
 import { ConfigService, ProfilesService } from 'tabby-core'
 import { Subscription } from 'rxjs'
 import { StartupCommandService } from '../services/startupCommand.service'
@@ -22,7 +22,7 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
   selectedWorkspace: Workspace | null = null
   editingWorkspace: Workspace | null = null
   isCreatingNew = false
-  isRunning = false
+  openingWorkspaceId: string | null = null
   private configSubscription: Subscription | null = null
 
   constructor(
@@ -31,7 +31,8 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     private profilesService: ProfilesService,
     private startupService: StartupCommandService,
     private cdr: ChangeDetectorRef,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private zone: NgZone
   ) {}
 
   ngOnInit(): void {
@@ -47,7 +48,7 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     setTimeout(() => {
       const parent = this.elementRef.nativeElement.closest('settings-tab-body') as HTMLElement
       if (parent) {
-        parent.style.maxWidth = '1024px'
+        parent.style.maxWidth = '876px'
       }
     }, 0)
   }
@@ -85,6 +86,7 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     this.selectedWorkspace = null
     this.editingWorkspace = workspace
     this.isCreatingNew = true
+    this.cdr.detectChanges()
   }
 
   private setProfileForAllPanes(node: WorkspacePane | WorkspaceSplit, profileId: string): void {
@@ -99,13 +101,21 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     this.selectWorkspace(workspace)
   }
 
-  async duplicateWorkspace(workspace: Workspace): Promise<void> {
+  async duplicateWorkspace(event: MouseEvent, workspace: Workspace): Promise<void> {
+    event.stopPropagation()
     const clone = this.workspaceService.duplicateWorkspace(workspace)
     await this.workspaceService.addWorkspace(clone)
     this.loadWorkspaces()
+
+    // Select the duplicated workspace
+    const duplicated = this.workspaces.find((w) => w.id === clone.id)
+    if (duplicated) {
+      this.selectWorkspace(duplicated)
+    }
   }
 
-  async deleteWorkspace(workspace: Workspace): Promise<void> {
+  async deleteWorkspace(event: MouseEvent, workspace: Workspace): Promise<void> {
+    event.stopPropagation()
     if (confirm(`Delete workspace "${workspace.name}"?`)) {
       const currentIndex = this.workspaces.findIndex((w) => w.id === workspace.id)
       await this.workspaceService.deleteWorkspace(workspace.id)
@@ -140,27 +150,6 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     }
   }
 
-  async onEditorRun(workspace: Workspace): Promise<void> {
-    if (this.isRunning) return
-    this.isRunning = true
-
-    try {
-      // Save first
-      await this.onEditorSave(workspace)
-
-      // Then open the workspace
-      const commands = this.workspaceService.collectStartupCommands(workspace)
-      if (commands.length > 0) {
-        this.startupService.registerCommands(commands)
-      }
-
-      const profile = await this.workspaceService.generateTabbyProfile(workspace)
-      this.profilesService.openNewTabForProfile(profile)
-    } finally {
-      this.isRunning = false
-    }
-  }
-
   onEditorCancel(): void {
     if (this.isCreatingNew) {
       // Cancel new workspace creation - go back to first workspace or empty
@@ -186,10 +175,29 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     return workspace.root.orientation === 'horizontal' ? 'horizontal' : 'vertical'
   }
 
-  async setAsDefault(workspace: Workspace): Promise<void> {
-    this.workspaces.forEach((w) => (w.isDefault = false))
-    workspace.isDefault = true
-    await this.workspaceService.saveWorkspaces(this.workspaces)
-    this.loadWorkspaces()
+  get hasUnsavedChanges(): boolean {
+    if (!this.editingWorkspace || !this.selectedWorkspace) return this.isCreatingNew
+    return JSON.stringify(this.editingWorkspace) !== JSON.stringify(this.selectedWorkspace)
+  }
+
+  async openWorkspace(event: MouseEvent, workspace: Workspace): Promise<void> {
+    event.stopPropagation()
+    if (this.openingWorkspaceId) return
+    this.openingWorkspaceId = workspace.id
+
+    try {
+      const commands = this.workspaceService.collectStartupCommands(workspace)
+      if (commands.length > 0) {
+        this.startupService.registerCommands(commands)
+      }
+
+      const profile = await this.workspaceService.generateTabbyProfile(workspace)
+      this.zone.run(() => {
+        this.profilesService.openNewTabForProfile(profile)
+      })
+    } finally {
+      this.openingWorkspaceId = null
+      this.cdr.detectChanges()
+    }
   }
 }

@@ -18,10 +18,9 @@ import { WorkspaceEditorService } from '../services/workspaceEditor.service'
 export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() workspace!: Workspace
   @Input() autoFocus = false
-  @Input() isRunning = false
+  @Input() hasUnsavedChanges = false
   @Output() save = new EventEmitter<Workspace>()
   @Output() cancel = new EventEmitter<void>()
-  @Output() run = new EventEmitter<Workspace>()
 
   @ViewChild('nameInput') nameInput!: ElementRef<HTMLInputElement>
 
@@ -64,12 +63,20 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
   }
 
   ngAfterViewInit(): void {
-    if (this.autoFocus && this.nameInput) {
-      setTimeout(() => {
-        this.nameInput.nativeElement.focus()
-        this.nameInput.nativeElement.select()
-      }, 0)
+    if (this.autoFocus) {
+      this.focusNameInput()
     }
+  }
+
+  private focusNameInput(): void {
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        if (this.nameInput?.nativeElement) {
+          this.nameInput.nativeElement.focus()
+          this.nameInput.nativeElement.select()
+        }
+      }, 0)
+    })
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -80,6 +87,11 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
       this.showPaneEditor = false
       this.iconDropdownOpen = false
       this.initializeWorkspace()
+    }
+
+    // Handle autoFocus change
+    if (changes['autoFocus']?.currentValue) {
+      this.focusNameInput()
     }
   }
 
@@ -102,13 +114,6 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
 
   onCancel(): void {
     this.cancel.emit()
-  }
-
-  onRun(): void {
-    if (!this.workspace.name?.trim()) {
-      return
-    }
-    this.run.emit(this.workspace)
   }
 
   selectPane(pane: WorkspacePane): void {
