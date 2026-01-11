@@ -3,7 +3,18 @@ import { ToolbarButtonProvider, ToolbarButton, ProfilesService, AppService } fro
 import { WorkspaceEditorService } from '../services/workspaceEditor.service'
 import { StartupCommandService } from '../services/startupCommand.service'
 import { SettingsTabComponent } from 'tabby-settings'
-import { CONFIG_KEY, DISPLAY_NAME } from '../build-config'
+import { CONFIG_KEY, DISPLAY_NAME, IS_DEV } from '../build-config'
+
+const ICON_GRID = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="3" y="3" width="7" height="7"/>
+  <rect x="14" y="3" width="7" height="7"/>
+  <rect x="14" y="14" width="7" height="7"/>
+  <rect x="3" y="14" width="7" height="7"/>
+</svg>`
+
+const ICON_BOLT = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+</svg>`
 import { countPanes } from '../models/workspace.model'
 
 @Injectable()
@@ -22,12 +33,7 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
   provide(): ToolbarButton[] {
     return [
       {
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="7" height="7"/>
-          <rect x="14" y="3" width="7" height="7"/>
-          <rect x="14" y="14" width="7" height="7"/>
-          <rect x="3" y="14" width="7" height="7"/>
-        </svg>`,
+        icon: IS_DEV ? ICON_BOLT : ICON_GRID,
         title: DISPLAY_NAME,
         weight: 5,
         click: () => this.showWorkspaceSelector()

@@ -200,6 +200,8 @@ npm creates symlinks for local packages, so each build is immediately available.
 | Package | `tabby-tabbyspaces` | `tabby-tabbyspaces-dev` |
 | Config | `config.store.tabbyspaces` | `config.store.tabbyspaces_dev` |
 | Display | "TabbySpaces" | "TabbySpaces DEV" |
+| Toolbar icon | Grid (4 squares) | ⚡ Bolt |
+| Settings icon | `th-large` | `bolt` |
 
 Both plugins can be installed simultaneously.
 
@@ -228,6 +230,18 @@ Automatizovan način za testiranje plugina kroz Chrome DevTools Protocol.
 | `mcp__tabby__execute_js` | Izvrši JS (fresh scope, async/await support) |
 | `mcp__tabby__screenshot` | Screenshot Tabby prozora |
 
+### Identifikacija DEV verzije
+
+DEV verzija ima ⚡ bolt ikonicu (umesto grid-a):
+- **Toolbar**: SVG bolt ikonica u gornjem desnom uglu
+- **Settings sidebar**: FontAwesome `fa-bolt` pored "TabbySpaces DEV"
+
+```javascript
+// Proveri da li je DEV verzija aktivna u settings
+document.querySelector('.nav-link .fa-bolt')  // DEV
+document.querySelector('.nav-link .fa-th-large')  // PROD
+```
+
 ### CSS Selektori Reference
 
 | Selektor | Element |
@@ -239,6 +253,8 @@ Automatizovan način za testiranje plugina kroz Chrome DevTools Protocol.
 | `.pane-editor-modal` | Edit pane modal |
 | `.context-menu` | Context menu (desni klik) |
 | `.workspace-item` | Workspace u listi |
+| `.nav-link .fa-bolt` | DEV settings tab ikonica |
+| `.nav-link .fa-th-large` | PROD settings tab ikonica |
 
 ### Primeri
 ```javascript
