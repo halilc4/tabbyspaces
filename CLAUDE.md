@@ -213,31 +213,53 @@ Automatizovan način za testiranje plugina kroz Chrome DevTools Protocol.
    cmd.exe /c start "" "C:\Program Files (x86)\Tabby\Tabby.exe" --remote-debugging-port=9222
    ```
 2. **Izlistaj targets** sa `mcp__tabby__list_targets`
-3. **Koristi poslednji target** (index -1 ili najveći index) - to je glavni Tabby prozor
-4. **Debug** sa `query` i `execute_js`
+3. **Identifikuj target** - oba imaju isti URL, ali:
+   - Target 0 = Tvoj radni Tabby (Claude Code session)
+   - Target 1 = Debug Tabby instance (pokrenut sa --remote-debugging-port)
+4. **Debug** sa `query`, `execute_js`, `screenshot`
 
-**VAŽNO:** Debug-uj NOVI Tabby instance, ne onaj u kojem radiš!
+**VAŽNO:** Debug-uj NOVI Tabby instance (target 1), ne onaj u kojem radiš!
 
 ### MCP Tools
 | Tool | Opis |
 |------|------|
-| `mcp__tabby__list_targets` | Lista CDP targets (tabs) sa URL i WebSocket |
+| `mcp__tabby__list_targets` | Lista CDP targets sa index, title, URL, WebSocket |
 | `mcp__tabby__query` | CSS selector → lista elemenata |
-| `mcp__tabby__execute_js` | Izvrši JS u Tabby kontekstu |
+| `mcp__tabby__execute_js` | Izvrši JS (fresh scope, async/await support) |
+| `mcp__tabby__screenshot` | Screenshot Tabby prozora |
+
+### CSS Selektori Reference
+
+| Selektor | Element |
+|----------|---------|
+| `.preview-pane` | Pane u split preview-u |
+| `.preview-pane.selected` | Selektovan pane |
+| `.toolbar-btn` | Toolbar dugmad |
+| `.toolbar-btn[title="Edit pane"]` | Specifično dugme po title-u |
+| `.pane-editor-modal` | Edit pane modal |
+| `.context-menu` | Context menu (desni klik) |
+| `.workspace-item` | Workspace u listi |
 
 ### Primeri
 ```javascript
 // Query elemente
-mcp__tabby__query(target: -1, selector: '.list-group-item')
+mcp__tabby__query(target: 1, selector: '.preview-pane')
 
-// Klikni na element po indexu
-document.querySelectorAll('.list-group-item')[5].click()
+// Klikni na pane i proveri toolbar
+document.querySelectorAll('.preview-pane')[0].click();
+return Array.from(document.querySelectorAll('.toolbar-btn'))
+  .map(b => ({title: b.title, disabled: b.disabled}));
 
-// Dobij sve linkove
-Array.from(document.querySelectorAll('a')).map(a => a.innerText)
+// Split pane i vrati novi count
+const before = document.querySelectorAll('.preview-pane').length;
+document.querySelectorAll('.preview-pane')[0].click();
+document.querySelector('.toolbar-btn[title="Split Horizontal"]').click();
+return { before, after: document.querySelectorAll('.preview-pane').length };
 
-// Proveri body content
-document.body.innerText
+// Async primer - sačekaj Angular change detection
+document.querySelectorAll('.preview-pane')[0].click();
+await new Promise(r => setTimeout(r, 100));
+return document.querySelectorAll('.preview-pane.selected').length;
 ```
 
 ## Known Issues
