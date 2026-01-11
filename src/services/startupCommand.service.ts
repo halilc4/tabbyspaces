@@ -93,6 +93,9 @@ export class StartupCommandService {
         console.log('[TabbySpaces] Shell ready, sending command:', fullCommand)
         terminalTab.sendInput(fullCommand + '\r')
 
+        // Clear profile args to prevent native splits from re-running command
+        this.clearProfileArgs(terminalTab)
+
         // Reset title - either to original or clear for dynamic shell title
         if (pending.originalTitle) {
           terminalTab.setTitle(pending.originalTitle)
@@ -105,6 +108,10 @@ export class StartupCommandService {
       // Fallback if session not available yet
       setTimeout(() => {
         terminalTab.sendInput(fullCommand + '\r')
+
+        // Clear profile args to prevent native splits from re-running command
+        this.clearProfileArgs(terminalTab)
+
         if (pending.originalTitle) {
           terminalTab.setTitle(pending.originalTitle)
         } else {
@@ -116,6 +123,17 @@ export class StartupCommandService {
 
   private buildFullCommand(pending: PendingCommand): string | null {
     return pending.command || null
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private clearProfileArgs(terminalTab: BaseTerminalTabComponent<any>): void {
+    // Clear args from profile to prevent native splits from re-running startup command
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const profile = (terminalTab as any).profile
+    if (profile?.options?.args) {
+      console.log('[TabbySpaces] Clearing profile args to prevent re-run on split')
+      profile.options.args = []
+    }
   }
 
   ngOnDestroy(): void {

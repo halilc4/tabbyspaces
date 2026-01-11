@@ -39,9 +39,9 @@
 ## Bugs
 
 - [ ] Audit async funkcija - proveriti da li fali `detectChanges()` posle async operacija koje menjaju state (duplicateWorkspace, deleteWorkspace, onEditorSave, openWorkspace)
-- [ ] Split pane-a pokrene komandu (in-memory profiles, treba drugačiji fix)
+- [x] Split pane-a pokrene komandu (in-memory profiles) - fix: čišćenje profile.options.args posle izvršenja komande
 - [x] Pane editor modal bug - mouseup izvan dialoga zatvara modal (npr. selekcija teksta pa prevlačenje miša van). Dialog treba zatvarati samo na Esc ili dugme close/cancel/save, bez click-outside. Primeniti na sve buduće dialoge.
-- [ ] Resize pane-ova u Tabby-u se vraća na originalne vrednosti (ratio problem). Opcije: 1) uvek default 0.5, 2) omogućiti korisniku podešavanje ratio-a u editoru, 3) update ratio kada user resize-uje pane u Tabby-u
+- [~] Resize pane-ova u Tabby-u se vraća na originalne vrednosti (ratio problem) - WATCH: dešava se samo na jednom workspace-u
 - [ ] Migracija i brisanje profila ne radi
 - [ ] Layout preview responsive - nested splits se ne prilagođavaju dobro na manje veličine
 - [x] New workspace: fokus na name input ne radi
