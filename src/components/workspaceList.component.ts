@@ -112,6 +112,7 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     if (duplicated) {
       this.selectWorkspace(duplicated)
     }
+    this.cdr.detectChanges()
   }
 
   async deleteWorkspace(event: MouseEvent, workspace: Workspace): Promise<void> {
@@ -130,6 +131,7 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
         this.editingWorkspace = null
         this.isCreatingNew = false
       }
+      this.cdr.detectChanges()
     }
   }
 
@@ -148,6 +150,7 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     if (saved) {
       this.selectWorkspace(saved)
     }
+    this.cdr.detectChanges()
   }
 
   onEditorCancel(): void {

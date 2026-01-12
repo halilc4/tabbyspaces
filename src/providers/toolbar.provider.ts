@@ -26,11 +26,13 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
     private startupService: StartupCommandService
   ) {
     super()
-    // Cleanup orphaned profiles from previous plugin versions (one-time migration)
-    this.workspaceService.cleanupOrphanedProfiles()
-
-    // Launch workspaces marked for startup (with delay to ensure Tabby is ready)
-    setTimeout(() => this.launchStartupWorkspaces(), 500)
+    // Delay startup tasks to ensure Tabby config is loaded
+    setTimeout(() => {
+      // Cleanup orphaned profiles from previous plugin versions (one-time migration)
+      this.workspaceService.cleanupOrphanedProfiles()
+      // Launch workspaces marked for startup
+      this.launchStartupWorkspaces()
+    }, 500)
   }
 
   private async launchStartupWorkspaces(): Promise<void> {

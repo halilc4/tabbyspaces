@@ -38,11 +38,11 @@
 
 ## Bugs
 
-- [ ] Audit async funkcija - proveriti da li fali `detectChanges()` posle async operacija koje menjaju state (duplicateWorkspace, deleteWorkspace, onEditorSave, openWorkspace)
+- [x] Audit async funkcija - proveriti da li fali `detectChanges()` posle async operacija koje menjaju state (duplicateWorkspace, deleteWorkspace, onEditorSave, openWorkspace)
 - [x] Split pane-a pokrene komandu (in-memory profiles) - fix: čišćenje profile.options.args posle izvršenja komande
 - [x] Pane editor modal bug - mouseup izvan dialoga zatvara modal (npr. selekcija teksta pa prevlačenje miša van). Dialog treba zatvarati samo na Esc ili dugme close/cancel/save, bez click-outside. Primeniti na sve buduće dialoge.
 - [~] Resize pane-ova u Tabby-u se vraća na originalne vrednosti (ratio problem) - WATCH: dešava se samo na jednom workspace-u
-- [ ] Migracija i brisanje profila ne radi
+- [x] Migracija i brisanje profila ne radi (fix: timing - cleanup se pozivao pre učitavanja config.store)
 - [ ] Layout preview responsive - nested splits se ne prilagođavaju dobro na manje veličine
 - [x] New workspace: fokus na name input ne radi
 - [x] Built-in shells (PowerShell, cmd, WSL) nisu radili - filter tražio `type === 'local'` umesto `type.startsWith('local:')`

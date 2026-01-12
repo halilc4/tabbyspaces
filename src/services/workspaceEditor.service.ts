@@ -89,7 +89,7 @@ export class WorkspaceEditorService {
     if (filtered.length !== profiles.length) {
       this.config.store.profiles = filtered
       this.config.save()
-      console.log(`[TabbySpaces] Cleaned up ${profiles.length - filtered.length} orphaned profiles`)
+      console.log(`[${DISPLAY_NAME}] Cleaned up ${profiles.length - filtered.length} orphaned profiles`)
     }
   }
 

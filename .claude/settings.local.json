@@ -24,7 +24,8 @@
       "Bash(tree:*)",
       "Bash(dir \"C:\\\\Users\\\\halil\\\\tabbyspaces\\\\node_modules\" /B)",
       "Bash(findstr:*)",
-      "mcp__tabby__screenshot"
+      "mcp__tabby__screenshot",
+      "Bash(python:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
