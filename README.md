@@ -9,7 +9,7 @@ Visual workspace editor for [Tabby](https://tabby.sh). Create split-layout termi
 - Visual editor for split layouts (horizontal/vertical, nested, any depth)
 - Per-pane configuration: profile, working directory, startup command, title
 - One-click workspace launch from toolbar
-- Hotkey support for quick workspace switching
+- Launch on startup (auto-open workspaces when Tabby starts)
 - Works with any shell (Bash, Zsh, PowerShell, Nushell, etc.)
 
 ## About this project
@@ -48,6 +48,13 @@ Restart Tabby after installation.
 ### Pane configuration
 
 ![Edit Pane](screenshots/pane-edit.png)
+
+## Roadmap
+
+- Hotkey support for quick workspace switching
+- Pane presets (saved configurations for quick adding)
+- Resize panes in editor (adjust split ratios)
+- Drag and drop panes (reorganize layout by dragging)
 
 ## Tech
 
