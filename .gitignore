@@ -12,6 +12,7 @@ dist-dev/
 .vscode/
 *.swp
 *.swo
+.venv/
 
 # OS
 .DS_Store

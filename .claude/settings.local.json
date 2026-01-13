@@ -27,7 +27,11 @@
       "mcp__tabby__screenshot",
       "Bash(python:*)",
       "Bash(cmd /c \"dir /A %APPDATA%\\\\tabby\\\\plugins\\\\node_modules\")",
-      "Bash(cmd /c \"dir %APPDATA%\\\\tabby\\\\plugins\")"
+      "Bash(cmd /c \"dir %APPDATA%\\\\tabby\\\\plugins\")",
+      "Bash(git log:*)",
+      "Bash(ls -la \"C:\\\\Users\\\\halil\\\\tabbyspaces\\\\screenshots\"\" 2>nul || echo \"Directory not found \")",
+      "Bash(dir:*)",
+      "Bash(cmd.exe /c start \"\" \"C:\\\\Program Files \\(x86\\)\\\\Tabby\\\\Tabby.exe\" --remote-debugging-port=9222)"
     ]
   },
   "enableAllProjectMcpServers": true,
