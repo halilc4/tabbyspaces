@@ -20,6 +20,8 @@ Igor Halilović had the idea and provided product direction. He hates Angular so
 
 Human provides the *what* and *why*. AI handles the *how*.
 
+Here's the fun part: to test this plugin, we built [tabby-mcp](https://github.com/halilc4/tabby-mcp) - an MCP server that lets Claude Code interact with Tabby via CDP. So the AI that built TabbySpaces can now test it too. Full circle.
+
 ## Install
 
 **From Tabby Plugin Manager:**
@@ -41,10 +43,6 @@ Restart Tabby after installation.
 4. Configure each pane (profile, cwd, startup command)
 5. Save and launch from the toolbar
 
-### Workspace editor
-
-![Edit Workspace](screenshots/workspace-edit.png)
-
 ### Pane configuration
 
 ![Edit Pane](screenshots/pane-edit.png)
@@ -62,6 +60,11 @@ Restart Tabby after installation.
 - TypeScript 4.9
 - Webpack 5
 - Pug templates, SCSS styles
+
+## Community
+
+- [Discussions](https://github.com/halilc4/tabbyspaces/discussions) - Questions, ideas, show your setup
+- [Issues](https://github.com/halilc4/tabbyspaces/issues) - Bug reports
 
 ## License
 
