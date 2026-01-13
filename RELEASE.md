@@ -28,12 +28,12 @@
 ### Funkcionalnosti za testirati
 - [x] Plugin se pojavljuje u Settings sidebar (ikonica `th-large`, ne `bolt`)
 - [x] Toolbar dugme (grid ikonica)
-- [ ] Kreiranje novog workspace-a
-- [ ] Split layout editing (horizontal/vertical)
-- [ ] Pane selection i editing
-- [ ] Startup command
-- [ ] Launch on startup
-- [ ] Čuvanje u `config.store.tabbyspaces`
+- [x] Kreiranje novog workspace-a
+- [x] Split layout editing (horizontal/vertical)
+- [x] Pane selection i editing
+- [x] Startup command
+- [x] Launch on startup
+- [x] Čuvanje u `config.store.tabbyspaces`
 
 ### Install/Uninstall
 - [x] Uninstall PROD (`npm uninstall tabby-tabbyspaces`)
