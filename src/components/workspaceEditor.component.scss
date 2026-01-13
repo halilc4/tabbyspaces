@@ -197,7 +197,20 @@
 
   .toolbar-group {
     display: flex;
+    align-items: center;
     gap: 2px;
+  }
+
+  .toolbar-label {
+    font-size: 0.75rem;
+    color: var(--theme-fg-more);
+    margin-right: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .toolbar-spacer {
+    flex: 1;
   }
 
   .toolbar-divider {

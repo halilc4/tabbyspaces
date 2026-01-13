@@ -25,7 +25,9 @@
       "Bash(dir \"C:\\\\Users\\\\halil\\\\tabbyspaces\\\\node_modules\" /B)",
       "Bash(findstr:*)",
       "mcp__tabby__screenshot",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(cmd /c \"dir /A %APPDATA%\\\\tabby\\\\plugins\\\\node_modules\")",
+      "Bash(cmd /c \"dir %APPDATA%\\\\tabby\\\\plugins\")"
     ]
   },
   "enableAllProjectMcpServers": true,

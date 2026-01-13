@@ -57,18 +57,8 @@ ng-template(#editorContent)
       span.layout-title Layout
 
     .layout-toolbar
-      .toolbar-group
-        button.toolbar-btn(
-          type='button',
-          [disabled]='!selectedPaneId',
-          (click)='editSelectedPane()',
-          title='Edit pane'
-        )
-          i.fas.fa-pen
-
-      .toolbar-divider
-
       .toolbar-group.split-group
+        span.toolbar-label Split
         button.toolbar-btn(
           type='button',
           [disabled]='!selectedPaneId',
@@ -87,6 +77,7 @@ ng-template(#editorContent)
       .toolbar-divider
 
       .toolbar-group.add-group
+        span.toolbar-label Add
         button.toolbar-btn(
           type='button',
           [disabled]='!selectedPaneId',
@@ -116,7 +107,7 @@ ng-template(#editorContent)
         )
           i.fas.fa-caret-down
 
-      .toolbar-divider
+      .toolbar-spacer
 
       .toolbar-group
         button.toolbar-btn.danger(

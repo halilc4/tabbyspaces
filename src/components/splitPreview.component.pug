@@ -6,6 +6,7 @@
       [style.flex-basis]='getFlexStyle(i)',
       [class.selected]='asPane(child).id === selectedPaneId',
       (click)='onPaneClick(asPane(child)); $event.stopPropagation()',
+      (dblclick)='onEditClick($event, asPane(child))',
       (contextmenu)='onContextMenu($event, asPane(child))'
     )
       .pane-content
