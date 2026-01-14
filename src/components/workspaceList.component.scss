@@ -4,91 +4,104 @@
   padding: $spacing-2xl;
 }
 
-.workspace-list-header {
-  @include flex-between;
-  margin-bottom: $spacing-2xl;
-
-  h3 {
-    margin: 0;
-    font-size: 1.5rem;
-  }
+// Tab bar
+.tab-bar {
+  display: flex;
+  background: var(--theme-bg-more);
+  border: 1px solid var(--theme-border);
+  border-bottom: none;
 }
 
-.workspace-list {
-  @include flex-col($spacing-lg);
-}
-
-.workspace-item {
-  @include flex-between;
-  @include interactive-card($radius-lg);
-  padding: $spacing-xl;
-
-  &.selected {
-    border-left-width: 3px;
-    box-shadow: 0 0 0 1px var(--theme-primary) inset;
-  }
-}
-
-.workspace-info {
-  @include flex-row($spacing-xl);
-}
-
-.workspace-icon {
-  font-size: 24px;
-  width: 40px;
-  text-align: center;
-}
-
-.workspace-details {
-  @include flex-col($spacing-sm);
-}
-
-.workspace-name {
-  font-size: 1.1rem;
-  font-weight: 500;
-}
-
-.workspace-meta {
-  font-size: 0.85rem;
+.tab {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  border-right: 1px solid var(--theme-border);
   color: var(--theme-fg-more);
+  cursor: pointer;
+  font-size: $font-sm;
+  min-width: 120px;
+  transition: background $transition-fast;
 
-  .separator {
-    margin: 0 6px;
+  &:hover {
+    background: var(--theme-bg-more-more);
+
+    .tab-close {
+      opacity: 1;
+    }
   }
 
-  .badge {
-    font-size: 0.75rem;
-    padding: $spacing-xs 6px;
-    border-radius: $radius-sm;
-    background: var(--theme-primary);
+  &.active {
+    background: var(--theme-bg);
+    color: var(--theme-fg);
+    border-bottom: 2px solid var(--theme-primary);
+    margin-bottom: -1px;
+  }
+}
+
+.tab-icon {
+  font-size: 12px;
+}
+
+.tab-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab-close {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  font-size: 9px;
+  border-radius: $radius-xs;
+  transition: opacity $transition-fast, background $transition-fast;
+
+  &:hover {
+    background: var(--theme-danger);
     color: white;
   }
 }
 
-.workspace-actions {
-  @include flex-row($spacing-sm);
+.tab-new {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  color: var(--theme-fg-more);
+  cursor: pointer;
+  transition: color $transition-fast, background $transition-fast;
 
-  .btn-link {
-    padding: $spacing-md;
-    color: var(--theme-fg-more);
-    @include icon-btn-opacity;
-
-    &.open-btn:hover {
-      color: var(--theme-success, $color-success);
-    }
-
-    &.text-danger:hover {
-      color: var(--theme-danger);
-    }
+  &:hover {
+    background: var(--theme-bg-more-more);
+    color: var(--theme-primary);
   }
 }
 
-.workspace-empty {
-  text-align: center;
-  padding: 40px;
-  color: var(--theme-fg-more);
+// Tab content
+.tab-content {
+  background: var(--theme-bg);
+  border: 1px solid var(--theme-border);
+  border-top: none;
+  padding: $spacing-xl;
 
-  p {
-    margin: $spacing-md 0;
+  &.empty-state {
+    text-align: center;
+    padding: $spacing-2xl;
+    color: var(--theme-fg-more);
+
+    p {
+      margin: $spacing-md 0;
+    }
+
+    strong {
+      color: var(--theme-primary);
+      padding: 0 $spacing-xs;
+    }
   }
 }

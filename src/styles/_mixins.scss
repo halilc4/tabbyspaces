@@ -33,12 +33,12 @@
 // ======================
 
 @mixin form-input($bg: var(--theme-bg)) {
-  padding: 10px 12px;
-  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-sm;
   border: 1px solid var(--theme-border);
   background: $bg;
   color: var(--theme-fg);
-  font-size: 0.95rem;
+  font-size: $font-md;
 
   &:focus {
     outline: none;
@@ -51,10 +51,23 @@
 }
 
 // ======================
+// FORM LABEL MIXIN (S1: Uppercase compact)
+// ======================
+
+@mixin form-label {
+  display: block;
+  font-size: $font-xs;
+  color: var(--theme-fg-less);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: $spacing-xs;
+}
+
+// ======================
 // INTERACTIVE CARD MIXIN
 // ======================
 
-@mixin interactive-card($radius: $radius-lg) {
+@mixin interactive-card($radius: $radius-md) {
   background: var(--theme-bg-more);
   border-radius: $radius;
   border: 1px solid var(--theme-border);

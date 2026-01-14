@@ -1,94 +1,120 @@
 @import '../styles/index';
 
-.pane-editor-overlay {
-  @include full-overlay($z-modal-overlay);
-  @include flex-center;
-  background: $overlay-bg;
+// Inline pane details panel
+.pane-details {
+  background: var(--theme-bg-more-more);
+  border-radius: $radius-sm;
+  padding: $spacing-lg;
+  padding-top: $spacing-lg;
+  margin-top: $spacing-xl;
+  border-left: 2px solid var(--theme-primary);
+  border-top: 1px solid var(--theme-border);
 }
 
-.pane-editor-modal {
-  background: var(--theme-bg);
-  border-radius: $radius-xl;
-  width: 90%;
-  max-width: 500px;
-  max-height: 80vh;
-  overflow: hidden;
+.pane-details-header {
   display: flex;
-  flex-direction: column;
-  box-shadow: $shadow-modal;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
 }
 
-.modal-header {
-  @include flex-between;
-  padding: $spacing-xl $spacing-2xl;
-  border-bottom: 1px solid var(--theme-border);
+.pane-details-title {
+  font-size: $font-sm;
+  color: var(--theme-fg);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
 
-  h4 {
-    margin: 0;
-    font-size: 1.15rem;
-  }
+.pane-details-close {
+  color: var(--theme-fg-more);
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  transition: color $transition-fast;
 
-  .close-btn {
-    font-size: 1.15rem;
-    color: var(--theme-fg-more);
-    padding: $spacing-sm $spacing-md;
-
-    &:hover {
-      color: var(--theme-fg);
-    }
+  &:hover {
+    color: var(--theme-fg);
   }
 }
 
-.modal-body {
-  padding: $spacing-2xl;
-  overflow-y: auto;
-  flex: 1;
+// 2-column grid for pane form
+.pane-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-lg;
+}
+
+@media (max-width: 600px) {
+  .pane-form {
+    grid-template-columns: 1fr;
+  }
 }
 
 .form-group {
-  margin-bottom: $spacing-xl;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-
   label {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 0.9rem;
-    color: var(--theme-fg-more);
+    @include form-label;
   }
 }
 
 .form-control {
   width: 100%;
-  @include form-input(var(--theme-bg-more));
+  @include form-input(var(--theme-bg));
+  font-size: $font-sm;
+  // Override Tabby's global border reset
+  border: 1px solid var(--theme-border) !important;
+
+  &:focus {
+    border-color: var(--theme-primary) !important;
+  }
 }
 
 select.form-control {
   cursor: pointer;
+  appearance: auto; // Show dropdown arrow
 }
 
-.input-with-button {
-  @include flex-row($spacing-md);
-
-  input {
-    flex: 1;
-  }
-}
-
-.help-text {
-  display: block;
-  margin-top: $spacing-sm;
-  font-size: 0.8rem;
-  color: var(--theme-fg-more);
-  opacity: 0.8;
-}
-
-.modal-footer {
+// Action buttons at bottom of panel
+.pane-form-actions {
+  grid-column: 1 / -1;
   display: flex;
   justify-content: flex-end;
-  gap: $spacing-lg;
-  padding: $spacing-xl $spacing-2xl;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
   border-top: 1px solid var(--theme-border);
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-sm $spacing-lg;
+    font-size: $font-sm;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    transition: all $transition-fast;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--theme-border);
+    color: var(--theme-fg);
+
+    &:hover {
+      background: var(--theme-bg-more);
+    }
+  }
+
+  .btn-primary {
+    background: var(--theme-primary);
+    border: 1px solid var(--theme-primary);
+    color: white;
+
+    &:hover {
+      filter: brightness(1.1);
+    }
+  }
 }

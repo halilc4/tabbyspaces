@@ -1,20 +1,20 @@
 // ======================
-// SPACING SCALE
+// SPACING SCALE (S1: Tight)
 // ======================
 $spacing-xs: 2px;   // toolbar group gap, tiny margins
 $spacing-sm: 4px;   // gaps, small padding
-$spacing-md: 8px;   // default gaps, button padding
-$spacing-lg: 12px;  // section gaps, form spacing
-$spacing-xl: 16px;  // container padding, large gaps
-$spacing-2xl: 20px; // modal padding, section margins
+$spacing-md: 6px;   // default gaps, button padding
+$spacing-lg: 10px;  // section gaps, form spacing
+$spacing-xl: 14px;  // container padding, large gaps
+$spacing-2xl: 18px; // modal padding, section margins
 
 // ======================
-// BORDER RADIUS SCALE
+// BORDER RADIUS SCALE (S1: Sharp)
 // ======================
-$radius-sm: 4px;    // buttons, small elements
-$radius-md: 6px;    // inputs, dropdowns
-$radius-lg: 8px;    // cards, containers
-$radius-xl: 12px;   // modals
+$radius-xs: 2px;    // tiny elements
+$radius-sm: 2px;    // buttons, small elements
+$radius-md: 3px;    // inputs, dropdowns
+$radius-lg: 4px;    // cards, containers, modals
 
 // ======================
 // CUSTOM COLORS
@@ -26,12 +26,19 @@ $color-warning: #f59e0b;
 $color-danger: #ef4444;
 
 // ======================
-// SHADOWS
+// SHADOWS (S1: Flat - no shadows)
 // ======================
-$shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.15);
-$shadow-context-menu: 0 8px 24px rgba(0, 0, 0, 0.3);
-$shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.4);
+$shadow-dropdown: none;
+$shadow-context-menu: none;
+$shadow-modal: none;
 $overlay-bg: rgba(0, 0, 0, 0.7);
+
+// ======================
+// FONT SIZES (S1: Compact)
+// ======================
+$font-xs: 0.7rem;   // 11px - sublabels, hints
+$font-sm: 0.8rem;   // 13px - labels, secondary text
+$font-md: 0.85rem;  // 14px - default body
 
 // ======================
 // Z-INDEX SCALE

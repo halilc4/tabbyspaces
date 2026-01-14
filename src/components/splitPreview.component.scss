@@ -31,7 +31,7 @@
   @include flex-center;
   background: var(--theme-bg-more);
   border-radius: $radius-sm;
-  border: 2px solid transparent;
+  border: 2px solid var(--theme-border);
   cursor: pointer;
   transition: all $transition-fast;
   position: relative;
@@ -39,11 +39,16 @@
 
   &:hover {
     background: var(--theme-bg-more-more);
+    border-color: var(--theme-fg-more);
   }
 
   &.selected {
     border-color: var(--theme-primary);
-    background: var(--theme-bg-more-more);
+    background: linear-gradient(
+      to bottom,
+      rgba(59, 130, 246, 0.08),
+      rgba(59, 130, 246, 0.04)
+    );
   }
 }
 
@@ -53,6 +58,13 @@
   color: var(--theme-fg);
   max-width: 100%;
   overflow: hidden;
+}
+
+.pane-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: $spacing-sm;
+  @include text-ellipsis;
 }
 
 .pane-title,
@@ -89,7 +101,7 @@
   position: absolute;
   top: $spacing-sm;
   right: $spacing-sm;
-  padding: $spacing-sm 6px;
+  padding: $spacing-sm $spacing-md;
   background: var(--theme-bg);
   border: 1px solid var(--theme-border);
   border-radius: $radius-sm;
@@ -98,6 +110,7 @@
   font-size: 0.7rem;
   transition: all $transition-fast;
   opacity: 0;
+  z-index: 10;
 
   &:hover {
     background: var(--theme-primary);
@@ -127,7 +140,7 @@
 }
 
 .context-menu-item {
-  @include flex-row(10px);
+  @include flex-row($spacing-lg);
   width: 100%;
   padding: $spacing-md $spacing-lg;
   border: none;

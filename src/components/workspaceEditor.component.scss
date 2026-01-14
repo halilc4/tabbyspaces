@@ -1,200 +1,284 @@
 @import '../styles/index';
 
-// Workspace editor (inline)
-.workspace-editor-inline {
-  background: var(--theme-bg-more);
-  border-radius: $radius-lg;
-  border: 1px solid var(--theme-border);
-  margin-bottom: $spacing-xl;
-
-  .editor-body {
-    padding: $spacing-xl;
-  }
-
-  .editor-footer {
-    @include flex-between;
-    padding: 10px $spacing-xl;
-    border-top: 1px solid var(--theme-border);
-    background: var(--theme-bg);
-    border-radius: 0 0 $radius-lg $radius-lg;
-
-    .startup-checkbox {
-      @include flex-row(6px);
-      font-size: 0.85rem;
-      color: var(--theme-fg-more);
-      cursor: pointer;
-
-      input {
-        margin: 0;
-      }
-    }
-
-    .editor-actions {
-      @include flex-row($spacing-md);
-
-      .btn-success {
-        @include btn-success;
-      }
-
-      .unsaved-indicator {
-        color: $color-warning;
-        font-weight: bold;
-        margin-left: $spacing-xs;
-      }
-    }
-  }
-}
-
-// Shared editor content
-.editor-top-row {
-  @include flex-row($spacing-lg);
-  align-items: flex-start;
+// Editor section
+.editor-section {
   margin-bottom: $spacing-xl;
 }
 
-.color-picker {
-  .color-input {
-    width: 40px;
-    height: 40px;
-    padding: $spacing-xs;
-    border: 1px solid var(--theme-border);
-    border-radius: $radius-md;
-    cursor: pointer;
-    background: var(--theme-bg);
-
-    &::-webkit-color-swatch-wrapper {
-      padding: $spacing-xs;
-    }
-
-    &::-webkit-color-swatch {
-      border-radius: $radius-sm;
-      border: none;
-    }
-  }
+.section-title {
+  font-size: 11px;
+  color: var(--theme-fg-more);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: $spacing-lg;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
 }
 
-.name-input {
+// Form layout
+.form-row {
+  display: flex;
+  gap: $spacing-lg;
+  align-items: flex-end;
+}
+
+.form-group {
   flex: 1;
-  min-width: 150px;
-  @include form-input(var(--theme-bg));
-  font-size: 1rem;
-  font-weight: 500;
-
-  &::placeholder {
-    font-weight: 400;
-  }
-}
-
-.icon-picker {
   position: relative;
 
-  .icon-trigger {
-    width: 40px;
-    height: 40px;
-    @include flex-center;
-    border: 1px solid var(--theme-border);
-    border-radius: $radius-md;
+  &.auto-width {
+    flex: none;
+  }
+
+  label {
+    @include form-label;
+  }
+
+  .form-control {
+    @include form-input(var(--theme-bg-more));
+    width: 100%;
+    font-size: $font-sm;
+    // Override Tabby's global border reset
+    border: 1px solid var(--theme-border) !important;
+
+    &:focus {
+      border-color: var(--theme-primary) !important;
+    }
+  }
+}
+
+// Dropdown trigger (icon picker)
+.dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: var(--theme-bg-more);
+  border: 1px solid var(--theme-border);
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: border-color $transition-fast;
+  height: 32px;
+  box-sizing: border-box;
+
+  &:hover {
+    border-color: var(--theme-fg-more);
+  }
+}
+
+.dropdown-icon {
+  font-size: 14px;
+}
+
+.dropdown-chevron {
+  color: var(--theme-fg-more);
+  font-size: 10px;
+}
+
+// Icon dropdown
+.icon-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: $spacing-sm;
+  padding: $spacing-md;
+  @include dropdown-panel;
+  z-index: $z-dropdown;
+  display: grid;
+  grid-template-columns: repeat(6, 28px);
+  gap: $spacing-sm;
+}
+
+.icon-option {
+  width: 28px;
+  height: 28px;
+  @include flex-center;
+  border: 1px solid transparent;
+  border-radius: $radius-sm;
+  background: transparent;
+  color: var(--theme-fg-more);
+  cursor: pointer;
+  transition: all $transition-fast;
+  font-size: 0.85rem;
+
+  &:hover {
+    background: var(--theme-bg-more-more);
+    color: var(--theme-fg);
+  }
+
+  &.selected {
+    border-color: currentColor;
     background: var(--theme-bg);
+  }
+}
+
+// Color trigger (wraps native color input)
+.color-trigger {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: var(--theme-bg-more);
+  border: 1px solid var(--theme-border);
+  border-radius: $radius-sm;
+  cursor: pointer;
+  position: relative;
+  transition: border-color $transition-fast;
+  height: 32px;
+  box-sizing: border-box;
+
+  &:hover {
+    border-color: var(--theme-fg-more);
+  }
+
+  &:focus-within {
+    border-color: var(--theme-primary);
+  }
+
+  .color-input-hidden {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
     cursor: pointer;
-    font-size: 1.1rem;
-    transition: background $transition-fast;
+  }
+}
+
+.dropdown-color {
+  width: 16px;
+  height: 16px;
+  border-radius: $radius-xs;
+}
+
+// Split preview container
+.split-preview-container {
+  background: var(--theme-bg-more);
+  border: 1px solid var(--theme-border);
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+}
+
+// Preview toolbar
+.preview-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 18px;
+  background: var(--theme-border);
+  margin: 0 $spacing-sm;
+  align-self: center;
+}
+
+.preview-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--theme-bg);
+  border: 1px solid var(--theme-border);
+  border-radius: $radius-sm;
+  color: var(--theme-fg-more);
+  cursor: pointer;
+  font-size: 10px;
+  transition: all $transition-fast;
+
+  &:hover:not(:disabled) {
+    border-color: var(--theme-primary);
+    color: var(--theme-primary);
+  }
+
+  &.danger:hover:not(:disabled) {
+    border-color: var(--theme-danger);
+    color: var(--theme-danger);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// Layout preview area
+.layout-preview {
+  background: var(--theme-bg);
+  border-radius: $radius-sm;
+  min-height: 150px;
+  max-height: 200px;
+  padding: $spacing-sm;
+}
+
+// Action buttons
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $spacing-xl;
+  border-top: 1px solid var(--theme-border);
+  margin-top: $spacing-xl;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+  }
+
+  label {
+    font-size: $font-sm;
+    color: var(--theme-fg);
+    cursor: pointer;
+  }
+}
+
+.action-buttons-right {
+  display: flex;
+  gap: $spacing-md;
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-sm $spacing-lg;
+    font-size: $font-sm;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    transition: all $transition-fast;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--theme-border);
+    color: var(--theme-fg);
 
     &:hover {
       background: var(--theme-bg-more);
     }
   }
 
-  .icon-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: $spacing-sm;
-    padding: $spacing-md;
-    @include dropdown-panel;
-    z-index: $z-dropdown;
-    display: grid;
-    grid-template-columns: repeat(6, 28px);
-    gap: $spacing-sm;
+  .btn-success {
+    @include btn-success;
   }
 
-  .icon-option {
-    width: 28px;
-    height: 28px;
-    @include flex-center;
-    border: 1px solid transparent;
-    border-radius: $radius-sm;
-    background: transparent;
-    color: var(--theme-fg-more);
-    cursor: pointer;
-    transition: all $transition-fast;
-    font-size: 0.85rem;
-
-    &:hover {
-      background: var(--theme-bg-more-more);
-      color: var(--theme-fg);
-    }
-
-    &.selected {
-      border-color: currentColor;
-      background: var(--theme-bg);
-    }
+  .unsaved-indicator {
+    color: $color-warning;
+    font-weight: bold;
+    margin-left: $spacing-xs;
   }
-}
-
-// Layout section
-.layout-section {
-  .layout-header {
-    @include flex-between;
-    margin-bottom: $spacing-md;
-  }
-
-  .layout-title {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--theme-fg-more);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-}
-
-// Layout toolbar
-.layout-toolbar {
-  @include flex-row($spacing-sm);
-  padding: $spacing-md 0;
-  margin-bottom: $spacing-md;
-
-  .toolbar-group {
-    @include flex-row($spacing-xs);
-  }
-
-  .toolbar-label {
-    font-size: 0.75rem;
-    color: var(--theme-fg-more);
-    margin-right: $spacing-sm;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-  }
-
-  .toolbar-spacer {
-    flex: 1;
-  }
-
-  .toolbar-divider {
-    width: 1px;
-    height: 20px;
-    background: var(--theme-border);
-    margin: 0 $spacing-sm;
-  }
-
-  .toolbar-btn {
-    @include toolbar-btn;
-  }
-}
-
-.layout-preview-container {
-  background: var(--theme-bg);
-  border-radius: $radius-md;
-  padding: $spacing-md;
-  min-height: 120px;
-  max-height: 180px;
 }
