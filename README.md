@@ -66,6 +66,12 @@ Restart Tabby after installation.
 - [Discussions](https://github.com/halilc4/tabbyspaces/discussions) - Questions, ideas, show your setup
 - [Issues](https://github.com/halilc4/tabbyspaces/issues) - Bug reports
 
+## Contributing
+
+PRs welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions.
+
+All PRs go to the `dev` branch. CI checks the build automatically.
+
 ## License
 
 MIT
