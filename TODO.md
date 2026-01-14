@@ -17,6 +17,8 @@
 ### Bugs
 - [~] Resize panes in Tabby reverts to original values (ratio problem) - WATCH: happens only on one workspace
 - [ ] Layout preview responsive - nested splits don't adapt well to smaller sizes
+- [ ] Launch on startup - Tabby remembers open tabs, check if we can detect if workspace is already open; if not, kill the feature
+- [ ] Tab titles are a mess - keep only workspace name or default to Tabby behavior (verify no caching/lookup by tab name)
 
 ### Other
 - [ ] Update screenshots in README
