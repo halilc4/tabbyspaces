@@ -44,12 +44,25 @@ src/
 │   ├── config.provider.ts
 │   ├── settings.provider.ts
 │   └── toolbar.provider.ts
+├── styles/                  # Shared SCSS (modular DRY)
+│   ├── _variables.scss      # Spacing, radius, colors, z-index
+│   └── _mixins.scss         # Reusable patterns
 └── components/              # Angular components (.ts, .pug, .scss)
     ├── workspaceList        # Main settings UI
     ├── workspaceEditor      # Single workspace editor
     ├── paneEditor           # Pane configuration
     └── splitPreview         # Visual split preview
 ```
+
+## Styles
+
+Modular DRY SCSS architecture. All components import `@import '../styles/index'`.
+
+- **Variables**: `$spacing-*`, `$radius-*`, `$color-*`, `$z-*`, `$transition-*`
+- **Mixins**: `flex-row`, `form-input`, `interactive-card`, `toolbar-btn`, `btn-success`, etc.
+- **Theming**: Uses Tabby's `--theme-*` CSS variables
+
+See `docs/DESIGN.md` for details.
 
 ## Build
 
