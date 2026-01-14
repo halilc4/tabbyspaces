@@ -1,12 +1,12 @@
+@import '../styles/index';
+
 .workspace-list-container {
-  padding: 20px;
+  padding: $spacing-2xl;
 }
 
 .workspace-list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  @include flex-between;
+  margin-bottom: $spacing-2xl;
 
   h3 {
     margin: 0;
@@ -15,38 +15,22 @@
 }
 
 .workspace-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  @include flex-col($spacing-lg);
 }
 
 .workspace-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px;
-  background: var(--theme-bg-more);
-  border-radius: 8px;
-  border: 1px solid var(--theme-border);
-  transition: background 0.2s, border-color 0.2s;
-  cursor: pointer;
-
-  &:hover {
-    background: var(--theme-bg-more-more);
-  }
+  @include flex-between;
+  @include interactive-card($radius-lg);
+  padding: $spacing-xl;
 
   &.selected {
-    border-color: var(--theme-primary);
     border-left-width: 3px;
-    background: var(--theme-bg-more-more);
     box-shadow: 0 0 0 1px var(--theme-primary) inset;
   }
 }
 
 .workspace-info {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  @include flex-row($spacing-xl);
 }
 
 .workspace-icon {
@@ -56,9 +40,7 @@
 }
 
 .workspace-details {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  @include flex-col($spacing-sm);
 }
 
 .workspace-name {
@@ -76,29 +58,23 @@
 
   .badge {
     font-size: 0.75rem;
-    padding: 2px 6px;
-    border-radius: 4px;
+    padding: $spacing-xs 6px;
+    border-radius: $radius-sm;
     background: var(--theme-primary);
     color: white;
   }
 }
 
 .workspace-actions {
-  display: flex;
-  gap: 4px;
+  @include flex-row($spacing-sm);
 
   .btn-link {
-    padding: 8px;
+    padding: $spacing-md;
     color: var(--theme-fg-more);
-    opacity: 0.7;
-    transition: opacity 0.2s, color 0.2s;
-
-    &:hover {
-      opacity: 1;
-    }
+    @include icon-btn-opacity;
 
     &.open-btn:hover {
-      color: var(--theme-success, #10b981);
+      color: var(--theme-success, $color-success);
     }
 
     &.text-danger:hover {
@@ -113,6 +89,6 @@
   color: var(--theme-fg-more);
 
   p {
-    margin: 8px 0;
+    margin: $spacing-md 0;
   }
 }

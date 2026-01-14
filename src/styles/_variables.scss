@@ -1,0 +1,48 @@
+// ======================
+// SPACING SCALE
+// ======================
+$spacing-xs: 2px;   // toolbar group gap, tiny margins
+$spacing-sm: 4px;   // gaps, small padding
+$spacing-md: 8px;   // default gaps, button padding
+$spacing-lg: 12px;  // section gaps, form spacing
+$spacing-xl: 16px;  // container padding, large gaps
+$spacing-2xl: 20px; // modal padding, section margins
+
+// ======================
+// BORDER RADIUS SCALE
+// ======================
+$radius-sm: 4px;    // buttons, small elements
+$radius-md: 6px;    // inputs, dropdowns
+$radius-lg: 8px;    // cards, containers
+$radius-xl: 12px;   // modals
+
+// ======================
+// CUSTOM COLORS
+// ======================
+// These extend Tabby's --theme-* variables
+$color-success: #10b981;
+$color-success-hover: #059669;
+$color-warning: #f59e0b;
+$color-danger: #ef4444;
+
+// ======================
+// SHADOWS
+// ======================
+$shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.15);
+$shadow-context-menu: 0 8px 24px rgba(0, 0, 0, 0.3);
+$shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.4);
+$overlay-bg: rgba(0, 0, 0, 0.7);
+
+// ======================
+// Z-INDEX SCALE
+// ======================
+$z-dropdown: 100;
+$z-modal-overlay: 1100;
+$z-context-menu-overlay: 1200;
+$z-context-menu: 1201;
+
+// ======================
+// TRANSITIONS
+// ======================
+$transition-fast: 0.15s;
+$transition-normal: 0.2s;

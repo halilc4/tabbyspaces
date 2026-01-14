@@ -1,27 +1,25 @@
+@import '../styles/index';
+
 // Workspace editor (inline)
 .workspace-editor-inline {
   background: var(--theme-bg-more);
-  border-radius: 8px;
+  border-radius: $radius-lg;
   border: 1px solid var(--theme-border);
-  margin-bottom: 16px;
+  margin-bottom: $spacing-xl;
 
   .editor-body {
-    padding: 16px;
+    padding: $spacing-xl;
   }
 
   .editor-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
+    @include flex-between;
+    padding: 10px $spacing-xl;
     border-top: 1px solid var(--theme-border);
     background: var(--theme-bg);
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 $radius-lg $radius-lg;
 
     .startup-checkbox {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      @include flex-row(6px);
       font-size: 0.85rem;
       color: var(--theme-fg-more);
       cursor: pointer;
@@ -32,24 +30,16 @@
     }
 
     .editor-actions {
-      display: flex;
-      gap: 8px;
+      @include flex-row($spacing-md);
 
       .btn-success {
-        background: #10b981;
-        border-color: #10b981;
-        color: white;
-
-        &:hover {
-          background: #059669;
-          border-color: #059669;
-        }
+        @include btn-success;
       }
 
       .unsaved-indicator {
-        color: #f59e0b;
+        color: $color-warning;
         font-weight: bold;
-        margin-left: 2px;
+        margin-left: $spacing-xs;
       }
     }
   }
@@ -57,28 +47,27 @@
 
 // Shared editor content
 .editor-top-row {
-  display: flex;
+  @include flex-row($spacing-lg);
   align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: $spacing-xl;
 }
 
 .color-picker {
   .color-input {
     width: 40px;
     height: 40px;
-    padding: 2px;
+    padding: $spacing-xs;
     border: 1px solid var(--theme-border);
-    border-radius: 6px;
+    border-radius: $radius-md;
     cursor: pointer;
     background: var(--theme-bg);
 
     &::-webkit-color-swatch-wrapper {
-      padding: 2px;
+      padding: $spacing-xs;
     }
 
     &::-webkit-color-swatch {
-      border-radius: 4px;
+      border-radius: $radius-sm;
       border: none;
     }
   }
@@ -87,21 +76,11 @@
 .name-input {
   flex: 1;
   min-width: 150px;
-  padding: 10px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--theme-border);
-  background: var(--theme-bg);
-  color: var(--theme-fg);
+  @include form-input(var(--theme-bg));
   font-size: 1rem;
   font-weight: 500;
 
-  &:focus {
-    outline: none;
-    border-color: var(--theme-primary);
-  }
-
   &::placeholder {
-    color: var(--theme-fg-more);
     font-weight: 400;
   }
 }
@@ -112,15 +91,13 @@
   .icon-trigger {
     width: 40px;
     height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
     border: 1px solid var(--theme-border);
-    border-radius: 6px;
+    border-radius: $radius-md;
     background: var(--theme-bg);
     cursor: pointer;
     font-size: 1.1rem;
-    transition: background 0.15s;
+    transition: background $transition-fast;
 
     &:hover {
       background: var(--theme-bg-more);
@@ -131,30 +108,25 @@
     position: absolute;
     top: 100%;
     right: 0;
-    margin-top: 4px;
-    padding: 8px;
-    background: var(--theme-bg-more);
-    border: 1px solid var(--theme-border);
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 100;
+    margin-top: $spacing-sm;
+    padding: $spacing-md;
+    @include dropdown-panel;
+    z-index: $z-dropdown;
     display: grid;
     grid-template-columns: repeat(6, 28px);
-    gap: 4px;
+    gap: $spacing-sm;
   }
 
   .icon-option {
     width: 28px;
     height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
     border: 1px solid transparent;
-    border-radius: 4px;
+    border-radius: $radius-sm;
     background: transparent;
     color: var(--theme-fg-more);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all $transition-fast;
     font-size: 0.85rem;
 
     &:hover {
@@ -172,10 +144,8 @@
 // Layout section
 .layout-section {
   .layout-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
+    @include flex-between;
+    margin-bottom: $spacing-md;
   }
 
   .layout-title {
@@ -189,22 +159,18 @@
 
 // Layout toolbar
 .layout-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 0;
-  margin-bottom: 8px;
+  @include flex-row($spacing-sm);
+  padding: $spacing-md 0;
+  margin-bottom: $spacing-md;
 
   .toolbar-group {
-    display: flex;
-    align-items: center;
-    gap: 2px;
+    @include flex-row($spacing-xs);
   }
 
   .toolbar-label {
     font-size: 0.75rem;
     color: var(--theme-fg-more);
-    margin-right: 4px;
+    margin-right: $spacing-sm;
     text-transform: uppercase;
     letter-spacing: 0.3px;
   }
@@ -217,38 +183,18 @@
     width: 1px;
     height: 20px;
     background: var(--theme-border);
-    margin: 0 4px;
+    margin: 0 $spacing-sm;
   }
 
   .toolbar-btn {
-    padding: 4px 8px;
-    background: var(--theme-bg);
-    border: 1px solid var(--theme-border);
-    border-radius: 4px;
-    color: var(--theme-fg);
-    cursor: pointer;
-    transition: all 0.15s;
-    font-size: 0.85rem;
-
-    &:hover:not(:disabled) {
-      background: var(--theme-bg-more-more);
-    }
-
-    &:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    &.danger {
-      color: var(--theme-danger, #ef4444);
-    }
+    @include toolbar-btn;
   }
 }
 
 .layout-preview-container {
   background: var(--theme-bg);
-  border-radius: 6px;
-  padding: 8px;
+  border-radius: $radius-md;
+  padding: $spacing-md;
   min-height: 120px;
   max-height: 180px;
 }

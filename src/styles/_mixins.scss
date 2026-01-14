@@ -1,0 +1,154 @@
+@import 'variables';
+
+// ======================
+// LAYOUT MIXINS
+// ======================
+
+@mixin flex-row($gap: $spacing-md) {
+  display: flex;
+  align-items: center;
+  gap: $gap;
+}
+
+@mixin flex-col($gap: $spacing-md) {
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ======================
+// FORM INPUT MIXIN
+// ======================
+
+@mixin form-input($bg: var(--theme-bg)) {
+  padding: 10px 12px;
+  border-radius: $radius-md;
+  border: 1px solid var(--theme-border);
+  background: $bg;
+  color: var(--theme-fg);
+  font-size: 0.95rem;
+
+  &:focus {
+    outline: none;
+    border-color: var(--theme-primary);
+  }
+
+  &::placeholder {
+    color: var(--theme-fg-more);
+  }
+}
+
+// ======================
+// INTERACTIVE CARD MIXIN
+// ======================
+
+@mixin interactive-card($radius: $radius-lg) {
+  background: var(--theme-bg-more);
+  border-radius: $radius;
+  border: 1px solid var(--theme-border);
+  cursor: pointer;
+  transition: background $transition-normal, border-color $transition-normal;
+
+  &:hover {
+    background: var(--theme-bg-more-more);
+  }
+
+  &.selected {
+    border-color: var(--theme-primary);
+    background: var(--theme-bg-more-more);
+  }
+}
+
+// ======================
+// BUTTON MIXINS
+// ======================
+
+@mixin toolbar-btn {
+  padding: $spacing-sm $spacing-md;
+  background: var(--theme-bg);
+  border: 1px solid var(--theme-border);
+  border-radius: $radius-sm;
+  color: var(--theme-fg);
+  cursor: pointer;
+  transition: all $transition-fast;
+  font-size: 0.85rem;
+
+  &:hover:not(:disabled) {
+    background: var(--theme-bg-more-more);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &.danger {
+    color: var(--theme-danger, $color-danger);
+  }
+}
+
+@mixin icon-btn-opacity {
+  opacity: 0.7;
+  transition: opacity $transition-normal, color $transition-normal;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+@mixin btn-success {
+  background: $color-success;
+  border-color: $color-success;
+  color: white;
+
+  &:hover {
+    background: $color-success-hover;
+    border-color: $color-success-hover;
+  }
+}
+
+// ======================
+// OVERLAY/MODAL MIXINS
+// ======================
+
+@mixin full-overlay($z-index: $z-modal-overlay) {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: $z-index;
+}
+
+// ======================
+// TEXT UTILITIES
+// ======================
+
+@mixin text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ======================
+// DROPDOWN/POPUP
+// ======================
+
+@mixin dropdown-panel {
+  background: var(--theme-bg-more);
+  border: 1px solid var(--theme-border);
+  border-radius: $radius-md;
+  box-shadow: $shadow-dropdown;
+}

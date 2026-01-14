@@ -1,33 +1,26 @@
+@import '../styles/index';
+
 .pane-editor-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1100;
+  @include full-overlay($z-modal-overlay);
+  @include flex-center;
+  background: $overlay-bg;
 }
 
 .pane-editor-modal {
   background: var(--theme-bg);
-  border-radius: 12px;
+  border-radius: $radius-xl;
   width: 90%;
   max-width: 500px;
   max-height: 80vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  box-shadow: $shadow-modal;
 }
 
 .modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
+  @include flex-between;
+  padding: $spacing-xl $spacing-2xl;
   border-bottom: 1px solid var(--theme-border);
 
   h4 {
@@ -38,7 +31,7 @@
   .close-btn {
     font-size: 1.15rem;
     color: var(--theme-fg-more);
-    padding: 4px 8px;
+    padding: $spacing-sm $spacing-md;
 
     &:hover {
       color: var(--theme-fg);
@@ -47,13 +40,13 @@
 }
 
 .modal-body {
-  padding: 20px;
+  padding: $spacing-2xl;
   overflow-y: auto;
   flex: 1;
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: $spacing-xl;
 
   &:last-child {
     margin-bottom: 0;
@@ -69,17 +62,7 @@
 
 .form-control {
   width: 100%;
-  padding: 10px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--theme-border);
-  background: var(--theme-bg-more);
-  color: var(--theme-fg);
-  font-size: 0.95rem;
-
-  &:focus {
-    outline: none;
-    border-color: var(--theme-primary);
-  }
+  @include form-input(var(--theme-bg-more));
 }
 
 select.form-control {
@@ -87,8 +70,7 @@ select.form-control {
 }
 
 .input-with-button {
-  display: flex;
-  gap: 8px;
+  @include flex-row($spacing-md);
 
   input {
     flex: 1;
@@ -97,7 +79,7 @@ select.form-control {
 
 .help-text {
   display: block;
-  margin-top: 4px;
+  margin-top: $spacing-sm;
   font-size: 0.8rem;
   color: var(--theme-fg-more);
   opacity: 0.8;
@@ -106,7 +88,7 @@ select.form-control {
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  padding: 16px 20px;
+  gap: $spacing-lg;
+  padding: $spacing-xl $spacing-2xl;
   border-top: 1px solid var(--theme-border);
 }
