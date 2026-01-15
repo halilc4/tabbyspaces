@@ -1,10 +1,11 @@
-import { Component, Input, Output, EventEmitter, OnInit, HostListener } from '@angular/core'
+import { Component, Input, Output, EventEmitter, OnInit, HostListener, ChangeDetectionStrategy } from '@angular/core'
 import { WorkspacePane, TabbyProfile } from '../models/workspace.model'
 
 @Component({
   selector: 'pane-editor',
   template: require('./paneEditor.component.pug'),
   styles: [require('./paneEditor.component.scss')],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaneEditorComponent implements OnInit {
   @Input() pane!: WorkspacePane

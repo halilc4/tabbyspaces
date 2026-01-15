@@ -8,6 +8,13 @@ import {
   createDefaultPane,
   generateUUID,
 } from '../models/workspace.model'
+
+interface TreeContext {
+  node: WorkspaceSplit
+  index: number
+  parent: WorkspaceSplit | null
+  child: WorkspacePane | WorkspaceSplit
+}
 import { WorkspaceEditorService } from '../services/workspaceEditor.service'
 
 @Component({
@@ -145,7 +152,7 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
   }
 
   onPaneSave(pane: WorkspacePane): void {
-    this.updatePaneInTree(this.workspace.root, pane)
+    this.updatePaneInTree(pane)
     this.closePaneEditor()
   }
 
@@ -176,23 +183,36 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
     }, 0)
   }
 
-  private updatePaneInTree(node: WorkspaceSplit, updatedPane: WorkspacePane): boolean {
+  private walkTree(
+    node: WorkspaceSplit,
+    visitor: (ctx: TreeContext) => boolean,
+    parent: WorkspaceSplit | null = null
+  ): boolean {
     for (let i = 0; i < node.children.length; i++) {
       const child = node.children[i]
+      const ctx: TreeContext = { node, index: i, parent, child }
+
       if (isWorkspaceSplit(child)) {
-        if (this.updatePaneInTree(child, updatedPane)) {
-          return true
-        }
-      } else if (child.id === updatedPane.id) {
-        node.children[i] = updatedPane
+        if (this.walkTree(child, visitor, node)) return true
+      } else if (visitor(ctx)) {
         return true
       }
     }
     return false
   }
 
+  private updatePaneInTree(updatedPane: WorkspacePane): boolean {
+    return this.walkTree(this.workspace.root, (ctx) => {
+      if ((ctx.child as WorkspacePane).id === updatedPane.id) {
+        ctx.node.children[ctx.index] = updatedPane
+        return true
+      }
+      return false
+    })
+  }
+
   splitPane(pane: WorkspacePane, orientation: 'horizontal' | 'vertical'): void {
-    this.splitPaneInTree(this.workspace.root, pane, orientation)
+    this.splitPaneInTree(pane, orientation)
   }
 
   splitSelectedPane(orientation: 'horizontal' | 'vertical'): void {
@@ -202,30 +222,24 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
   }
 
   private splitPaneInTree(
-    node: WorkspaceSplit,
     targetPane: WorkspacePane,
     orientation: 'horizontal' | 'vertical'
   ): boolean {
-    for (let i = 0; i < node.children.length; i++) {
-      const child = node.children[i]
-      if (isWorkspaceSplit(child)) {
-        if (this.splitPaneInTree(child, targetPane, orientation)) {
-          return true
-        }
-      } else if (child.id === targetPane.id) {
+    return this.walkTree(this.workspace.root, (ctx) => {
+      if ((ctx.child as WorkspacePane).id === targetPane.id) {
         const newPane = createDefaultPane()
-        newPane.profileId = child.profileId // Copy profile from source pane
+        newPane.profileId = (ctx.child as WorkspacePane).profileId
         const newSplit: WorkspaceSplit = {
           orientation,
           ratios: [0.5, 0.5],
-          children: [child, newPane],
+          children: [ctx.child, newPane],
         }
-        node.children[i] = newSplit
-        this.recalculateRatios(node)
+        ctx.node.children[ctx.index] = newSplit
+        this.recalculateRatios(ctx.node)
         return true
       }
-    }
-    return false
+      return false
+    })
   }
 
   removePane(pane: WorkspacePane): void {
@@ -306,63 +320,56 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
     if (!this.selectedPaneId) return
     const pane = this.findPaneById(this.selectedPaneId)
     if (!pane) return
-    this.addPaneInTree(this.workspace.root, pane, direction, null)
+    this.addPaneInTree(pane, direction)
   }
 
   addPaneFromEvent(pane: WorkspacePane, direction: 'left' | 'right' | 'top' | 'bottom'): void {
-    this.addPaneInTree(this.workspace.root, pane, direction, null)
+    this.addPaneInTree(pane, direction)
   }
 
   private addPaneInTree(
-    node: WorkspaceSplit,
     targetPane: WorkspacePane,
-    direction: 'left' | 'right' | 'top' | 'bottom',
-    parentNode: WorkspaceSplit | null
+    direction: 'left' | 'right' | 'top' | 'bottom'
   ): boolean {
     const isHorizontalAdd = direction === 'left' || direction === 'right'
     const isBefore = direction === 'left' || direction === 'top'
     const targetOrientation = isHorizontalAdd ? 'horizontal' : 'vertical'
 
-    for (let i = 0; i < node.children.length; i++) {
-      const child = node.children[i]
+    return this.walkTree(this.workspace.root, (ctx) => {
+      if ((ctx.child as WorkspacePane).id !== targetPane.id) return false
 
-      if (isWorkspaceSplit(child)) {
-        if (this.addPaneInTree(child, targetPane, direction, node)) return true
-      } else if (child.id === targetPane.id) {
-        const newPane = createDefaultPane()
-        newPane.profileId = child.profileId
+      const newPane = createDefaultPane()
+      newPane.profileId = (ctx.child as WorkspacePane).profileId
 
-        if (node.orientation === targetOrientation) {
-          // Same orientation: add as sibling
-          const insertIndex = isBefore ? i : i + 1
-          node.children.splice(insertIndex, 0, newPane)
-          this.recalculateRatios(node)
-        } else {
-          // Different orientation: wrap entire node in new split
-          const nodeCopy: WorkspaceSplit = {
-            orientation: node.orientation,
-            ratios: [...node.ratios],
-            children: [...node.children]
-          }
-          const wrapper: WorkspaceSplit = {
-            orientation: targetOrientation,
-            ratios: [0.5, 0.5],
-            children: isBefore ? [newPane, nodeCopy] : [nodeCopy, newPane]
-          }
+      if (ctx.node.orientation === targetOrientation) {
+        // Same orientation: add as sibling
+        const insertIndex = isBefore ? ctx.index : ctx.index + 1
+        ctx.node.children.splice(insertIndex, 0, newPane)
+        this.recalculateRatios(ctx.node)
+      } else {
+        // Different orientation: wrap entire node in new split
+        const nodeCopy: WorkspaceSplit = {
+          orientation: ctx.node.orientation,
+          ratios: [...ctx.node.ratios],
+          children: [...ctx.node.children]
+        }
+        const wrapper: WorkspaceSplit = {
+          orientation: targetOrientation,
+          ratios: [0.5, 0.5],
+          children: isBefore ? [newPane, nodeCopy] : [nodeCopy, newPane]
+        }
 
-          if (node === this.workspace.root) {
-            this.workspace.root = wrapper
-          } else if (parentNode) {
-            const nodeIndex = parentNode.children.indexOf(node)
-            if (nodeIndex !== -1) {
-              parentNode.children[nodeIndex] = wrapper
-            }
+        if (ctx.node === this.workspace.root) {
+          this.workspace.root = wrapper
+        } else if (ctx.parent) {
+          const nodeIndex = ctx.parent.children.indexOf(ctx.node)
+          if (nodeIndex !== -1) {
+            ctx.parent.children[nodeIndex] = wrapper
           }
         }
-        return true
       }
-    }
-    return false
+      return true
+    })
   }
 
 }

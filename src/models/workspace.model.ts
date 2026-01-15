@@ -78,10 +78,19 @@ export interface Workspace {
   launchOnStartup?: boolean
 }
 
+/**
+ * Type guard to check if a node is a WorkspaceSplit.
+ * @param node - The node to check
+ * @returns True if the node is a WorkspaceSplit
+ */
 export function isWorkspaceSplit(node: WorkspacePane | WorkspaceSplit): node is WorkspaceSplit {
   return 'orientation' in node && 'children' in node
 }
 
+/**
+ * Creates a new pane with default configuration.
+ * @returns A new WorkspacePane with generated UUID and empty settings
+ */
 export function createDefaultPane(): WorkspacePane {
   return {
     id: generateUUID(),
@@ -91,6 +100,11 @@ export function createDefaultPane(): WorkspacePane {
   }
 }
 
+/**
+ * Creates a new split with two default panes.
+ * @param orientation - Split direction ('horizontal' or 'vertical'), defaults to 'horizontal'
+ * @returns A new WorkspaceSplit with two panes at 50/50 ratio
+ */
 export function createDefaultSplit(orientation: 'horizontal' | 'vertical' = 'horizontal'): WorkspaceSplit {
   return {
     orientation,
@@ -118,14 +132,21 @@ const WORKSPACE_ICONS = [
   'bug', 'wrench', 'cube', 'layer-group', 'sitemap', 'project-diagram'
 ]
 
+/** Returns a random color from the workspace color palette. */
 export function getRandomColor(): string {
   return WORKSPACE_COLORS[Math.floor(Math.random() * WORKSPACE_COLORS.length)]
 }
 
+/** Returns a random icon from the workspace icon set. */
 export function getRandomIcon(): string {
   return WORKSPACE_ICONS[Math.floor(Math.random() * WORKSPACE_ICONS.length)]
 }
 
+/**
+ * Creates a new workspace with default configuration.
+ * @param name - Display name for the workspace (optional)
+ * @returns A new Workspace with generated UUID, random icon/color, and a default split
+ */
 export function createDefaultWorkspace(name: string = ''): Workspace {
   return {
     id: generateUUID(),
@@ -137,6 +158,7 @@ export function createDefaultWorkspace(name: string = ''): Workspace {
   }
 }
 
+/** Generates a random UUID v4 string. */
 export function generateUUID(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0
@@ -145,9 +167,36 @@ export function generateUUID(): string {
   })
 }
 
+/**
+ * Recursively counts the total number of panes in a split tree.
+ * @param node - The root node to count from
+ * @returns Total number of panes in the tree
+ */
 export function countPanes(node: WorkspacePane | WorkspaceSplit): number {
   if (isWorkspaceSplit(node)) {
     return node.children.reduce((sum, child) => sum + countPanes(child), 0)
   }
   return 1
+}
+
+/**
+ * Creates a deep clone of an object, preserving type information.
+ * More efficient than JSON.parse(JSON.stringify()) for simple objects.
+ * @param obj - The object to clone
+ * @returns A deep copy of the object
+ */
+export function deepClone<T>(obj: T): T {
+  if (obj === null || typeof obj !== 'object') {
+    return obj
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(item => deepClone(item)) as T
+  }
+  const cloned = {} as T
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      cloned[key] = deepClone(obj[key])
+    }
+  }
+  return cloned
 }

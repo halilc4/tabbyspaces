@@ -9,8 +9,11 @@ import {
   WorkspaceSplit,
   countPanes,
   createDefaultWorkspace,
+  deepClone,
   isWorkspaceSplit,
 } from '../models/workspace.model'
+
+const SETTINGS_MAX_WIDTH = '876px'
 
 @Component({
   selector: 'workspace-list',
@@ -48,7 +51,7 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     setTimeout(() => {
       const parent = this.elementRef.nativeElement.closest('settings-tab-body') as HTMLElement
       if (parent) {
-        parent.style.maxWidth = '876px'
+        parent.style.maxWidth = SETTINGS_MAX_WIDTH
       }
     }, 0)
   }
@@ -62,7 +65,7 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
   selectWorkspace(workspace: Workspace): void {
     this.isCreatingNew = false
     this.selectedWorkspace = workspace
-    this.editingWorkspace = JSON.parse(JSON.stringify(workspace))
+    this.editingWorkspace = deepClone(workspace)
   }
 
   isSelected(workspace: Workspace): boolean {

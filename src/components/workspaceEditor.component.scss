@@ -1,4 +1,4 @@
-@import '../styles/index';
+@use '../styles/index' as *;
 
 // Editor section
 .editor-section {
@@ -181,33 +181,7 @@
 }
 
 .preview-btn {
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--theme-bg);
-  border: 1px solid var(--theme-border);
-  border-radius: $radius-sm;
-  color: var(--theme-fg-more);
-  cursor: pointer;
-  font-size: 10px;
-  transition: all $transition-fast;
-
-  &:hover:not(:disabled) {
-    border-color: var(--theme-primary);
-    color: var(--theme-primary);
-  }
-
-  &.danger:hover:not(:disabled) {
-    border-color: var(--theme-danger);
-    color: var(--theme-danger);
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
+  @include icon-btn-sm;
 }
 
 // Layout preview area
@@ -251,28 +225,12 @@
   display: flex;
   gap: $spacing-md;
 
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: $spacing-sm;
-    padding: $spacing-sm $spacing-lg;
-    font-size: $font-sm;
-    border-radius: $radius-sm;
-    cursor: pointer;
-    transition: all $transition-fast;
-  }
-
   .btn-ghost {
-    background: transparent;
-    border: 1px solid var(--theme-border);
-    color: var(--theme-fg);
-
-    &:hover {
-      background: var(--theme-bg-more);
-    }
+    @include btn-ghost;
   }
 
   .btn-success {
+    @include btn-base;
     @include btn-success;
   }
 

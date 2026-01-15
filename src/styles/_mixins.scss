@@ -1,26 +1,8 @@
-@import 'variables';
+@use 'variables' as *;
 
 // ======================
 // LAYOUT MIXINS
 // ======================
-
-@mixin flex-row($gap: $spacing-md) {
-  display: flex;
-  align-items: center;
-  gap: $gap;
-}
-
-@mixin flex-col($gap: $spacing-md) {
-  display: flex;
-  flex-direction: column;
-  gap: $gap;
-}
-
-@mixin flex-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
 @mixin flex-center {
   display: flex;
@@ -64,27 +46,6 @@
 }
 
 // ======================
-// INTERACTIVE CARD MIXIN
-// ======================
-
-@mixin interactive-card($radius: $radius-md) {
-  background: var(--theme-bg-more);
-  border-radius: $radius;
-  border: 1px solid var(--theme-border);
-  cursor: pointer;
-  transition: background $transition-normal, border-color $transition-normal;
-
-  &:hover {
-    background: var(--theme-bg-more-more);
-  }
-
-  &.selected {
-    border-color: var(--theme-primary);
-    background: var(--theme-bg-more-more);
-  }
-}
-
-// ======================
 // BUTTON MIXINS
 // ======================
 
@@ -112,15 +73,6 @@
   }
 }
 
-@mixin icon-btn-opacity {
-  opacity: 0.7;
-  transition: opacity $transition-normal, color $transition-normal;
-
-  &:hover {
-    opacity: 1;
-  }
-}
-
 @mixin btn-success {
   background: $color-success;
   border-color: $color-success;
@@ -129,6 +81,67 @@
   &:hover {
     background: $color-success-hover;
     border-color: $color-success-hover;
+  }
+}
+
+@mixin btn-base {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-sm;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+}
+
+@mixin btn-ghost {
+  @include btn-base;
+  background: transparent;
+  border: 1px solid var(--theme-border);
+  color: var(--theme-fg);
+
+  &:hover {
+    background: var(--theme-bg-more);
+  }
+}
+
+@mixin btn-primary {
+  @include btn-base;
+  background: var(--theme-primary);
+  border: 1px solid var(--theme-primary);
+  color: white;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}
+
+@mixin icon-btn-sm($size: 24px) {
+  width: $size;
+  height: $size;
+  @include flex-center;
+  background: var(--theme-bg);
+  border: 1px solid var(--theme-border);
+  border-radius: $radius-sm;
+  color: var(--theme-fg-more);
+  cursor: pointer;
+  font-size: 10px;
+  transition: all $transition-fast;
+
+  &:hover:not(:disabled) {
+    border-color: var(--theme-primary);
+    color: var(--theme-primary);
+  }
+
+  &.danger:hover:not(:disabled) {
+    border-color: var(--theme-danger);
+    color: var(--theme-danger);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 }
 
