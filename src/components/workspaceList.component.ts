@@ -168,7 +168,7 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
       }
     } else if (this.selectedWorkspace) {
       // Reset to original workspace data
-      this.editingWorkspace = JSON.parse(JSON.stringify(this.selectedWorkspace))
+      this.editingWorkspace = deepClone(this.selectedWorkspace)
     }
     this.cdr.detectChanges()
   }

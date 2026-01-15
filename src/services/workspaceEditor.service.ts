@@ -6,6 +6,7 @@ import {
   WorkspaceSplit,
   isWorkspaceSplit,
   generateUUID,
+  deepClone,
   TabbyProfile,
   TabbyRecoveryToken,
   TabbySplitLayoutProfile,
@@ -221,7 +222,7 @@ export class WorkspaceEditorService {
 
   /** Creates a deep copy of a workspace with new IDs. */
   duplicateWorkspace(workspace: Workspace): Workspace {
-    const clone = JSON.parse(JSON.stringify(workspace)) as Workspace
+    const clone = deepClone(workspace)
     clone.id = generateUUID()
     clone.name = `${workspace.name} (Copy)`
     clone.launchOnStartup = false
