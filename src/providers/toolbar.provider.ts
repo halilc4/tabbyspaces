@@ -18,6 +18,11 @@ const ICON_BOLT = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" f
 </svg>`
 import { countPanes } from '../models/workspace.model'
 
+/** Recovery token structure for workspace tabs */
+interface RecoveryTokenWithWorkspace {
+  workspaceId?: string
+}
+
 @Injectable()
 export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
   constructor(
@@ -64,19 +69,33 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
     }
   }
 
+  /**
+   * Type-safe helper to extract workspace ID from tab's recovery token.
+   */
+  private getRecoveryWorkspaceId(tab: unknown): string | undefined {
+    if (tab && typeof tab === 'object' && 'recoveryToken' in tab) {
+      const token = (tab as { recoveryToken?: RecoveryTokenWithWorkspace }).recoveryToken
+      return token?.workspaceId
+    }
+    return undefined
+  }
+
   private isWorkspaceAlreadyOpen(workspaceId: string): boolean {
+    const profilePrefix = `split-layout:${CONFIG_KEY}:`
+
     for (const tab of this.app.tabs) {
       if (tab instanceof SplitTabComponent) {
         // Strategy 1: Check recoveryToken.workspaceId (for restored tabs)
-        const token = (tab as any).recoveryToken
-        if (token?.workspaceId === workspaceId) {
+        if (this.getRecoveryWorkspaceId(tab) === workspaceId) {
           return true
         }
 
         // Strategy 2: Check profile ID (for freshly opened tabs)
         for (const child of tab.getAllTabs()) {
           if (child instanceof BaseTerminalTabComponent) {
-            if (child.profile?.id?.includes(`:${workspaceId}`)) {
+            const profileId = child.profile?.id ?? ''
+            // Strict matching: prefix + workspaceId at the end
+            if (profileId.startsWith(profilePrefix) && profileId.endsWith(`:${workspaceId}`)) {
               return true
             }
           }
