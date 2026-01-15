@@ -131,20 +131,10 @@ export class SplitPreviewComponent {
   }
 
   getPaneLabel(pane: WorkspacePane): string {
-    // Base label is always the profile name
-    let profileName = ''
-    if (pane.profileId) {
-      const profile = this.profiles.find(p => p.id === pane.profileId)
-      if (profile?.name) profileName = profile.name
-    }
+    if (!pane.profileId) return 'Select profile'
 
-    if (!profileName) return 'Select profile'
-
-    // Format: "Title - Profile" or just "Profile"
-    if (pane.title) {
-      return `${pane.title} - ${profileName}`
-    }
-    return profileName
+    const profile = this.profiles.find(p => p.id === pane.profileId)
+    return profile?.name || 'Select profile'
   }
 
   // Pass-through events from nested splits

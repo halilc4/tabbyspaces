@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core'
-import { ToolbarButtonProvider, ToolbarButton, ProfilesService, AppService } from 'tabby-core'
+import { ToolbarButtonProvider, ToolbarButton, ProfilesService, AppService, SplitTabComponent } from 'tabby-core'
+import { BaseTerminalTabComponent } from 'tabby-terminal'
 import { WorkspaceEditorService } from '../services/workspaceEditor.service'
 import { StartupCommandService } from '../services/startupCommand.service'
 import { SettingsTabComponent } from 'tabby-settings'
@@ -26,13 +27,28 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
     private startupService: StartupCommandService
   ) {
     super()
-    // Delay startup tasks to ensure Tabby config is loaded
-    setTimeout(() => {
-      // Cleanup orphaned profiles from previous plugin versions (one-time migration)
+    // Wait for Tabby to finish recovery before launching startup workspaces
+    this.waitForTabbyReady().then(() => {
       this.workspaceService.cleanupOrphanedProfiles()
-      // Launch workspaces marked for startup
       this.launchStartupWorkspaces()
-    }, 500)
+    })
+  }
+
+  private waitForTabbyReady(): Promise<void> {
+    return new Promise(resolve => {
+      let lastTabCount = -1
+      const checkStable = () => {
+        const currentCount = this.app.tabs.length
+        if (currentCount === lastTabCount && currentCount >= 0) {
+          resolve()
+        } else {
+          lastTabCount = currentCount
+          setTimeout(checkStable, 300)
+        }
+      }
+      // Initial delay to let Tabby start loading
+      setTimeout(checkStable, 500)
+    })
   }
 
   private async launchStartupWorkspaces(): Promise<void> {
@@ -40,8 +56,34 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
     const startupWorkspaces = workspaces.filter(w => w.launchOnStartup)
 
     for (const workspace of startupWorkspaces) {
+      if (this.isWorkspaceAlreadyOpen(workspace.id)) {
+        console.log(`[TabbySpaces] Workspace "${workspace.name}" already open, skipping`)
+        continue
+      }
       await this.openWorkspace(workspace.id)
     }
+  }
+
+  private isWorkspaceAlreadyOpen(workspaceId: string): boolean {
+    for (const tab of this.app.tabs) {
+      if (tab instanceof SplitTabComponent) {
+        // Strategy 1: Check recoveryToken.workspaceId (for restored tabs)
+        const token = (tab as any).recoveryToken
+        if (token?.workspaceId === workspaceId) {
+          return true
+        }
+
+        // Strategy 2: Check profile ID (for freshly opened tabs)
+        for (const child of tab.getAllTabs()) {
+          if (child instanceof BaseTerminalTabComponent) {
+            if (child.profile?.id?.includes(`:${workspaceId}`)) {
+              return true
+            }
+          }
+        }
+      }
+    }
+    return false
   }
 
   provide(): ToolbarButton[] {

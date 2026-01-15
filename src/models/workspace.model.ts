@@ -38,6 +38,8 @@ export interface TabbyRecoveryToken {
   tabCustomTitle?: string
   disableDynamicTitle?: boolean
   cwd?: string
+  // Allow custom properties (matches Tabby's RecoveryToken interface)
+  [key: string]: any
 }
 
 export interface TabbySplitLayoutProfile {
@@ -59,7 +61,6 @@ export interface WorkspacePane {
   profileId: string
   cwd?: string
   startupCommand?: string
-  title?: string
 }
 
 export interface WorkspaceSplit {
@@ -87,7 +88,6 @@ export function createDefaultPane(): WorkspacePane {
     profileId: '',
     cwd: '',
     startupCommand: '',
-    title: '',
   }
 }
 

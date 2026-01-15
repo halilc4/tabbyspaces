@@ -105,26 +105,27 @@ export class WorkspaceEditorService {
       color: workspace.color,
       isBuiltin: false,
       options: {
-        recoveryToken: this.generateRecoveryToken(workspace.root),
+        recoveryToken: this.generateRecoveryToken(workspace.root, workspace.name, workspace.id),
       },
     }
   }
 
-  private generateRecoveryToken(split: WorkspaceSplit): TabbyRecoveryToken {
+  private generateRecoveryToken(split: WorkspaceSplit, workspaceName: string, workspaceId: string): TabbyRecoveryToken {
     return {
       type: 'app:split-tab',
       orientation: split.orientation === 'horizontal' ? 'h' : 'v',
       ratios: split.ratios,
+      workspaceId,
       children: split.children.map((child) => {
         if (isWorkspaceSplit(child)) {
-          return this.generateRecoveryToken(child)
+          return this.generateRecoveryToken(child, workspaceName, workspaceId)
         }
-        return this.generatePaneToken(child)
+        return this.generatePaneToken(child, workspaceName, workspaceId)
       }),
     }
   }
 
-  private generatePaneToken(pane: WorkspacePane): TabbyRecoveryToken {
+  private generatePaneToken(pane: WorkspacePane, workspaceName: string, workspaceId: string): TabbyRecoveryToken {
     const baseProfile = this.getProfileById(pane.profileId)
 
     if (!baseProfile) {
@@ -162,7 +163,7 @@ export class WorkspaceEditorService {
       options,
       icon: baseProfile.icon || '',
       color: baseProfile.color || '',
-      disableDynamicTitle: false,
+      disableDynamicTitle: true,
       weight: 0,
       isBuiltin: false,
       isTemplate: false,
@@ -170,16 +171,18 @@ export class WorkspaceEditorService {
       behaviorOnSessionEnd: 'auto',
     }
 
-    // Use pane.id for matching in StartupCommandService
-    // Original title will be restored after command execution
+    // tabTitle: workspace name (what user sees)
+    // tabCustomTitle: pane.id (for matching in StartupCommandService)
+    // workspaceId: for duplicate detection after Tabby recovery
     const cwd = pane.cwd || baseProfile.options?.cwd || ''
     return {
       type: 'app:local-tab',
       profile,
       savedState: false,
-      tabTitle: pane.id,
+      tabTitle: workspaceName,
       tabCustomTitle: pane.id,
-      disableDynamicTitle: false,
+      workspaceId,
+      disableDynamicTitle: true,
       cwd,
     }
   }
@@ -226,23 +229,24 @@ export class WorkspaceEditorService {
 
   collectStartupCommands(workspace: Workspace): PendingCommand[] {
     const commands: PendingCommand[] = []
-    this.collectCommandsFromNode(workspace.root, commands)
+    this.collectCommandsFromNode(workspace.root, workspace.name, commands)
     return commands
   }
 
   private collectCommandsFromNode(
     node: WorkspacePane | WorkspaceSplit,
+    workspaceName: string,
     commands: PendingCommand[]
   ): void {
     if (isWorkspaceSplit(node)) {
       for (const child of node.children) {
-        this.collectCommandsFromNode(child, commands)
+        this.collectCommandsFromNode(child, workspaceName, commands)
       }
     } else if (node.startupCommand) {
       commands.push({
         paneId: node.id,
         command: node.startupCommand,
-        originalTitle: node.title || '',
+        originalTitle: workspaceName,
       })
     }
   }

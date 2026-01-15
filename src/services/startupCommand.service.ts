@@ -96,12 +96,9 @@ export class StartupCommandService {
         // Clear profile args to prevent native splits from re-running command
         this.clearProfileArgs(terminalTab)
 
-        // Reset title - either to original or clear for dynamic shell title
-        if (pending.originalTitle) {
-          terminalTab.setTitle(pending.originalTitle)
-        } else {
-          terminalTab.customTitle = ''
-        }
+        // Set tab title to workspace name
+        terminalTab.setTitle(pending.originalTitle)
+        terminalTab.customTitle = pending.originalTitle
       })
     } else {
       console.log('[TabbySpaces] No session.output$, falling back to timeout')
@@ -112,11 +109,9 @@ export class StartupCommandService {
         // Clear profile args to prevent native splits from re-running command
         this.clearProfileArgs(terminalTab)
 
-        if (pending.originalTitle) {
-          terminalTab.setTitle(pending.originalTitle)
-        } else {
-          terminalTab.customTitle = ''
-        }
+        // Set tab title to workspace name
+        terminalTab.setTitle(pending.originalTitle)
+        terminalTab.customTitle = pending.originalTitle
       }, 500)
     }
   }
