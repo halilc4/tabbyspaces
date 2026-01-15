@@ -423,9 +423,9 @@ function deepClone<T>(obj: T): T {
 ## Fix Priority for Next Release
 
 ### P0 - Must Fix
-- [ ] CR-001: Memory Leak in StartupCommandService
-- [ ] CR-002: Race Condition in Shell Initialization
-- [ ] CR-003: Unsafe Type Casts
+- [x] CR-001: Memory Leak in StartupCommandService ✅ Fixed in d99e554
+- [x] CR-002: Race Condition in Shell Initialization ✅ Fixed in d99e554
+- [x] CR-003: Unsafe Type Casts ✅ Fixed in d99e554
 
 ### P1 - Should Fix
 - [ ] CR-004: DRY Violation - Tree Walking
