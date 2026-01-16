@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core'
+import { Component, Input, Output, EventEmitter } from '@angular/core'
 import {
   WorkspaceSplit,
   WorkspacePane,
@@ -10,7 +10,6 @@ import {
   selector: 'split-preview',
   template: require('./splitPreview.component.pug'),
   styles: [require('./splitPreview.component.scss')],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SplitPreviewComponent {
   @Input() split!: WorkspaceSplit
