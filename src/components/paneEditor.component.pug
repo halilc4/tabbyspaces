@@ -4,14 +4,11 @@
     span.pane-details-title
       i.fas.fa-terminal
       |  Pane Configuration
-    span.pane-details-close((click)='onCancel()')
-      i.fas.fa-xmark
-      |  Close
 
   .pane-form
     .form-group
       label Profile
-      select.form-control([(ngModel)]='editedPane.profileId')
+      select.form-control([(ngModel)]='pane.profileId')
         option(value='') -- Select Profile --
         option(*ngFor='let profile of profiles', [value]='profile.id')
           | {{ profile.name }}
@@ -20,7 +17,7 @@
       label Working Directory
       input.form-control(
         type='text',
-        [(ngModel)]='editedPane.cwd',
+        [(ngModel)]='pane.cwd',
         placeholder='C:\\path\\to\\project'
       )
 
@@ -28,14 +25,6 @@
       label Startup Command
       input.form-control(
         type='text',
-        [(ngModel)]='editedPane.startupCommand',
+        [(ngModel)]='pane.startupCommand',
         placeholder='e.g., npm run dev'
       )
-
-  .pane-form-actions
-    button.btn.btn-ghost(type='button', (click)='onCancel()')
-      i.fas.fa-xmark
-      |  Cancel
-    button.btn.btn-primary(type='button', (click)='onSave()')
-      i.fas.fa-check
-      |  Apply

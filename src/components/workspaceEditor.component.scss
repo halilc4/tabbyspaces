@@ -40,7 +40,7 @@
     width: 100%;
     font-size: $font-sm;
     // Override Tabby's global border reset
-    border: 1px solid var(--theme-border) !important;
+    border: 1px solid var(--theme-border, $fallback-border) !important;
 
     &:focus {
       border-color: var(--theme-primary) !important;
@@ -55,7 +55,7 @@
   gap: $spacing-sm;
   padding: $spacing-sm $spacing-md;
   background: var(--theme-bg-more);
-  border: 1px solid var(--theme-border);
+  border: 1px solid var(--theme-border, $fallback-border);
   border-radius: $radius-sm;
   cursor: pointer;
   transition: border-color $transition-fast;
@@ -120,7 +120,7 @@
   gap: $spacing-sm;
   padding: $spacing-sm $spacing-md;
   background: var(--theme-bg-more);
-  border: 1px solid var(--theme-border);
+  border: 1px solid var(--theme-border, $fallback-border);
   border-radius: $radius-sm;
   cursor: pointer;
   position: relative;
@@ -153,10 +153,90 @@
   border-radius: $radius-xs;
 }
 
+// Background picker
+.background-picker {
+  position: relative;
+}
+
+.background-trigger {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: var(--theme-bg-more);
+  border: 1px solid var(--theme-border, $fallback-border);
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: border-color $transition-fast;
+  height: 32px;
+  box-sizing: border-box;
+
+  &:hover {
+    border-color: var(--theme-fg-more);
+  }
+}
+
+.background-preview {
+  width: 48px;
+  height: 18px;
+  border-radius: $radius-xs;
+  border: 1px solid var(--theme-border, $fallback-border);
+  @include flex-center;
+  color: var(--theme-fg-more, $fallback-fg-more);
+  font-size: 10px;
+}
+
+.background-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: $spacing-sm;
+  padding: $spacing-md;
+  @include dropdown-panel;
+  z-index: $z-dropdown;
+  min-width: 260px;
+}
+
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.preset-option {
+  aspect-ratio: 1.5;
+  height: 32px;
+  @include flex-center;
+  border: 1px solid var(--theme-border, $fallback-border);
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+  color: var(--theme-fg-more, $fallback-fg-more);
+  font-size: 10px;
+
+  &:hover {
+    border-color: var(--theme-fg-more);
+  }
+
+  &.selected {
+    border-color: var(--theme-primary);
+    border-width: 2px;
+  }
+}
+
+.custom-input-wrapper {
+  .custom-bg-input {
+    width: 100%;
+    font-size: $font-xs;
+  }
+}
+
 // Split preview container
 .split-preview-container {
   background: var(--theme-bg-more);
-  border: 1px solid var(--theme-border);
+  border: 1px solid var(--theme-border, $fallback-border);
   border-radius: $radius-md;
   padding: $spacing-lg;
 }
@@ -169,13 +249,13 @@
   gap: $spacing-sm;
   margin-bottom: $spacing-lg;
   padding-bottom: $spacing-md;
-  border-bottom: 1px solid var(--theme-border);
+  border-bottom: 1px solid var(--theme-border, $fallback-border);
 }
 
 .toolbar-separator {
   width: 1px;
   height: 18px;
-  background: var(--theme-border);
+  background: var(--theme-border, $fallback-border);
   margin: 0 $spacing-sm;
   align-self: center;
 }
@@ -199,7 +279,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: $spacing-xl;
-  border-top: 1px solid var(--theme-border);
+  border-top: 1px solid var(--theme-border, $fallback-border);
   margin-top: $spacing-xl;
 }
 

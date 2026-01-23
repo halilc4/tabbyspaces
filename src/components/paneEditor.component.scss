@@ -8,7 +8,7 @@
   padding-top: $spacing-lg;
   margin-top: $spacing-xl;
   border-left: 2px solid var(--theme-primary);
-  border-top: 1px solid var(--theme-border);
+  border-top: 1px solid var(--theme-border, $fallback-border);
 }
 
 .pane-details-header {
@@ -25,20 +25,6 @@
   display: flex;
   align-items: center;
   gap: $spacing-sm;
-}
-
-.pane-details-close {
-  color: var(--theme-fg-more);
-  cursor: pointer;
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  gap: $spacing-xs;
-  transition: color $transition-fast;
-
-  &:hover {
-    color: var(--theme-fg);
-  }
 }
 
 // 2-column grid for pane form
@@ -65,7 +51,7 @@
   @include form-input(var(--theme-bg));
   font-size: $font-sm;
   // Override Tabby's global border reset
-  border: 1px solid var(--theme-border) !important;
+  border: 1px solid var(--theme-border, $fallback-border) !important;
 
   &:focus {
     border-color: var(--theme-primary) !important;
@@ -75,23 +61,4 @@
 select.form-control {
   cursor: pointer;
   appearance: auto; // Show dropdown arrow
-}
-
-// Action buttons at bottom of panel
-.pane-form-actions {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: flex-end;
-  gap: $spacing-md;
-  margin-top: $spacing-lg;
-  padding-top: $spacing-lg;
-  border-top: 1px solid var(--theme-border);
-
-  .btn-ghost {
-    @include btn-ghost;
-  }
-
-  .btn-primary {
-    @include btn-primary;
-  }
 }

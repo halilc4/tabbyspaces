@@ -1,12 +1,14 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, AfterViewInit, SimpleChanges, HostListener, ElementRef, ViewChild } from '@angular/core'
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, AfterViewInit, SimpleChanges, HostListener, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core'
 import {
   Workspace,
   WorkspacePane,
   WorkspaceSplit,
+  WorkspaceBackground,
   TabbyProfile,
   isWorkspaceSplit,
   createDefaultPane,
   generateUUID,
+  BACKGROUND_PRESETS,
 } from '../models/workspace.model'
 
 interface TreeContext {
@@ -41,17 +43,34 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
     'bug', 'wrench', 'cube', 'layer-group', 'sitemap', 'project-diagram'
   ]
   iconDropdownOpen = false
+  backgroundPresets = BACKGROUND_PRESETS
+  backgroundDropdownOpen = false
+  customBackgroundValue = ''
 
   constructor(
     private workspaceService: WorkspaceEditorService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private cdr: ChangeDetectorRef
   ) {}
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    const iconPicker = this.elementRef.nativeElement.querySelector('.icon-picker')
-    if (iconPicker && !iconPicker.contains(event.target as Node)) {
+    // Check if click is outside the icon dropdown area (trigger + dropdown)
+    const dropdownTrigger = this.elementRef.nativeElement.querySelector('.dropdown-trigger')
+    const iconDropdown = this.elementRef.nativeElement.querySelector('.icon-dropdown')
+    const iconClickedInside = dropdownTrigger?.contains(event.target as Node) ||
+                          iconDropdown?.contains(event.target as Node)
+    if (this.iconDropdownOpen && !iconClickedInside) {
       this.iconDropdownOpen = false
+    }
+
+    // Check if click is outside the background dropdown area
+    const bgTrigger = this.elementRef.nativeElement.querySelector('.background-trigger')
+    const bgDropdown = this.elementRef.nativeElement.querySelector('.background-dropdown')
+    const bgClickedInside = bgTrigger?.contains(event.target as Node) ||
+                            bgDropdown?.contains(event.target as Node)
+    if (this.backgroundDropdownOpen && !bgClickedInside) {
+      this.backgroundDropdownOpen = false
     }
   }
 
@@ -64,9 +83,49 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
     this.iconDropdownOpen = false
   }
 
+  toggleBackgroundDropdown(): void {
+    this.backgroundDropdownOpen = !this.backgroundDropdownOpen
+  }
+
+  selectBackgroundPreset(preset: WorkspaceBackground): void {
+    if (preset.type === 'none') {
+      this.workspace.background = undefined
+      this.customBackgroundValue = ''
+    } else {
+      this.workspace.background = { ...preset }
+      this.customBackgroundValue = preset.value
+    }
+    this.backgroundDropdownOpen = false
+  }
+
+  applyCustomBackground(): void {
+    const value = this.customBackgroundValue.trim()
+    if (value) {
+      this.workspace.background = {
+        type: 'gradient',
+        value
+      }
+    } else {
+      this.workspace.background = undefined
+    }
+  }
+
+  clearBackground(): void {
+    this.workspace.background = undefined
+    this.customBackgroundValue = ''
+  }
+
+  isBackgroundSelected(preset: WorkspaceBackground): boolean {
+    if (preset.type === 'none') {
+      return !this.workspace.background || this.workspace.background.type === 'none'
+    }
+    return this.workspace.background?.value === preset.value
+  }
+
   async ngOnInit(): Promise<void> {
     this.profiles = await this.workspaceService.getAvailableProfiles()
     this.initializeWorkspace()
+    this.cdr.detectChanges()
   }
 
   ngAfterViewInit(): void {
@@ -88,11 +147,26 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['workspace'] && !changes['workspace'].firstChange) {
-      // Reset component state when workspace input changes
-      this.selectedPaneId = null
-      this.editingPane = null
-      this.showPaneEditor = false
+      const prevId = changes['workspace'].previousValue?.id
+      const currId = this.workspace.id
+
+      if (prevId !== currId) {
+        // Different workspace - reset everything and focus name input
+        this.selectedPaneId = null
+        this.editingPane = null
+        this.showPaneEditor = false
+        this.focusNameInput()
+      } else {
+        // Same workspace ID but different reference (after save/reload)
+        // Re-sync editingPane to point to pane in new object tree
+        if (this.selectedPaneId && this.showPaneEditor) {
+          this.editingPane = this.findPaneById(this.selectedPaneId)
+        }
+      }
+      // Always reset dropdowns and sync background value
       this.iconDropdownOpen = false
+      this.backgroundDropdownOpen = false
+      this.customBackgroundValue = this.workspace.background?.value || ''
       this.initializeWorkspace()
     }
 
@@ -123,37 +197,26 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
     this.cancel.emit()
   }
 
-  selectPane(pane: WorkspacePane): void {
-    this.selectedPaneId = pane.id
-  }
-
   deselectPane(): void {
     this.selectedPaneId = null
   }
 
   onPreviewBackgroundClick(): void {
     this.deselectPane()
+    this.closePaneEditor()
   }
 
   editPane(pane: WorkspacePane): void {
+    this.selectedPaneId = pane.id
     this.editingPane = pane
     this.showPaneEditor = true
-  }
-
-  editSelectedPane(): void {
-    if (!this.selectedPaneId) return
-    const pane = this.findPaneById(this.selectedPaneId)
-    if (pane) this.editPane(pane)
+    this.cdr.detectChanges()
   }
 
   closePaneEditor(): void {
     this.showPaneEditor = false
     this.editingPane = null
-  }
-
-  onPaneSave(pane: WorkspacePane): void {
-    this.updatePaneInTree(pane)
-    this.closePaneEditor()
+    this.cdr.detectChanges()
   }
 
   // Helper functions
@@ -213,6 +276,7 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
 
   splitPane(pane: WorkspacePane, orientation: 'horizontal' | 'vertical'): void {
     this.splitPaneInTree(pane, orientation)
+    this.cdr.detectChanges()
   }
 
   splitSelectedPane(orientation: 'horizontal' | 'vertical'): void {
@@ -247,6 +311,7 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
       this.selectedPaneId = null
     }
     this.removePaneFromTree(this.workspace.root, pane)
+    this.cdr.detectChanges()
   }
 
   removeSelectedPane(): void {
@@ -293,6 +358,7 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
 
   setOrientation(orientation: 'horizontal' | 'vertical'): void {
     this.workspace.root.orientation = orientation
+    this.cdr.detectChanges()
   }
 
   updateRatio(index: number, value: number): void {
@@ -313,6 +379,7 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
     })
 
     this.workspace.root.ratios = ratios
+    this.cdr.detectChanges()
   }
 
   // Add pane operations
@@ -321,10 +388,12 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
     const pane = this.findPaneById(this.selectedPaneId)
     if (!pane) return
     this.addPaneInTree(pane, direction)
+    this.cdr.detectChanges()
   }
 
   addPaneFromEvent(pane: WorkspacePane, direction: 'left' | 'right' | 'top' | 'bottom'): void {
     this.addPaneInTree(pane, direction)
+    this.cdr.detectChanges()
   }
 
   private addPaneInTree(

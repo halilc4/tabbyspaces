@@ -42,6 +42,32 @@
         span.dropdown-chevron
           i.fas.fa-chevron-down
 
+    .form-group.auto-width
+      label Background
+      .background-picker
+        .background-trigger((click)='toggleBackgroundDropdown()')
+          span.background-preview([style.background]='workspace.background?.value || "transparent"')
+            i.fas.fa-ban(*ngIf='!workspace.background?.value')
+          span.dropdown-chevron
+            i.fas.fa-chevron-down
+        .background-dropdown(*ngIf='backgroundDropdownOpen')
+          .preset-grid
+            button.preset-option(
+              *ngFor='let preset of backgroundPresets',
+              type='button',
+              [class.selected]='isBackgroundSelected(preset)',
+              [style.background]='preset.value || "var(--theme-bg)"',
+              (click)='selectBackgroundPreset(preset)'
+            )
+              i.fas.fa-ban(*ngIf='preset.type === "none"')
+          .custom-input-wrapper
+            input.form-control.custom-bg-input(
+              type='text',
+              [(ngModel)]='customBackgroundValue',
+              placeholder='Custom CSS gradient...',
+              (blur)='applyCustomBackground()'
+            )
+
 //- Section 2: Split Layout
 .editor-section
   .section-title
@@ -51,13 +77,6 @@
   .split-preview-container
     //- Preview toolbar
     .preview-toolbar
-      button.preview-btn(
-        type='button',
-        title='Edit pane',
-        [disabled]='!selectedPaneId',
-        (click)='editSelectedPane()'
-      )
-        i.fas.fa-pen
       button.preview-btn(
         type='button',
         title='Split Horizontal',
@@ -116,7 +135,6 @@
         [split]='workspace.root',
         [selectedPaneId]='selectedPaneId',
         [profiles]='profiles',
-        (paneSelect)='selectPane($event)',
         (paneEdit)='editPane($event)',
         (splitHorizontal)='splitPane($event, "horizontal")',
         (splitVertical)='splitPane($event, "vertical")',
@@ -127,13 +145,12 @@
         (removePane)='removePane($event)'
       )
 
-    //- Inline pane editor (replaces modal)
+    //- Inline pane editor
     pane-editor(
       *ngIf='showPaneEditor && editingPane',
       [pane]='editingPane',
       [profiles]='profiles',
-      (save)='onPaneSave($event)',
-      (cancel)='closePaneEditor()'
+      (close)='closePaneEditor()'
     )
 
 //- Action buttons

@@ -12,7 +12,8 @@ if (fs.existsSync(distDevDir)) {
 
 // 2. Run webpack with dev env directly to dist-dev
 console.log('Building dev version...')
-execSync(`npx webpack --mode production --env dev --output-path "${distDevDir}"`, {
+const webpackCli = path.join(rootDir, 'node_modules', 'webpack-cli', 'bin', 'cli.js')
+execSync(`node "${webpackCli}" --mode production --env dev --output-path "${distDevDir}"`, {
   cwd: rootDir,
   stdio: 'inherit'
 })

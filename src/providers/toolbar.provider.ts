@@ -3,6 +3,7 @@ import { ToolbarButtonProvider, ToolbarButton, ProfilesService, AppService, Spli
 import { BaseTerminalTabComponent } from 'tabby-terminal'
 import { WorkspaceEditorService } from '../services/workspaceEditor.service'
 import { StartupCommandService } from '../services/startupCommand.service'
+import { WorkspaceBackgroundService } from '../services/workspaceBackground.service'
 import { SettingsTabComponent } from 'tabby-settings'
 import { CONFIG_KEY, DISPLAY_NAME, IS_DEV } from '../build-config'
 
@@ -32,9 +33,13 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
     private workspaceService: WorkspaceEditorService,
     private profilesService: ProfilesService,
     private app: AppService,
-    private startupService: StartupCommandService
+    private startupService: StartupCommandService,
+    private backgroundService: WorkspaceBackgroundService
   ) {
     super()
+    // Initialize background service to listen for tab events
+    this.backgroundService.initialize()
+
     // Wait for Tabby to finish recovery before launching startup workspaces
     this.waitForTabbyReady().then(() => {
       this.workspaceService.cleanupOrphanedProfiles()

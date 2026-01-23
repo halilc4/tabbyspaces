@@ -2,15 +2,16 @@
   //- Tab bar navigation
   .tab-bar
     .tab(
-      *ngFor='let workspace of workspaces',
-      [class.active]='isSelected(workspace)',
-      (click)='selectWorkspace(workspace)'
+      *ngFor='let tab of displayTabs; trackBy: trackByTab',
+      [class.active]='isTabSelected(tab)',
+      (click)='!tab.isNew && selectWorkspace(tab.workspace)'
     )
-      span.tab-icon([style.color]='workspace.color')
-        i.fas([class]='"fa-" + (workspace.icon || "columns")')
-      span.tab-name {{ workspace.name }}
+      span.tab-icon([style.color]='tab.workspace.color')
+        i.fas([class]='"fa-" + (tab.workspace.icon || "columns")')
+      span.tab-name {{ tab.workspace.name || 'New Workspace' }}
       span.tab-close(
-        (click)='deleteWorkspace($event, workspace)',
+        *ngIf='!tab.isNew',
+        (click)='deleteWorkspace($event, tab.workspace)',
         title='Delete workspace'
       )
         i.fas.fa-xmark

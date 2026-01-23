@@ -8,8 +8,28 @@
 .tab-bar {
   display: flex;
   background: var(--theme-bg-more);
-  border: 1px solid var(--theme-border);
+  border: 1px solid var(--theme-border, $fallback-border);
   border-bottom: none;
+  overflow-y: hidden;
+  overflow-x: auto;
+
+  // Thin scrollbar
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--theme-bg-more);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--theme-border, $fallback-border);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--theme-fg-more);
+    }
+  }
 }
 
 .tab {
@@ -17,7 +37,7 @@
   align-items: center;
   gap: $spacing-md;
   padding: $spacing-md $spacing-lg;
-  border-right: 1px solid var(--theme-border);
+  border-right: 1px solid var(--theme-border, $fallback-border);
   color: var(--theme-fg-more);
   cursor: pointer;
   font-size: $font-sm;
@@ -86,7 +106,7 @@
 // Tab content
 .tab-content {
   background: var(--theme-bg);
-  border: 1px solid var(--theme-border);
+  border: 1px solid var(--theme-border, $fallback-border);
   border-top: none;
   padding: $spacing-xl;
 

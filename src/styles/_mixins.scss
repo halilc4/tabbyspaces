@@ -17,7 +17,7 @@
 @mixin form-input($bg: var(--theme-bg)) {
   padding: $spacing-sm $spacing-md;
   border-radius: $radius-sm;
-  border: 1px solid var(--theme-border);
+  border: 1px solid var(--theme-border, $fallback-border);
   background: $bg;
   color: var(--theme-fg);
   font-size: $font-md;
@@ -28,7 +28,7 @@
   }
 
   &::placeholder {
-    color: var(--theme-fg-more);
+    color: var(--theme-fg-more, $fallback-fg-more);
   }
 }
 
@@ -52,7 +52,7 @@
 @mixin toolbar-btn {
   padding: $spacing-sm $spacing-md;
   background: var(--theme-bg);
-  border: 1px solid var(--theme-border);
+  border: 1px solid var(--theme-border, $fallback-border);
   border-radius: $radius-sm;
   color: var(--theme-fg);
   cursor: pointer;
@@ -98,7 +98,7 @@
 @mixin btn-ghost {
   @include btn-base;
   background: transparent;
-  border: 1px solid var(--theme-border);
+  border: 1px solid var(--theme-border, $fallback-border);
   color: var(--theme-fg);
 
   &:hover {
@@ -122,9 +122,9 @@
   height: $size;
   @include flex-center;
   background: var(--theme-bg);
-  border: 1px solid var(--theme-border);
+  border: 1px solid var(--theme-border, $fallback-border);
   border-radius: $radius-sm;
-  color: var(--theme-fg-more);
+  color: var(--theme-fg-more, $fallback-fg-more);
   cursor: pointer;
   font-size: 10px;
   transition: all $transition-fast;
@@ -174,7 +174,7 @@
 
 @mixin dropdown-panel {
   background: var(--theme-bg-more);
-  border: 1px solid var(--theme-border);
+  border: 1px solid var(--theme-border, $fallback-border);
   border-radius: $radius-md;
   box-shadow: $shadow-dropdown;
 }

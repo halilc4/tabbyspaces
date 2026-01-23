@@ -69,14 +69,43 @@ export interface WorkspaceSplit {
   children: (WorkspacePane | WorkspaceSplit)[]
 }
 
+export interface WorkspaceBackground {
+  type: 'none' | 'solid' | 'gradient' | 'image'
+  value: string  // CSS value: hex, gradient string, or URL
+}
+
 export interface Workspace {
   id: string
   name: string
   icon?: string
   color?: string
+  background?: WorkspaceBackground
   root: WorkspaceSplit
   launchOnStartup?: boolean
 }
+
+// Preset backgrounds for quick selection
+export const BACKGROUND_PRESETS: WorkspaceBackground[] = [
+  { type: 'none', value: '' },
+  // Existing presets
+  { type: 'gradient', value: 'linear-gradient(132deg, transparent 83%, rgba(6, 220, 249, 0.18) 100%), linear-gradient(210deg, transparent 85%, rgba(139, 92, 246, 0.2) 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, transparent 50%)' },
+  { type: 'gradient', value: 'linear-gradient(45deg, rgba(239, 68, 68, 0.1) 0%, transparent 50%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, transparent 50%)' },
+  { type: 'gradient', value: 'linear-gradient(225deg, transparent 70%, rgba(249, 115, 22, 0.15) 100%)' },
+  { type: 'gradient', value: 'linear-gradient(180deg, rgba(139, 92, 246, 0.1) 0%, transparent 40%)' },
+  // New presets
+  { type: 'gradient', value: 'linear-gradient(315deg, transparent 80%, rgba(236, 72, 153, 0.15) 100%)' }, // Pink bottom-right
+  { type: 'gradient', value: 'linear-gradient(0deg, rgba(6, 182, 212, 0.12) 0%, transparent 35%)' }, // Cyan bottom
+  { type: 'gradient', value: 'linear-gradient(45deg, transparent 85%, rgba(234, 179, 8, 0.18) 100%), linear-gradient(225deg, transparent 85%, rgba(249, 115, 22, 0.15) 100%)' }, // Gold corners
+  { type: 'gradient', value: 'linear-gradient(160deg, rgba(34, 197, 94, 0.12) 0%, transparent 40%)' }, // Green top-left
+  { type: 'gradient', value: 'linear-gradient(200deg, transparent 75%, rgba(99, 102, 241, 0.18) 100%)' }, // Indigo bottom-left
+  { type: 'gradient', value: 'linear-gradient(135deg, rgba(20, 184, 166, 0.1) 0%, transparent 50%), linear-gradient(315deg, rgba(139, 92, 246, 0.1) 0%, transparent 50%)' }, // Teal + Violet diagonal
+  { type: 'gradient', value: 'linear-gradient(90deg, rgba(239, 68, 68, 0.08) 0%, transparent 30%, transparent 70%, rgba(59, 130, 246, 0.08) 100%)' }, // Red-Blue sides
+  { type: 'gradient', value: 'linear-gradient(180deg, transparent 60%, rgba(16, 185, 129, 0.12) 100%)' }, // Emerald bottom fade
+  { type: 'gradient', value: 'linear-gradient(45deg, rgba(168, 85, 247, 0.1) 0%, transparent 40%), linear-gradient(225deg, rgba(6, 182, 212, 0.1) 0%, transparent 40%)' }, // Purple + Cyan corners
+  { type: 'gradient', value: 'linear-gradient(150deg, transparent 70%, rgba(251, 146, 60, 0.15) 100%), linear-gradient(30deg, transparent 70%, rgba(251, 146, 60, 0.1) 100%)' }, // Warm orange accents
+]
 
 /**
  * Type guard to check if a node is a WorkspaceSplit.

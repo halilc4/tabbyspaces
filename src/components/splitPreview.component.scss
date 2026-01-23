@@ -8,7 +8,7 @@
   border-radius: $radius-md;
   overflow: hidden;
   background: var(--theme-bg);
-  border: 1px solid var(--theme-border);
+  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.1));
 
   &.horizontal {
     flex-direction: row;
@@ -31,7 +31,7 @@
   @include flex-center;
   background: var(--theme-bg-more);
   border-radius: $radius-sm;
-  border: 2px solid var(--theme-border);
+  border: 2px solid var(--theme-border, rgba(255, 255, 255, 0.1));
   cursor: pointer;
   transition: all $transition-fast;
   position: relative;
@@ -39,7 +39,7 @@
 
   &:hover {
     background: var(--theme-bg-more-more);
-    border-color: var(--theme-fg-more);
+    border-color: var(--theme-fg-more, rgba(255, 255, 255, 0.3));
   }
 
   &.selected {
@@ -97,32 +97,6 @@
   }
 }
 
-.pane-edit-btn {
-  position: absolute;
-  top: $spacing-sm;
-  right: $spacing-sm;
-  padding: $spacing-sm $spacing-md;
-  background: var(--theme-bg);
-  border: 1px solid var(--theme-border);
-  border-radius: $radius-sm;
-  color: var(--theme-fg);
-  cursor: pointer;
-  font-size: 0.7rem;
-  transition: all $transition-fast;
-  opacity: 0;
-  z-index: 10;
-
-  &:hover {
-    background: var(--theme-primary);
-    color: white;
-    border-color: var(--theme-primary);
-  }
-}
-
-.preview-pane:hover .pane-edit-btn {
-  opacity: 1;
-}
-
 // Context menu
 .context-menu-overlay {
   @include full-overlay($z-context-menu-overlay);
@@ -131,7 +105,7 @@
 .context-menu {
   position: fixed;
   background: var(--theme-bg);
-  border: 1px solid var(--theme-border);
+  border: 1px solid var(--theme-border, $fallback-border);
   border-radius: $radius-lg;
   box-shadow: $shadow-context-menu;
   min-width: 160px;
@@ -174,7 +148,7 @@
 
 .context-menu-divider {
   height: 1px;
-  background: var(--theme-border);
+  background: var(--theme-border, $fallback-border);
   margin: $spacing-sm 0;
 }
 

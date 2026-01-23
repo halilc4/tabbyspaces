@@ -1,35 +1,19 @@
-import { Component, Input, Output, EventEmitter, OnInit, HostListener, ChangeDetectionStrategy } from '@angular/core'
+import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core'
 import { WorkspacePane, TabbyProfile } from '../models/workspace.model'
 
 @Component({
   selector: 'pane-editor',
   template: require('./paneEditor.component.pug'),
   styles: [require('./paneEditor.component.scss')],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PaneEditorComponent implements OnInit {
+export class PaneEditorComponent {
   @Input() pane!: WorkspacePane
   @Input() profiles: TabbyProfile[] = []
-  @Output() save = new EventEmitter<WorkspacePane>()
-  @Output() cancel = new EventEmitter<void>()
-
-  editedPane!: WorkspacePane
-
-  ngOnInit(): void {
-    this.editedPane = { ...this.pane }
-  }
+  @Output() close = new EventEmitter<void>()
 
   @HostListener('document:keydown.escape')
   onEscapeKey(): void {
-    this.cancel.emit()
-  }
-
-  onSave(): void {
-    this.save.emit(this.editedPane)
-  }
-
-  onCancel(): void {
-    this.cancel.emit()
+    this.close.emit()
   }
 
   getProfileName(profileId: string): string {

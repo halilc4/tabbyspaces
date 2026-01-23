@@ -25,6 +25,10 @@ $color-success-hover: #059669;
 $color-warning: #f59e0b;
 $color-danger: #ef4444;
 
+// Fallback values for Tabby theme variables that may not be defined
+$fallback-border: rgba(255, 255, 255, 0.1);
+$fallback-fg-more: rgba(255, 255, 255, 0.3);
+
 // ======================
 // SHADOWS (S1: Flat - no shadows)
 // ======================

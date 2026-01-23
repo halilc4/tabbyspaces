@@ -1,12 +1,15 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ChangeDetectorRef, ElementRef, NgZone } from '@angular/core'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { ConfigService, ProfilesService } from 'tabby-core'
 import { Subscription } from 'rxjs'
 import { StartupCommandService } from '../services/startupCommand.service'
 import { WorkspaceEditorService } from '../services/workspaceEditor.service'
+import { DeleteConfirmModalComponent } from './deleteConfirmModal.component'
 import {
   Workspace,
   WorkspacePane,
   WorkspaceSplit,
+  TabbyProfile,
   countPanes,
   createDefaultWorkspace,
   deepClone,
@@ -26,6 +29,8 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
   editingWorkspace: Workspace | null = null
   isCreatingNew = false
   openingWorkspaceId: string | null = null
+  displayTabs: Array<{ workspace: Workspace; isNew: boolean }> = []
+  private cachedProfiles: TabbyProfile[] = []
   private configSubscription: Subscription | null = null
 
   constructor(
@@ -33,16 +38,18 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     private workspaceService: WorkspaceEditorService,
     private profilesService: ProfilesService,
     private startupService: StartupCommandService,
+    private modalService: NgbModal,
     private cdr: ChangeDetectorRef,
     private elementRef: ElementRef,
     private zone: NgZone
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.loadWorkspaces()
     this.autoSelectFirst()
+    this.cachedProfiles = await this.workspaceService.getAvailableProfiles()
     this.configSubscription = this.config.changed$.subscribe(() => {
-      this.loadWorkspaces()
+      this.zone.run(() => this.loadWorkspaces())
     })
   }
 
@@ -66,6 +73,7 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     this.isCreatingNew = false
     this.selectedWorkspace = workspace
     this.editingWorkspace = deepClone(workspace)
+    this.updateDisplayTabs()
   }
 
   isSelected(workspace: Workspace): boolean {
@@ -77,18 +85,29 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   loadWorkspaces(): void {
+    const previousSelectedId = this.selectedWorkspace?.id
     this.workspaces = this.workspaceService.getWorkspaces()
-    this.cdr.detectChanges()
+
+    // Re-sync selectedWorkspace to point to object in new array
+    // This prevents stale reference after delete/reload operations
+    if (previousSelectedId) {
+      this.selectedWorkspace = this.workspaces.find(w => w.id === previousSelectedId) || null
+    }
+
+    this.updateDisplayTabs()
   }
 
-  async createWorkspace(): Promise<void> {
-    const profiles = await this.workspaceService.getAvailableProfiles()
-    const defaultProfileId = profiles[0]?.id || ''
+  createWorkspace(): void {
+    console.log('[L5 DEBUG] createWorkspace called, cachedProfiles:', this.cachedProfiles.length)
+    const defaultProfileId = this.cachedProfiles[0]?.id || ''
     const workspace = createDefaultWorkspace()
     this.setProfileForAllPanes(workspace.root, defaultProfileId)
     this.selectedWorkspace = null
     this.editingWorkspace = workspace
     this.isCreatingNew = true
+    console.log('[L5 DEBUG] before updateDisplayTabs, isCreatingNew:', this.isCreatingNew, 'editingWorkspace:', !!this.editingWorkspace)
+    this.updateDisplayTabs()
+    console.log('[L5 DEBUG] after updateDisplayTabs, displayTabs.length:', this.displayTabs.length)
     this.cdr.detectChanges()
   }
 
@@ -108,33 +127,48 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     event.stopPropagation()
     const clone = this.workspaceService.duplicateWorkspace(workspace)
     await this.workspaceService.addWorkspace(clone)
-    this.loadWorkspaces()
 
-    // Select the duplicated workspace
-    const duplicated = this.workspaces.find((w) => w.id === clone.id)
-    if (duplicated) {
-      this.selectWorkspace(duplicated)
-    }
-    this.cdr.detectChanges()
+    this.zone.run(() => {
+      this.loadWorkspaces()
+      const duplicated = this.workspaces.find((w) => w.id === clone.id)
+      if (duplicated) {
+        this.selectWorkspace(duplicated)
+      }
+    })
   }
 
   async deleteWorkspace(event: MouseEvent, workspace: Workspace): Promise<void> {
     event.stopPropagation()
-    if (confirm(`Delete workspace "${workspace.name}"?`)) {
-      const currentIndex = this.workspaces.findIndex((w) => w.id === workspace.id)
-      await this.workspaceService.deleteWorkspace(workspace.id)
-      this.loadWorkspaces()
 
-      // Select next workspace after deletion
-      if (this.workspaces.length > 0) {
-        const nextIndex = Math.min(currentIndex, this.workspaces.length - 1)
-        this.selectWorkspace(this.workspaces[nextIndex])
-      } else {
+    const confirmed = await this.confirmDelete(workspace.name)
+    if (!confirmed) return
+
+    const wasSelected = this.selectedWorkspace?.id === workspace.id
+    const deletedIndex = this.workspaces.findIndex((w) => w.id === workspace.id)
+
+    await this.workspaceService.deleteWorkspace(workspace.id)
+
+    this.zone.run(() => {
+      this.loadWorkspaces()
+      if (this.workspaces.length === 0) {
         this.selectedWorkspace = null
         this.editingWorkspace = null
         this.isCreatingNew = false
+      } else if (wasSelected) {
+        const nextIndex = Math.min(deletedIndex, this.workspaces.length - 1)
+        this.selectWorkspace(this.workspaces[nextIndex])
       }
-      this.cdr.detectChanges()
+    })
+  }
+
+  private async confirmDelete(name: string): Promise<boolean> {
+    const modalRef = this.modalService.open(DeleteConfirmModalComponent)
+    modalRef.componentInstance.workspaceName = name
+    try {
+      await modalRef.result
+      return true
+    } catch {
+      return false
     }
   }
 
@@ -145,15 +179,16 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     } else {
       await this.workspaceService.updateWorkspace(workspace)
     }
-    this.loadWorkspaces()
-    this.isCreatingNew = false
 
-    // Select the saved workspace
-    const saved = this.workspaces.find((w) => w.id === workspace.id)
-    if (saved) {
-      this.selectWorkspace(saved)
-    }
-    this.cdr.detectChanges()
+    // Wrap state changes in zone.run to ensure proper change detection
+    this.zone.run(() => {
+      this.loadWorkspaces()
+      this.isCreatingNew = false
+      const saved = this.workspaces.find((w) => w.id === workspace.id)
+      if (saved) {
+        this.selectWorkspace(saved)
+      }
+    })
   }
 
   onEditorCancel(): void {
@@ -165,6 +200,7 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
       } else {
         this.selectedWorkspace = null
         this.editingWorkspace = null
+        this.updateDisplayTabs()
       }
     } else if (this.selectedWorkspace) {
       // Reset to original workspace data
@@ -184,6 +220,24 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
   get hasUnsavedChanges(): boolean {
     if (!this.editingWorkspace || !this.selectedWorkspace) return this.isCreatingNew
     return JSON.stringify(this.editingWorkspace) !== JSON.stringify(this.selectedWorkspace)
+  }
+
+  // Update display tabs array (call after state changes)
+  private updateDisplayTabs(): void {
+    const tabs = this.workspaces.map(w => ({ workspace: w, isNew: false }))
+    if (this.isCreatingNew && this.editingWorkspace) {
+      tabs.push({ workspace: this.editingWorkspace, isNew: true })
+    }
+    this.displayTabs = tabs
+  }
+
+  isTabSelected(tab: { workspace: Workspace; isNew: boolean }): boolean {
+    if (tab.isNew) return true
+    return this.selectedWorkspace?.id === tab.workspace.id
+  }
+
+  trackByTab(index: number, tab: { workspace: Workspace; isNew: boolean }): string {
+    return tab.isNew ? '__new__' : tab.workspace.id
   }
 
   async openWorkspace(event: MouseEvent, workspace: Workspace): Promise<void> {
@@ -206,4 +260,5 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
       this.cdr.detectChanges()
     }
   }
+
 }
