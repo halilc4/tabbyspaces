@@ -64,6 +64,7 @@
 - [x] Refactoring: Remove profile persistence, shell-aware CWD, dead code cleanup
 
 ### Bugs
+- [x] Focus lost after deleting workspace (native confirm() steals focus from Electron) - fix: use NgbModal instead
 - [x] Audit async functions - check if `detectChanges()` is missing after async operations that change state
 - [x] Split pane runs command (in-memory profiles) - fix: clear profile.options.args after command execution
 - [x] Pane editor modal bug - mouseup outside dialog closes modal. Dialog should close only on Esc or close/cancel/save button
