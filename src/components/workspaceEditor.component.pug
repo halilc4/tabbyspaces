@@ -1,46 +1,26 @@
-//- Inline workspace editor
-.workspace-editor-inline
-  .editor-body
-    ng-container(*ngTemplateOutlet='editorContent')
+//- Section 1: Workspace Settings
+.editor-section
+  .section-title
+    i.fas.fa-cog
+    |  Workspace Settings
 
-  .editor-footer
-    label.startup-checkbox
-      input(type='checkbox', [(ngModel)]='workspace.launchOnStartup')
-      |  Launch on startup
-    .editor-actions
-      button.btn.btn-secondary.btn-sm(type='button', (click)='onCancel()') Cancel
-      button.btn.btn-primary.btn-sm(type='button', (click)='onSave()', [disabled]='!workspace.name?.trim() || !hasUnsavedChanges')
-        i.fas.fa-save
-        |  Save
-        span.unsaved-indicator(*ngIf='hasUnsavedChanges') *
-
-//- Shared editor content
-ng-template(#editorContent)
-  //- Top row: Color picker, Name input, Icon grid
-  .editor-top-row
-    .color-picker
-      input.color-input(
-        type='color',
-        [(ngModel)]='workspace.color',
-        title='Workspace color'
+  .form-row
+    .form-group
+      label Name
+      input.form-control(
+        #nameInput,
+        type='text',
+        [(ngModel)]='workspace.name',
+        placeholder='Workspace name'
       )
 
-    input.name-input(
-      #nameInput,
-      type='text',
-      [(ngModel)]='workspace.name',
-      placeholder='Name your workspace'
-    )
-
-    .icon-picker
-      button.icon-trigger(
-        type='button',
-        [style.color]='workspace.color',
-        (click)='toggleIconDropdown()',
-        title='Select icon'
-      )
-        i.fas([class]='"fa-" + workspace.icon')
-
+    .form-group.auto-width
+      label Icon
+      .dropdown-trigger((click)='toggleIconDropdown()')
+        span.dropdown-icon([style.color]='workspace.color')
+          i.fas([class]='"fa-" + workspace.icon')
+        span.dropdown-chevron
+          i.fas.fa-chevron-down
       .icon-dropdown(*ngIf='iconDropdownOpen')
         button.icon-option(
           *ngFor='let icon of availableIcons',
@@ -51,79 +31,110 @@ ng-template(#editorContent)
         )
           i.fas([class]='"fa-" + icon')
 
-  //- Layout section
-  .layout-section
-    .layout-header
-      span.layout-title Layout
+    .form-group.auto-width
+      label Color
+      .color-trigger
+        span.dropdown-color([style.background]='workspace.color')
+        input.color-input-hidden(
+          type='color',
+          [(ngModel)]='workspace.color'
+        )
+        span.dropdown-chevron
+          i.fas.fa-chevron-down
 
-    .layout-toolbar
-      .toolbar-group.split-group
-        span.toolbar-label Split
-        button.toolbar-btn(
-          type='button',
-          [disabled]='!selectedPaneId',
-          (click)='splitSelectedPane("horizontal")',
-          title='Split Horizontal'
-        )
-          i.fas.fa-arrows-alt-h
-        button.toolbar-btn(
-          type='button',
-          [disabled]='!selectedPaneId',
-          (click)='splitSelectedPane("vertical")',
-          title='Split Vertical'
-        )
-          i.fas.fa-arrows-alt-v
+    .form-group.auto-width
+      label Background
+      .background-picker
+        .background-trigger((click)='toggleBackgroundDropdown()')
+          span.background-preview([style.background]='workspace.background?.value || "transparent"')
+            i.fas.fa-ban(*ngIf='!workspace.background?.value')
+          span.dropdown-chevron
+            i.fas.fa-chevron-down
+        .background-dropdown(*ngIf='backgroundDropdownOpen')
+          .preset-grid
+            button.preset-option(
+              *ngFor='let preset of backgroundPresets',
+              type='button',
+              [class.selected]='isBackgroundSelected(preset)',
+              [style.background]='preset.value || "var(--theme-bg)"',
+              (click)='selectBackgroundPreset(preset)'
+            )
+              i.fas.fa-ban(*ngIf='preset.type === "none"')
+          .custom-input-wrapper
+            input.form-control.custom-bg-input(
+              type='text',
+              [(ngModel)]='customBackgroundValue',
+              placeholder='Custom CSS gradient...',
+              (blur)='applyCustomBackground()'
+            )
 
-      .toolbar-divider
+//- Section 2: Split Layout
+.editor-section
+  .section-title
+    i.fas.fa-columns
+    |  Split Layout
 
-      .toolbar-group.add-group
-        span.toolbar-label Add
-        button.toolbar-btn(
-          type='button',
-          [disabled]='!selectedPaneId',
-          (click)='addPane("left")',
-          title='Add Left'
-        )
-          i.fas.fa-caret-left
-        button.toolbar-btn(
-          type='button',
-          [disabled]='!selectedPaneId',
-          (click)='addPane("right")',
-          title='Add Right'
-        )
-          i.fas.fa-caret-right
-        button.toolbar-btn(
-          type='button',
-          [disabled]='!selectedPaneId',
-          (click)='addPane("top")',
-          title='Add Top'
-        )
-          i.fas.fa-caret-up
-        button.toolbar-btn(
-          type='button',
-          [disabled]='!selectedPaneId',
-          (click)='addPane("bottom")',
-          title='Add Bottom'
-        )
-          i.fas.fa-caret-down
+  .split-preview-container
+    //- Preview toolbar
+    .preview-toolbar
+      button.preview-btn(
+        type='button',
+        title='Split Horizontal',
+        [disabled]='!selectedPaneId',
+        (click)='splitSelectedPane("horizontal")'
+      )
+        i.fas.fa-grip-lines-vertical
+      button.preview-btn(
+        type='button',
+        title='Split Vertical',
+        [disabled]='!selectedPaneId',
+        (click)='splitSelectedPane("vertical")'
+      )
+        i.fas.fa-grip-lines
+      span.toolbar-separator
+      button.preview-btn(
+        type='button',
+        title='Add Left',
+        [disabled]='!selectedPaneId',
+        (click)='addPane("left")'
+      )
+        i.fas.fa-arrow-left
+      button.preview-btn(
+        type='button',
+        title='Add Right',
+        [disabled]='!selectedPaneId',
+        (click)='addPane("right")'
+      )
+        i.fas.fa-arrow-right
+      button.preview-btn(
+        type='button',
+        title='Add Top',
+        [disabled]='!selectedPaneId',
+        (click)='addPane("top")'
+      )
+        i.fas.fa-arrow-up
+      button.preview-btn(
+        type='button',
+        title='Add Bottom',
+        [disabled]='!selectedPaneId',
+        (click)='addPane("bottom")'
+      )
+        i.fas.fa-arrow-down
+      span.toolbar-separator
+      button.preview-btn.danger(
+        type='button',
+        title='Remove pane',
+        [disabled]='!selectedPaneId || !canRemovePane()',
+        (click)='removeSelectedPane()'
+      )
+        i.fas.fa-trash
 
-      .toolbar-spacer
-
-      .toolbar-group
-        button.toolbar-btn.danger(
-          type='button',
-          [disabled]='!selectedPaneId || !canRemovePane()',
-          (click)='removeSelectedPane()',
-          title='Remove pane'
-        )
-          i.fas.fa-trash
-
-    .layout-preview-container((click)='onPreviewBackgroundClick()')
+    //- Split preview
+    .layout-preview((click)='onPreviewBackgroundClick()')
       split-preview(
         [split]='workspace.root',
         [selectedPaneId]='selectedPaneId',
         [profiles]='profiles',
-        (paneSelect)='selectPane($event)',
         (paneEdit)='editPane($event)',
         (splitHorizontal)='splitPane($event, "horizontal")',
         (splitVertical)='splitPane($event, "vertical")',
@@ -134,11 +145,28 @@ ng-template(#editorContent)
         (removePane)='removePane($event)'
       )
 
-//- Pane editor (always modal)
-pane-editor(
-  *ngIf='showPaneEditor && editingPane',
-  [pane]='editingPane',
-  [profiles]='profiles',
-  (save)='onPaneSave($event)',
-  (cancel)='closePaneEditor()'
-)
+    //- Inline pane editor
+    pane-editor(
+      *ngIf='showPaneEditor && editingPane',
+      [pane]='editingPane',
+      [profiles]='profiles',
+      (close)='closePaneEditor()'
+    )
+
+//- Action buttons
+.action-buttons
+  .checkbox-group
+    input(type='checkbox', [(ngModel)]='workspace.launchOnStartup', id='launchStartup')
+    label(for='launchStartup') Launch on startup
+  .action-buttons-right
+    button.btn.btn-ghost(type='button', (click)='onCancel()')
+      i.fas.fa-xmark
+      |  Cancel
+    button.btn.btn-success(
+      type='button',
+      (click)='onSave()',
+      [disabled]='!workspace.name?.trim() || !hasUnsavedChanges'
+    )
+      i.fas.fa-check
+      |  Save
+      span.unsaved-indicator(*ngIf='hasUnsavedChanges') *

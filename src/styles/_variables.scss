@@ -1,0 +1,67 @@
+// ======================
+// SPACING SCALE (S1: Tight)
+// ======================
+$spacing-xs: 2px;   // toolbar group gap, tiny margins
+$spacing-sm: 4px;   // gaps, small padding
+$spacing-md: 6px;   // default gaps, button padding
+$spacing-lg: 10px;  // section gaps, form spacing
+$spacing-xl: 14px;  // container padding, large gaps
+$spacing-2xl: 18px; // modal padding, section margins
+
+// ======================
+// BORDER RADIUS SCALE (S1: Sharp)
+// ======================
+$radius-xs: 2px;    // tiny elements
+$radius-sm: 2px;    // buttons, small elements
+$radius-md: 3px;    // inputs, dropdowns
+$radius-lg: 4px;    // cards, containers, modals
+
+// ======================
+// CUSTOM COLORS
+// ======================
+// These extend Tabby's --theme-* variables
+$color-success: #10b981;
+$color-success-hover: #059669;
+$color-warning: #f59e0b;
+$color-danger: #ef4444;
+
+// Fallback values for Tabby theme variables that may not be defined
+$fallback-border: rgba(255, 255, 255, 0.1);
+$fallback-fg-more: rgba(255, 255, 255, 0.3);
+
+// ======================
+// SHADOWS (S1: Flat - no shadows)
+// ======================
+$shadow-dropdown: none;
+$shadow-context-menu: none;
+$shadow-modal: none;
+$overlay-bg: rgba(0, 0, 0, 0.7);
+
+// ======================
+// PREVIEW COMPONENT
+// ======================
+$preview-height: 140px;
+$nested-split-bg: rgba(255, 255, 255, 0.02);
+$selected-pane-gradient-start: rgba(59, 130, 246, 0.08);
+$selected-pane-gradient-end: rgba(59, 130, 246, 0.04);
+
+// ======================
+// FONT SIZES (S1: Compact)
+// ======================
+$font-xs: 0.7rem;   // 11px - sublabels, hints
+$font-sm: 0.8rem;   // 13px - labels, secondary text
+$font-md: 0.85rem;  // 14px - default body
+
+// ======================
+// Z-INDEX SCALE
+// ======================
+$z-dropdown: 100;
+$z-modal-overlay: 1100;
+$z-context-menu-overlay: 1200;
+$z-context-menu: 1201;
+
+// ======================
+// TRANSITIONS
+// ======================
+$transition-fast: 0.15s;
+$transition-normal: 0.2s;

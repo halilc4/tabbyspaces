@@ -9,11 +9,13 @@ import { WorkspaceEditorSettingsProvider } from './providers/settings.provider'
 import { WorkspaceToolbarProvider } from './providers/toolbar.provider'
 import { WorkspaceEditorService } from './services/workspaceEditor.service'
 import { StartupCommandService } from './services/startupCommand.service'
+import { WorkspaceBackgroundService } from './services/workspaceBackground.service'
 
 import { WorkspaceListComponent } from './components/workspaceList.component'
 import { WorkspaceEditorComponent } from './components/workspaceEditor.component'
 import { PaneEditorComponent } from './components/paneEditor.component'
 import { SplitPreviewComponent } from './components/splitPreview.component'
+import { DeleteConfirmModalComponent } from './components/deleteConfirmModal.component'
 
 @NgModule({
   imports: [CommonModule, FormsModule],
@@ -23,12 +25,14 @@ import { SplitPreviewComponent } from './components/splitPreview.component'
     { provide: ToolbarButtonProvider, useClass: WorkspaceToolbarProvider, multi: true },
     WorkspaceEditorService,
     StartupCommandService,
+    WorkspaceBackgroundService,
   ],
   declarations: [
     WorkspaceListComponent,
     WorkspaceEditorComponent,
     PaneEditorComponent,
     SplitPreviewComponent,
+    DeleteConfirmModalComponent,
   ],
 })
 export default class WorkspaceEditorModule {}

@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V06: Tabbed Interface - TabbySpaces</title>
+  <link rel="stylesheet" href="shared/base.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      color: var(--theme-fg-less);
+      text-decoration: none;
+      font-size: var(--font-size-sm);
+      margin-bottom: var(--space-xl);
+      transition: color var(--transition-fast);
+    }
+    .back-link:hover {
+      color: var(--theme-primary);
+    }
+
+    /* Page header */
+    .page-header {
+      margin-bottom: var(--space-xl);
+    }
+    .page-header h1 {
+      font-size: var(--font-size-lg);
+      color: var(--theme-fg-more);
+      margin-bottom: var(--space-sm);
+    }
+    .page-header p {
+      color: var(--theme-fg-less);
+      font-size: var(--font-size-sm);
+    }
+
+    /* Tab bar container */
+    .tab-bar {
+      display: flex;
+      align-items: stretch;
+      background: var(--theme-bg-more);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      border: 1px solid var(--theme-border);
+      border-bottom: none;
+      overflow: hidden;
+    }
+
+    /* Individual tab */
+    .tab {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-lg) var(--space-xl);
+      border-right: 1px solid var(--theme-border);
+      color: var(--theme-fg-less);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      position: relative;
+      min-width: 140px;
+    }
+    .tab:hover {
+      background: var(--theme-bg-more-more);
+      color: var(--theme-fg);
+    }
+    .tab:hover .tab-close {
+      opacity: 1;
+    }
+
+    /* Active tab */
+    .tab.active {
+      background: var(--theme-bg);
+      color: var(--theme-fg-more);
+      border-bottom: 2px solid var(--theme-primary);
+      margin-bottom: -1px;
+    }
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--theme-bg);
+    }
+
+    /* Tab icon */
+    .tab-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-sm);
+    }
+    .tab-icon.code { color: #3b82f6; }
+    .tab-icon.server { color: #f59e0b; }
+    .tab-icon.book { color: #10b981; }
+
+    /* Tab name */
+    .tab-name {
+      font-size: var(--font-size-sm);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    /* Tab close button */
+    .tab-close {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      opacity: 0;
+      transition: all var(--transition-fast);
+      font-size: 10px;
+    }
+    .tab-close:hover {
+      background: var(--theme-danger);
+      color: white;
+    }
+
+    /* New tab button */
+    .tab-new {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      color: var(--theme-fg-less);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .tab-new:hover {
+      background: var(--theme-bg-more-more);
+      color: var(--theme-primary);
+    }
+
+    /* Tab content area */
+    .tab-content {
+      background: var(--theme-bg);
+      border: 1px solid var(--theme-border);
+      border-top: none;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      padding: var(--space-xl);
+    }
+
+    /* Editor section */
+    .editor-section {
+      margin-bottom: var(--space-xl);
+    }
+    .editor-section:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Section title */
+    .section-title {
+      font-size: var(--font-size-sm);
+      color: var(--theme-fg-less);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: var(--space-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .section-title i {
+      font-size: var(--font-size-xs);
+    }
+
+    /* Form row */
+    .form-row {
+      display: flex;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-lg);
+      align-items: flex-end;
+    }
+    .form-row:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Form group */
+    .form-group {
+      flex: 1;
+    }
+    .form-group.auto-width {
+      flex: none;
+    }
+    .form-group label {
+      display: block;
+      font-size: var(--font-size-xs);
+      color: var(--theme-fg-less);
+      margin-bottom: var(--space-sm);
+    }
+    .form-group input[type="text"] {
+      width: 100%;
+    }
+
+    /* Dropdown trigger */
+    .dropdown-trigger {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+      background: var(--theme-bg-more);
+      border: 1px solid var(--theme-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      min-width: 100px;
+    }
+    .dropdown-trigger:hover {
+      border-color: var(--theme-fg-less);
+    }
+    .dropdown-trigger .dropdown-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-xs);
+    }
+    .dropdown-trigger .dropdown-icon.icon-blue { color: #3b82f6; }
+    .dropdown-trigger .dropdown-color {
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-xs);
+    }
+    .dropdown-trigger .dropdown-label {
+      font-size: var(--font-size-sm);
+      color: var(--theme-fg);
+    }
+    .dropdown-trigger .dropdown-chevron {
+      margin-left: auto;
+      color: var(--theme-fg-less);
+      font-size: var(--font-size-xs);
+    }
+
+    /* Split preview container */
+    .split-preview-container {
+      background: var(--theme-bg-more);
+      border: 1px solid var(--theme-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+    }
+
+    /* Preview toolbar */
+    .preview-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid var(--theme-border);
+      gap: var(--space-sm);
+    }
+    .toolbar-separator {
+      width: 1px;
+      height: 20px;
+      background: var(--theme-border);
+      margin: 0 var(--space-sm);
+    }
+    .preview-btn {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--theme-bg);
+      border: 1px solid var(--theme-border);
+      border-radius: var(--radius-sm);
+      color: var(--theme-fg-less);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-size: var(--font-size-xs);
+    }
+    .preview-btn:hover {
+      border-color: var(--theme-primary);
+      color: var(--theme-primary);
+    }
+    .preview-btn.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .preview-btn.disabled:hover {
+      border-color: var(--theme-border);
+      color: var(--theme-fg-less);
+    }
+    .preview-btn.danger:hover {
+      border-color: var(--theme-danger);
+      color: var(--theme-danger);
+    }
+
+    /* Split preview - nested layout */
+    .split-preview {
+      display: flex;
+      gap: var(--space-md);
+      height: 220px;
+    }
+    .split-preview.vertical {
+      flex-direction: column;
+    }
+
+    /* Nested split container */
+    .nested-split {
+      flex: 1;
+      display: flex;
+      gap: var(--space-md);
+      min-width: 0;
+    }
+    .nested-split.vertical {
+      flex-direction: column;
+    }
+
+    /* Preview pane */
+    .preview-pane {
+      flex: 1;
+      background: var(--theme-bg);
+      border: 2px solid var(--theme-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-width: 0;
+      min-height: 0;
+    }
+    .preview-pane:hover {
+      border-color: var(--theme-fg-less);
+    }
+    .preview-pane.selected {
+      border-color: var(--theme-primary);
+      box-shadow: 0 0 0 1px var(--theme-primary);
+    }
+
+    .pane-icon {
+      font-size: 20px;
+      color: var(--theme-fg-less);
+      margin-bottom: var(--space-sm);
+    }
+    .pane-label {
+      font-size: var(--font-size-xs);
+      color: var(--theme-fg);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+    .pane-sublabel {
+      font-size: 10px;
+      color: var(--theme-fg-less);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    /* Pane details panel */
+    .pane-details {
+      background: var(--theme-bg-more-more);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      margin-top: var(--space-lg);
+      border-left: 3px solid var(--theme-primary);
+    }
+    .pane-details-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+    }
+    .pane-details-title {
+      font-size: var(--font-size-sm);
+      color: var(--theme-fg);
+      font-weight: 500;
+    }
+    .pane-details-close {
+      color: var(--theme-fg-less);
+      cursor: pointer;
+      font-size: var(--font-size-xs);
+    }
+    .pane-details-close:hover {
+      color: var(--theme-fg);
+    }
+
+    /* Pane form */
+    .pane-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+    }
+    .pane-form .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    .pane-form select {
+      width: 100%;
+    }
+
+    /* Action buttons */
+    .action-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--space-xl);
+      border-top: 1px solid var(--theme-border);
+      margin-top: var(--space-xl);
+    }
+    .action-buttons-left {
+      display: flex;
+      gap: var(--space-md);
+    }
+    .action-buttons-right {
+      display: flex;
+      gap: var(--space-md);
+    }
+
+    /* Checkbox */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--theme-primary);
+    }
+    .checkbox-group label {
+      font-size: var(--font-size-sm);
+      color: var(--theme-fg);
+    }
+  </style>
+</head>
+<body>
+  <div class="mockup-container">
+    <!-- Back link -->
+    <a href="index.html" class="back-link">
+      <i class="fa-solid fa-arrow-left"></i>
+      Back to variants
+    </a>
+
+    <!-- Page header -->
+    <div class="page-header">
+      <h1><i class="fa-solid fa-folder-open"></i> V06: Tabbed Interface</h1>
+      <p>Browser-tab metaphor for workspace switching with full editor below.</p>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <div class="tab active">
+        <span class="tab-icon code"><i class="fa-solid fa-code"></i></span>
+        <span class="tab-name">Development</span>
+        <span class="tab-close"><i class="fa-solid fa-xmark"></i></span>
+      </div>
+      <div class="tab">
+        <span class="tab-icon server"><i class="fa-solid fa-server"></i></span>
+        <span class="tab-name">DevOps</span>
+        <span class="tab-close"><i class="fa-solid fa-xmark"></i></span>
+      </div>
+      <div class="tab">
+        <span class="tab-icon book"><i class="fa-solid fa-book"></i></span>
+        <span class="tab-name">Research</span>
+        <span class="tab-close"><i class="fa-solid fa-xmark"></i></span>
+      </div>
+      <div class="tab-new">
+        <i class="fa-solid fa-plus"></i>
+      </div>
+    </div>
+
+    <!-- Tab content (active workspace editor) -->
+    <div class="tab-content">
+      <!-- Workspace settings section -->
+      <div class="editor-section">
+        <div class="section-title">
+          <i class="fa-solid fa-cog"></i>
+          Workspace Settings
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" value="Development" placeholder="Workspace name">
+          </div>
+          <div class="form-group auto-width">
+            <label>Icon</label>
+            <div class="dropdown-trigger">
+              <span class="dropdown-icon icon-blue"><i class="fa-solid fa-code"></i></span>
+              <span class="dropdown-chevron"><i class="fa-solid fa-chevron-down"></i></span>
+            </div>
+          </div>
+          <div class="form-group auto-width">
+            <label>Color</label>
+            <div class="dropdown-trigger">
+              <span class="dropdown-color" style="background: #3b82f6;"></span>
+              <span class="dropdown-chevron"><i class="fa-solid fa-chevron-down"></i></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Split layout section -->
+      <div class="editor-section">
+        <div class="section-title">
+          <i class="fa-solid fa-columns"></i>
+          Split Layout
+        </div>
+
+        <div class="split-preview-container">
+          <div class="preview-toolbar">
+            <button class="preview-btn" title="Edit pane">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="preview-btn" title="Split horizontal">
+              <i class="fa-solid fa-grip-lines-vertical"></i>
+            </button>
+            <button class="preview-btn" title="Split vertical">
+              <i class="fa-solid fa-grip-lines"></i>
+            </button>
+            <span class="toolbar-separator"></span>
+            <button class="preview-btn" title="Move left">
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <button class="preview-btn" title="Move right">
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button class="preview-btn" title="Move up">
+              <i class="fa-solid fa-arrow-up"></i>
+            </button>
+            <button class="preview-btn" title="Move down">
+              <i class="fa-solid fa-arrow-down"></i>
+            </button>
+            <span class="toolbar-separator"></span>
+            <button class="preview-btn danger" title="Delete pane">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+
+          <!-- Nested split layout: horizontal with nested vertical on left -->
+          <div class="split-preview">
+            <!-- Left side: vertical split with 2 panes -->
+            <div class="nested-split vertical">
+              <div class="preview-pane selected">
+                <i class="fa-solid fa-terminal pane-icon"></i>
+                <div class="pane-label">PowerShell</div>
+                <div class="pane-sublabel">C:\Projects\app</div>
+              </div>
+              <div class="preview-pane">
+                <i class="fa-solid fa-terminal pane-icon"></i>
+                <div class="pane-label">PowerShell</div>
+                <div class="pane-sublabel">C:\Projects\app</div>
+              </div>
+            </div>
+            <!-- Right side: single pane -->
+            <div class="preview-pane">
+              <i class="fa-solid fa-terminal pane-icon"></i>
+              <div class="pane-label">PowerShell</div>
+              <div class="pane-sublabel">C:\Projects\api</div>
+            </div>
+          </div>
+
+          <!-- Pane details (shown when pane selected) -->
+          <div class="pane-details">
+            <div class="pane-details-header">
+              <span class="pane-details-title">
+                <i class="fa-solid fa-terminal"></i> Pane 1 Configuration
+              </span>
+              <span class="pane-details-close">
+                <i class="fa-solid fa-xmark"></i> Close
+              </span>
+            </div>
+            <div class="pane-form">
+              <div class="form-group">
+                <label>Profile</label>
+                <select>
+                  <option selected>PowerShell</option>
+                  <option>CMD</option>
+                  <option>Git Bash</option>
+                  <option>WSL: Ubuntu</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Working Directory</label>
+                <input type="text" value="C:\Projects\app" placeholder="Optional CWD">
+              </div>
+              <div class="form-group">
+                <label>Tab Title</label>
+                <input type="text" value="" placeholder="Optional title override">
+              </div>
+              <div class="form-group">
+                <label>Startup Command</label>
+                <input type="text" value="npm run dev" placeholder="Optional command">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-buttons">
+        <div class="action-buttons-left">
+          <div class="checkbox-group">
+            <input type="checkbox" id="launchStartup">
+            <label for="launchStartup">Launch on startup</label>
+          </div>
+        </div>
+        <div class="action-buttons-right">
+          <button class="btn btn-ghost">
+            <i class="fa-solid fa-xmark"></i>
+            Cancel
+          </button>
+          <button class="btn btn-success">
+            <i class="fa-solid fa-check"></i>
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Design notes -->
+  <div class="design-notes">
+    <h4><i class="fa-solid fa-lightbulb"></i> Design Notes</h4>
+    <ul>
+      <li><strong>Familiar metaphor:</strong> Browser tabs are universally understood - instant learnability</li>
+      <li><strong>Quick switching:</strong> All workspaces visible and one-click accessible</li>
+      <li><strong>Active tab connected:</strong> No border between tab and content creates visual unity</li>
+      <li><strong>Close on hover:</strong> Clean tabs, X appears only when needed</li>
+      <li><strong>New tab button:</strong> Plus icon follows convention for adding items</li>
+      <li><strong>Full editor below:</strong> No scrolling needed, everything visible at once</li>
+      <li><strong>Inline pane config:</strong> Click pane to edit, no modal disruption</li>
+      <li><strong>Consistent with code editors:</strong> VSCode, terminals all use tabs</li>
+    </ul>
+  </div>
+</body>
+</html>

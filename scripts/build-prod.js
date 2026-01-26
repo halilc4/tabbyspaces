@@ -12,7 +12,8 @@ if (fs.existsSync(distDir)) {
 
 // 2. Run webpack
 console.log('Building production version...')
-execSync('npx webpack --mode production', {
+const webpackCli = path.join(rootDir, 'node_modules', 'webpack-cli', 'bin', 'cli.js')
+execSync(`node "${webpackCli}" --mode production`, {
   cwd: rootDir,
   stdio: 'inherit'
 })

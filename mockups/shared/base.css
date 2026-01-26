@@ -1,0 +1,216 @@
+/* TabbySpaces Design Mockups - Base Styles */
+/* Simulates Tabby's dark theme environment */
+
+:root {
+  /* Tabby-like dark theme variables */
+  --theme-bg: #1e1e1e;
+  --theme-bg-more: #252526;
+  --theme-bg-more-more: #2d2d30;
+  --theme-fg: #cccccc;
+  --theme-fg-more: #ffffff;
+  --theme-fg-less: #808080;
+  --theme-border: #3c3c3c;
+  --theme-primary: #0078d4;
+  --theme-success: #10b981;
+  --theme-danger: #ef4444;
+  --theme-warning: #f59e0b;
+
+  /* Spacing scale */
+  --space-xs: 2px;
+  --space-sm: 4px;
+  --space-md: 8px;
+  --space-lg: 12px;
+  --space-xl: 16px;
+  --space-2xl: 20px;
+  --space-3xl: 24px;
+  --space-4xl: 32px;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  /* Typography */
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Cascadia Code", "Fira Code", Consolas, monospace;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.85rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.4);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.5);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  color: var(--theme-fg);
+  background: var(--theme-bg);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* Container - simulates Tabby settings panel */
+.mockup-container {
+  max-width: 876px;
+  margin: 0 auto;
+  padding: var(--space-xl);
+  background: var(--theme-bg);
+  min-height: 100vh;
+}
+
+/* Typography utilities */
+.text-muted { color: var(--theme-fg-less); }
+.text-primary { color: var(--theme-primary); }
+.text-success { color: var(--theme-success); }
+.text-danger { color: var(--theme-danger); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-xs { font-size: var(--font-size-xs); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.font-mono { font-family: var(--font-mono); }
+.font-bold { font-weight: 600; }
+
+/* Common form elements */
+input[type="text"],
+input[type="color"],
+select {
+  background: var(--theme-bg);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-md);
+  color: var(--theme-fg);
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-size-sm);
+  transition: border-color var(--transition-fast);
+}
+
+input[type="text"]:focus,
+select:focus {
+  outline: none;
+  border-color: var(--theme-primary);
+}
+
+/* Button base */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-primary {
+  background: var(--theme-primary);
+  color: white;
+}
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+.btn-success {
+  background: var(--theme-success);
+  color: white;
+}
+.btn-success:hover {
+  filter: brightness(1.1);
+}
+
+.btn-danger {
+  background: var(--theme-danger);
+  color: white;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--theme-fg);
+}
+.btn-ghost:hover {
+  background: var(--theme-bg-more);
+}
+
+/* Card base */
+.card {
+  background: var(--theme-bg-more);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+}
+
+.card-hover:hover {
+  border-color: var(--theme-primary);
+}
+
+/* Flex utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-xs { gap: var(--space-xs); }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
+.gap-lg { gap: var(--space-lg); }
+.gap-xl { gap: var(--space-xl); }
+
+/* Grid utilities */
+.grid { display: grid; }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+
+/* Spacing utilities */
+.p-md { padding: var(--space-md); }
+.p-lg { padding: var(--space-lg); }
+.p-xl { padding: var(--space-xl); }
+.mt-md { margin-top: var(--space-md); }
+.mt-lg { margin-top: var(--space-lg); }
+.mt-xl { margin-top: var(--space-xl); }
+.mb-md { margin-bottom: var(--space-md); }
+.mb-lg { margin-bottom: var(--space-lg); }
+
+/* Design notes (visible as overlay) */
+.design-notes {
+  position: fixed;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  background: rgba(0,0,0,0.9);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  max-width: 300px;
+  font-size: var(--font-size-xs);
+  color: var(--theme-fg-less);
+  z-index: 1000;
+}
+.design-notes h4 {
+  color: var(--theme-primary);
+  margin-bottom: var(--space-md);
+}
+.design-notes ul {
+  list-style: none;
+  padding-left: 0;
+}
+.design-notes li {
+  margin-bottom: var(--space-sm);
+}
+.design-notes li::before {
+  content: "• ";
+  color: var(--theme-primary);
+}

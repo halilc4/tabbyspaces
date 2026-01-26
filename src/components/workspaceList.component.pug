@@ -1,57 +1,37 @@
 .workspace-list-container
-  .workspace-list-header
-    h3 Workspace Editor
-    button.btn.btn-primary(type='button', (click)='createWorkspace()')
-      i.fas.fa-plus
-      |  New Workspace
-
-  //- Editor (above list)
-  workspace-editor(
-    *ngIf='editingWorkspace',
-    [workspace]='editingWorkspace',
-    [autoFocus]='isCreatingNew',
-    [hasUnsavedChanges]='hasUnsavedChanges',
-    (save)='onEditorSave($event)',
-    (cancel)='onEditorCancel()'
-  )
-
-  //- Workspace list
-  .workspace-list(*ngIf='workspaces.length > 0')
-    .workspace-item(
-      *ngFor='let workspace of workspaces',
-      [class.selected]='isSelected(workspace)',
-      (click)='selectWorkspace(workspace)'
+  //- Tab bar navigation
+  .tab-bar
+    .tab(
+      *ngFor='let tab of displayTabs; trackBy: trackByTab',
+      [class.active]='isTabSelected(tab)',
+      (click)='!tab.isNew && selectWorkspace(tab.workspace)'
     )
-      .workspace-info
-        .workspace-icon([style.color]='workspace.color')
-          i.fas([class]='"fa-" + (workspace.icon || "columns")')
-        .workspace-details
-          .workspace-name {{ workspace.name }}
-          .workspace-meta
-            span {{ getPaneCount(workspace) }} panes
-            span.separator &middot;
-            span {{ getOrientationLabel(workspace) }}
-            span.separator(*ngIf='workspace.launchOnStartup') &middot;
-            span.badge.badge-primary(*ngIf='workspace.launchOnStartup') startup
+      span.tab-icon([style.color]='tab.workspace.color')
+        i.fas([class]='"fa-" + (tab.workspace.icon || "columns")')
+      span.tab-name {{ tab.workspace.name || 'New Workspace' }}
+      span.tab-close(
+        *ngIf='!tab.isNew',
+        (click)='deleteWorkspace($event, tab.workspace)',
+        title='Delete workspace'
+      )
+        i.fas.fa-xmark
 
-      .workspace-actions
-        button.btn.btn-link.open-btn(
-          type='button',
-          title='Open',
-          [disabled]='openingWorkspaceId === workspace.id',
-          (click)='openWorkspace($event, workspace)'
-        )
-          i.fas(
-            [class.fa-external-link-alt]='openingWorkspaceId !== workspace.id',
-            [class.fa-spinner]='openingWorkspaceId === workspace.id',
-            [class.fa-spin]='openingWorkspaceId === workspace.id'
-          )
-        button.btn.btn-link(type='button', title='Duplicate', (click)='duplicateWorkspace($event, workspace)')
-          i.fas.fa-copy
-        button.btn.btn-link.text-danger(type='button', title='Delete', (click)='deleteWorkspace($event, workspace)')
-          i.fas.fa-trash
+    .tab-new((click)='createWorkspace()', title='New workspace')
+      i.fas.fa-plus
 
-  //- Empty state
-  .workspace-empty(*ngIf='workspaces.length === 0 && !isCreatingNew')
+  //- Tab content (editor)
+  .tab-content(*ngIf='editingWorkspace')
+    workspace-editor(
+      [workspace]='editingWorkspace',
+      [autoFocus]='isCreatingNew',
+      [hasUnsavedChanges]='hasUnsavedChanges',
+      (save)='onEditorSave($event)',
+      (cancel)='onEditorCancel()'
+    )
+
+  //- Empty state (when no workspaces)
+  .tab-content.empty-state(*ngIf='!editingWorkspace && workspaces.length === 0')
     p No workspaces configured yet.
-    p Click "New Workspace" to create your first split-layout workspace.
+    p Click
+      strong +
+      | to create your first workspace.

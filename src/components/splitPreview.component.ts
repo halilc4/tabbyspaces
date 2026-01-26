@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core'
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core'
 import {
   WorkspaceSplit,
   WorkspacePane,
@@ -11,12 +11,11 @@ import {
   template: require('./splitPreview.component.pug'),
   styles: [require('./splitPreview.component.scss')],
 })
-export class SplitPreviewComponent {
+export class SplitPreviewComponent implements OnChanges {
   @Input() split!: WorkspaceSplit
   @Input() depth = 0
   @Input() selectedPaneId: string | null = null
   @Input() profiles: TabbyProfile[] = []
-  @Output() paneSelect = new EventEmitter<WorkspacePane>()
   @Output() paneEdit = new EventEmitter<WorkspacePane>()
   @Output() splitHorizontal = new EventEmitter<WorkspacePane>()
   @Output() splitVertical = new EventEmitter<WorkspacePane>()
@@ -28,6 +27,15 @@ export class SplitPreviewComponent {
 
   contextMenuPane: WorkspacePane | null = null
   contextMenuPosition = { x: 0, y: 0 }
+
+  constructor(private cdr: ChangeDetectorRef) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Clear context menu when split input changes to avoid stale state
+    if (changes['split']) {
+      this.closeContextMenu()
+    }
+  }
 
   isPane(child: WorkspacePane | WorkspaceSplit): boolean {
     return !isWorkspaceSplit(child)
@@ -50,11 +58,6 @@ export class SplitPreviewComponent {
   }
 
   onPaneClick(pane: WorkspacePane): void {
-    this.paneSelect.emit(pane)
-  }
-
-  onEditClick(event: MouseEvent, pane: WorkspacePane): void {
-    event.stopPropagation()
     this.paneEdit.emit(pane)
   }
 
@@ -72,6 +75,7 @@ export class SplitPreviewComponent {
 
   closeContextMenu(): void {
     this.contextMenuPane = null
+    this.cdr.detectChanges()
   }
 
   onEdit(): void {
@@ -131,27 +135,13 @@ export class SplitPreviewComponent {
   }
 
   getPaneLabel(pane: WorkspacePane): string {
-    // Base label is always the profile name
-    let profileName = ''
-    if (pane.profileId) {
-      const profile = this.profiles.find(p => p.id === pane.profileId)
-      if (profile?.name) profileName = profile.name
-    }
+    if (!pane.profileId) return 'Select profile'
 
-    if (!profileName) return 'Select profile'
-
-    // Format: "Title - Profile" or just "Profile"
-    if (pane.title) {
-      return `${pane.title} - ${profileName}`
-    }
-    return profileName
+    const profile = this.profiles.find(p => p.id === pane.profileId)
+    return profile?.name || 'Select profile'
   }
 
   // Pass-through events from nested splits
-  onNestedPaneSelect(pane: WorkspacePane): void {
-    this.paneSelect.emit(pane)
-  }
-
   onNestedPaneEdit(pane: WorkspacePane): void {
     this.paneEdit.emit(pane)
   }

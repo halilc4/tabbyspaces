@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core'
-import { ToolbarButtonProvider, ToolbarButton, ProfilesService, AppService } from 'tabby-core'
+import { ToolbarButtonProvider, ToolbarButton, ProfilesService, AppService, SplitTabComponent } from 'tabby-core'
+import { BaseTerminalTabComponent } from 'tabby-terminal'
 import { WorkspaceEditorService } from '../services/workspaceEditor.service'
 import { StartupCommandService } from '../services/startupCommand.service'
+import { WorkspaceBackgroundService } from '../services/workspaceBackground.service'
 import { SettingsTabComponent } from 'tabby-settings'
 import { CONFIG_KEY, DISPLAY_NAME, IS_DEV } from '../build-config'
 
@@ -15,7 +17,15 @@ const ICON_GRID = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" f
 const ICON_BOLT = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
 </svg>`
+
+const SELECTOR_SETTINGS_ID = '__settings__'
+
 import { countPanes } from '../models/workspace.model'
+
+/** Recovery token structure for workspace tabs */
+interface RecoveryTokenWithWorkspace {
+  workspaceId?: string
+}
 
 @Injectable()
 export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
@@ -23,16 +33,35 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
     private workspaceService: WorkspaceEditorService,
     private profilesService: ProfilesService,
     private app: AppService,
-    private startupService: StartupCommandService
+    private startupService: StartupCommandService,
+    private backgroundService: WorkspaceBackgroundService
   ) {
     super()
-    // Delay startup tasks to ensure Tabby config is loaded
-    setTimeout(() => {
-      // Cleanup orphaned profiles from previous plugin versions (one-time migration)
+    // Initialize background service to listen for tab events
+    this.backgroundService.initialize()
+
+    // Wait for Tabby to finish recovery before launching startup workspaces
+    this.waitForTabbyReady().then(() => {
       this.workspaceService.cleanupOrphanedProfiles()
-      // Launch workspaces marked for startup
       this.launchStartupWorkspaces()
-    }, 500)
+    })
+  }
+
+  private waitForTabbyReady(): Promise<void> {
+    return new Promise(resolve => {
+      let lastTabCount = -1
+      const checkStable = () => {
+        const currentCount = this.app.tabs.length
+        if (currentCount === lastTabCount && currentCount >= 0) {
+          resolve()
+        } else {
+          lastTabCount = currentCount
+          setTimeout(checkStable, 300)
+        }
+      }
+      // Initial delay to let Tabby start loading
+      setTimeout(checkStable, 500)
+    })
   }
 
   private async launchStartupWorkspaces(): Promise<void> {
@@ -40,8 +69,48 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
     const startupWorkspaces = workspaces.filter(w => w.launchOnStartup)
 
     for (const workspace of startupWorkspaces) {
+      if (this.isWorkspaceAlreadyOpen(workspace.id)) {
+        console.log(`[TabbySpaces] Workspace "${workspace.name}" already open, skipping`)
+        continue
+      }
       await this.openWorkspace(workspace.id)
     }
+  }
+
+  /**
+   * Type-safe helper to extract workspace ID from tab's recovery token.
+   */
+  private getRecoveryWorkspaceId(tab: unknown): string | undefined {
+    if (tab && typeof tab === 'object' && 'recoveryToken' in tab) {
+      const token = (tab as { recoveryToken?: RecoveryTokenWithWorkspace }).recoveryToken
+      return token?.workspaceId
+    }
+    return undefined
+  }
+
+  private isWorkspaceAlreadyOpen(workspaceId: string): boolean {
+    const profilePrefix = `split-layout:${CONFIG_KEY}:`
+
+    for (const tab of this.app.tabs) {
+      if (tab instanceof SplitTabComponent) {
+        // Strategy 1: Check recoveryToken.workspaceId (for restored tabs)
+        if (this.getRecoveryWorkspaceId(tab) === workspaceId) {
+          return true
+        }
+
+        // Strategy 2: Check profile ID (for freshly opened tabs)
+        for (const child of tab.getAllTabs()) {
+          if (child instanceof BaseTerminalTabComponent) {
+            const profileId = child.profile?.id ?? ''
+            // Strict matching: prefix + workspaceId at the end
+            if (profileId.startsWith(profilePrefix) && profileId.endsWith(`:${workspaceId}`)) {
+              return true
+            }
+          }
+        }
+      }
+    }
+    return false
   }
 
   provide(): ToolbarButton[] {
@@ -77,12 +146,12 @@ export class WorkspaceToolbarProvider extends ToolbarButtonProvider {
       description: 'Create and edit workspaces',
       icon: 'cog',
       color: undefined,
-      result: '__settings__'
+      result: SELECTOR_SETTINGS_ID
     })
 
     const selectedId = await this.app.showSelector('Select Workspace', options)
 
-    if (selectedId === '__settings__') {
+    if (selectedId === SELECTOR_SETTINGS_ID) {
       this.openSettings()
     } else if (selectedId) {
       this.openWorkspace(selectedId)

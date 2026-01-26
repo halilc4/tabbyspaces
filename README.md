@@ -4,19 +4,26 @@ Visual workspace editor for [Tabby](https://tabby.sh). Create split-layout termi
 
 ![Workspace Editor](screenshots/editor.png)
 
-## What it does
+## Features
 
-- Visual editor for split layouts (horizontal/vertical, nested, any depth)
-- Per-pane configuration: profile, working directory, startup command, title
-- One-click workspace launch from toolbar
-- Launch on startup (auto-open workspaces when Tabby starts)
-- Works with any shell (Bash, Zsh, PowerShell, Nushell, etc.)
+- **Visual split editor** - Design layouts inline, not in modal dialogs. Split horizontally, vertically, nest to any depth
+- **Layout toolbar** - Select a pane, then split, add adjacent panes, or delete with toolbar buttons
+- **Per-pane configuration** - Set profile, working directory, and startup command for each pane
+- **One-click launch** - Open workspaces instantly from the toolbar dropdown
+- **Launch on startup** - Auto-open multiple workspaces when Tabby starts
+- **Any shell** - Works with Bash, Zsh, PowerShell, Nushell, cmd, WSL, and any other shell Tabby supports
+
+## Screenshots
+
+| Editor with selected pane | Pane configuration |
+|---------------------------|-------------------|
+| ![Editor](screenshots/editor.png) | ![Pane Edit](screenshots/pane-edit.png) |
 
 ## About this project
 
 This plugin was written 100% by [Claude Code](https://claude.ai/code).
 
-Igor Halilović had the idea and provided product direction. He hates Angular so much (19 years of web dev, wrote his own TypeScript framework) that he didn't look at this code. Not once. He told Claude Code what he wanted, Claude Code built it.
+Igor Halilovic had the idea and provided product direction. He hates Angular so much (19 years of web dev, wrote his own TypeScript framework) that he didn't look at this code. Not once. He told Claude Code what he wanted, Claude Code built it.
 
 Human provides the *what* and *why*. AI handles the *how*.
 
@@ -25,7 +32,7 @@ Here's the fun part: to test this plugin, we built [tabby-mcp](https://github.co
 ## Install
 
 **From Tabby Plugin Manager:**
-Settings → Plugins → Search "tabbyspaces" → Install
+Settings > Plugins > Search "tabbyspaces" > Install
 
 **Manual:**
 ```bash
@@ -35,17 +42,13 @@ npm install tabby-tabbyspaces
 
 Restart Tabby after installation.
 
-## Usage
+## Quick Start
 
-1. Open Settings → TabbySpaces
-2. Create a workspace
-3. Design your split layout visually
-4. Configure each pane (profile, cwd, startup command)
-5. Save and launch from the toolbar
-
-### Pane configuration
-
-![Edit Pane](screenshots/pane-edit.png)
+1. **Open settings** - Settings > TabbySpaces
+2. **Create workspace** - Click "New Workspace", name it
+3. **Design layout** - Click a pane to select it, use toolbar to split (horizontal/vertical)
+4. **Configure panes** - Click a pane (or use its context menu) to set profile, cwd, startup command
+5. **Save and launch** - Save changes, then click "Open" or use the toolbar dropdown
 
 ## Roadmap
 
@@ -65,6 +68,12 @@ Restart Tabby after installation.
 
 - [Discussions](https://github.com/halilc4/tabbyspaces/discussions) - Questions, ideas, show your setup
 - [Issues](https://github.com/halilc4/tabbyspaces/issues) - Bug reports
+
+## Contributing
+
+PRs welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions.
+
+All PRs go to the `dev` branch. CI checks the build automatically.
 
 ## License
 

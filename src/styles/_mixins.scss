@@ -1,0 +1,180 @@
+@use 'variables' as *;
+
+// ======================
+// LAYOUT MIXINS
+// ======================
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ======================
+// FORM INPUT MIXIN
+// ======================
+
+@mixin form-input($bg: var(--theme-bg)) {
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-sm;
+  border: 1px solid var(--theme-border, $fallback-border);
+  background: $bg;
+  color: var(--theme-fg);
+  font-size: $font-md;
+
+  &:focus {
+    outline: none;
+    border-color: var(--theme-primary);
+  }
+
+  &::placeholder {
+    color: var(--theme-fg-more, $fallback-fg-more);
+  }
+}
+
+// ======================
+// FORM LABEL MIXIN (S1: Uppercase compact)
+// ======================
+
+@mixin form-label {
+  display: block;
+  font-size: $font-xs;
+  color: var(--theme-fg-less);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: $spacing-xs;
+}
+
+// ======================
+// BUTTON MIXINS
+// ======================
+
+@mixin toolbar-btn {
+  padding: $spacing-sm $spacing-md;
+  background: var(--theme-bg);
+  border: 1px solid var(--theme-border, $fallback-border);
+  border-radius: $radius-sm;
+  color: var(--theme-fg);
+  cursor: pointer;
+  transition: all $transition-fast;
+  font-size: 0.85rem;
+
+  &:hover:not(:disabled) {
+    background: var(--theme-bg-more-more);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &.danger {
+    color: var(--theme-danger, $color-danger);
+  }
+}
+
+@mixin btn-success {
+  background: $color-success;
+  border-color: $color-success;
+  color: white;
+
+  &:hover {
+    background: $color-success-hover;
+    border-color: $color-success-hover;
+  }
+}
+
+@mixin btn-base {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-sm;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+}
+
+@mixin btn-ghost {
+  @include btn-base;
+  background: transparent;
+  border: 1px solid var(--theme-border, $fallback-border);
+  color: var(--theme-fg);
+
+  &:hover {
+    background: var(--theme-bg-more);
+  }
+}
+
+@mixin btn-primary {
+  @include btn-base;
+  background: var(--theme-primary);
+  border: 1px solid var(--theme-primary);
+  color: white;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}
+
+@mixin icon-btn-sm($size: 24px) {
+  width: $size;
+  height: $size;
+  @include flex-center;
+  background: var(--theme-bg);
+  border: 1px solid var(--theme-border, $fallback-border);
+  border-radius: $radius-sm;
+  color: var(--theme-fg-more, $fallback-fg-more);
+  cursor: pointer;
+  font-size: 10px;
+  transition: all $transition-fast;
+
+  &:hover:not(:disabled) {
+    border-color: var(--theme-primary);
+    color: var(--theme-primary);
+  }
+
+  &.danger:hover:not(:disabled) {
+    border-color: var(--theme-danger);
+    color: var(--theme-danger);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// ======================
+// OVERLAY/MODAL MIXINS
+// ======================
+
+@mixin full-overlay($z-index: $z-modal-overlay) {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: $z-index;
+}
+
+// ======================
+// TEXT UTILITIES
+// ======================
+
+@mixin text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ======================
+// DROPDOWN/POPUP
+// ======================
+
+@mixin dropdown-panel {
+  background: var(--theme-bg-more);
+  border: 1px solid var(--theme-border, $fallback-border);
+  border-radius: $radius-md;
+  box-shadow: $shadow-dropdown;
+}

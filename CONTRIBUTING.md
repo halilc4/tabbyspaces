@@ -49,7 +49,9 @@ No hot reload. Tabby doesn't support it for plugins. Restart after each build.
 2. Create a branch (`git checkout -b fix/thing`)
 3. Make your changes
 4. Test manually in Tabby
-5. Submit PR with a clear description
+5. Submit PR **to the `dev` branch** (not `main`)
+
+CI will check that your code builds. `main` is for releases only.
 
 No strict commit message format. Just be clear about what you changed and why.
 

@@ -1,118 +1,127 @@
+@use '../styles/index' as *;
+
 .workspace-list-container {
-  padding: 20px;
+  padding: $spacing-2xl;
 }
 
-.workspace-list-header {
+// Tab bar
+.tab-bar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  background: var(--theme-bg-more);
+  border: 1px solid var(--theme-border, $fallback-border);
+  border-bottom: none;
+  overflow-y: hidden;
+  overflow-x: auto;
 
-  h3 {
-    margin: 0;
-    font-size: 1.5rem;
+  // Thin scrollbar
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--theme-bg-more);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--theme-border, $fallback-border);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--theme-fg-more);
+    }
   }
 }
 
-.workspace-list {
+.tab {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.workspace-item {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  background: var(--theme-bg-more);
-  border-radius: 8px;
-  border: 1px solid var(--theme-border);
-  transition: background 0.2s, border-color 0.2s;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  border-right: 1px solid var(--theme-border, $fallback-border);
+  color: var(--theme-fg-more);
   cursor: pointer;
+  font-size: $font-sm;
+  min-width: 120px;
+  transition: background $transition-fast;
 
   &:hover {
     background: var(--theme-bg-more-more);
+
+    .tab-close {
+      opacity: 1;
+    }
   }
 
-  &.selected {
-    border-color: var(--theme-primary);
-    border-left-width: 3px;
-    background: var(--theme-bg-more-more);
-    box-shadow: 0 0 0 1px var(--theme-primary) inset;
+  &.active {
+    background: var(--theme-bg);
+    color: var(--theme-fg);
+    border-bottom: 2px solid var(--theme-primary);
+    margin-bottom: -1px;
   }
 }
 
-.workspace-info {
+.tab-icon {
+  font-size: 12px;
+}
+
+.tab-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab-close {
+  width: 16px;
+  height: 16px;
   display: flex;
   align-items: center;
-  gap: 16px;
-}
+  justify-content: center;
+  opacity: 0;
+  font-size: 9px;
+  border-radius: $radius-xs;
+  transition: opacity $transition-fast, background $transition-fast;
 
-.workspace-icon {
-  font-size: 24px;
-  width: 40px;
-  text-align: center;
-}
-
-.workspace-details {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.workspace-name {
-  font-size: 1.1rem;
-  font-weight: 500;
-}
-
-.workspace-meta {
-  font-size: 0.85rem;
-  color: var(--theme-fg-more);
-
-  .separator {
-    margin: 0 6px;
-  }
-
-  .badge {
-    font-size: 0.75rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: var(--theme-primary);
+  &:hover {
+    background: var(--theme-danger);
     color: white;
   }
 }
 
-.workspace-actions {
+.tab-new {
   display: flex;
-  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  color: var(--theme-fg-more);
+  cursor: pointer;
+  transition: color $transition-fast, background $transition-fast;
 
-  .btn-link {
-    padding: 8px;
-    color: var(--theme-fg-more);
-    opacity: 0.7;
-    transition: opacity 0.2s, color 0.2s;
-
-    &:hover {
-      opacity: 1;
-    }
-
-    &.open-btn:hover {
-      color: var(--theme-success, #10b981);
-    }
-
-    &.text-danger:hover {
-      color: var(--theme-danger);
-    }
+  &:hover {
+    background: var(--theme-bg-more-more);
+    color: var(--theme-primary);
   }
 }
 
-.workspace-empty {
-  text-align: center;
-  padding: 40px;
-  color: var(--theme-fg-more);
+// Tab content
+.tab-content {
+  background: var(--theme-bg);
+  border: 1px solid var(--theme-border, $fallback-border);
+  border-top: none;
+  padding: $spacing-xl;
 
-  p {
-    margin: 8px 0;
+  &.empty-state {
+    text-align: center;
+    padding: $spacing-2xl;
+    color: var(--theme-fg-more);
+
+    p {
+      margin: $spacing-md 0;
+    }
+
+    strong {
+      color: var(--theme-primary);
+      padding: 0 $spacing-xs;
+    }
   }
 }

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>S1: Tight & Sharp - TabbySpaces</title>
+  <link rel="stylesheet" href="shared/base.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* S1: Tight spacing, sharp corners, flat, IDE-like */
+    :root {
+      --s-xs: 2px;
+      --s-sm: 4px;
+      --s-md: 6px;
+      --s-lg: 10px;
+      --s-xl: 14px;
+      --s-2xl: 18px;
+      --r-xs: 2px;
+      --r-sm: 2px;
+      --r-md: 3px;
+      --r-lg: 4px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--s-sm);
+      color: var(--theme-fg-less);
+      text-decoration: none;
+      font-size: var(--font-size-sm);
+      margin-bottom: var(--s-xl);
+    }
+    .back-link:hover { color: var(--theme-primary); }
+
+    .page-header {
+      margin-bottom: var(--s-lg);
+    }
+    .page-header h1 {
+      font-size: var(--font-size-lg);
+      color: var(--theme-fg-more);
+      margin-bottom: var(--s-xs);
+    }
+    .page-header p {
+      color: var(--theme-fg-less);
+      font-size: var(--font-size-sm);
+    }
+
+    .tab-bar {
+      display: flex;
+      background: var(--theme-bg-more);
+      border: 1px solid var(--theme-border);
+      border-bottom: none;
+    }
+
+    .tab {
+      display: flex;
+      align-items: center;
+      gap: var(--s-md);
+      padding: var(--s-md) var(--s-lg);
+      border-right: 1px solid var(--theme-border);
+      color: var(--theme-fg-less);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      min-width: 120px;
+    }
+    .tab:hover {
+      background: var(--theme-bg-more-more);
+    }
+    .tab:hover .tab-close { opacity: 1; }
+    .tab.active {
+      background: var(--theme-bg);
+      color: var(--theme-fg-more);
+      border-bottom: 2px solid var(--theme-primary);
+      margin-bottom: -1px;
+    }
+
+    .tab-icon {
+      font-size: 12px;
+    }
+    .tab-icon.code { color: #3b82f6; }
+    .tab-icon.server { color: #f59e0b; }
+    .tab-icon.book { color: #10b981; }
+
+    .tab-close {
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      font-size: 9px;
+      margin-left: auto;
+    }
+    .tab-close:hover {
+      background: var(--theme-danger);
+      color: white;
+    }
+
+    .tab-new {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      color: var(--theme-fg-less);
+      cursor: pointer;
+    }
+    .tab-new:hover {
+      background: var(--theme-bg-more-more);
+      color: var(--theme-primary);
+    }
+
+    .tab-content {
+      background: var(--theme-bg);
+      border: 1px solid var(--theme-border);
+      border-top: none;
+      padding: var(--s-xl);
+    }
+
+    .editor-section {
+      margin-bottom: var(--s-xl);
+    }
+
+    .section-title {
+      font-size: 11px;
+      color: var(--theme-fg-less);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: var(--s-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--s-sm);
+    }
+
+    .form-row {
+      display: flex;
+      gap: var(--s-lg);
+      margin-bottom: var(--s-lg);
+      align-items: flex-end;
+    }
+
+    .form-group {
+      flex: 1;
+    }
+    .form-group.auto-width {
+      flex: none;
+    }
+    .form-group label {
+      display: block;
+      font-size: 10px;
+      color: var(--theme-fg-less);
+      margin-bottom: var(--s-xs);
+      text-transform: uppercase;
+    }
+    .form-group input[type="text"] {
+      width: 100%;
+      padding: var(--s-sm) var(--s-md);
+      background: var(--theme-bg-more);
+      border: 1px solid var(--theme-border);
+      border-radius: var(--r-sm);
+      color: var(--theme-fg);
+      font-size: var(--font-size-sm);
+    }
+
+    .dropdown-trigger {
+      display: flex;
+      align-items: center;
+      gap: var(--s-sm);
+      padding: var(--s-sm) var(--s-md);
+      background: var(--theme-bg-more);
+      border: 1px solid var(--theme-border);
+      border-radius: var(--r-sm);
+      cursor: pointer;
+    }
+    .dropdown-trigger:hover {
+      border-color: var(--theme-fg-less);
+    }
+    .dropdown-icon {
+      font-size: 14px;
+    }
+    .dropdown-icon.icon-blue { color: #3b82f6; }
+    .dropdown-color {
+      width: 16px;
+      height: 16px;
+      border-radius: var(--r-xs);
+    }
+    .dropdown-chevron {
+      color: var(--theme-fg-less);
+      font-size: 10px;
+    }
+
+    .split-preview-container {
+      background: var(--theme-bg-more);
+      border: 1px solid var(--theme-border);
+      border-radius: var(--r-md);
+      padding: var(--s-lg);
+    }
+
+    .preview-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--s-xs);
+      margin-bottom: var(--s-lg);
+      padding-bottom: var(--s-md);
+      border-bottom: 1px solid var(--theme-border);
+    }
+    .toolbar-separator {
+      width: 1px;
+      height: 18px;
+      background: var(--theme-border);
+      margin: 0 var(--s-sm);
+    }
+    .preview-btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--theme-bg);
+      border: 1px solid var(--theme-border);
+      border-radius: var(--r-sm);
+      color: var(--theme-fg-less);
+      cursor: pointer;
+      font-size: 10px;
+    }
+    .preview-btn:hover {
+      border-color: var(--theme-primary);
+      color: var(--theme-primary);
+    }
+    .preview-btn.danger:hover {
+      border-color: var(--theme-danger);
+      color: var(--theme-danger);
+    }
+
+    .split-preview {
+      display: flex;
+      gap: var(--s-sm);
+      height: 180px;
+    }
+
+    .nested-split {
+      flex: 1;
+      display: flex;
+      gap: var(--s-sm);
+    }
+    .nested-split.vertical {
+      flex-direction: column;
+    }
+
+    .preview-pane {
+      flex: 1;
+      background: var(--theme-bg);
+      border: 1px solid var(--theme-border);
+      border-radius: var(--r-sm);
+      padding: var(--s-md);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .preview-pane:hover {
+      border-color: var(--theme-fg-less);
+    }
+    .preview-pane.selected {
+      border-color: var(--theme-primary);
+      border-width: 2px;
+    }
+
+    .pane-icon {
+      font-size: 16px;
+      color: var(--theme-fg-less);
+      margin-bottom: var(--s-xs);
+    }
+    .pane-label {
+      font-size: 11px;
+      color: var(--theme-fg);
+    }
+    .pane-sublabel {
+      font-size: 9px;
+      color: var(--theme-fg-less);
+    }
+
+    .pane-details {
+      background: var(--theme-bg-more-more);
+      border-radius: var(--r-sm);
+      padding: var(--s-lg);
+      margin-top: var(--s-lg);
+      border-left: 2px solid var(--theme-primary);
+    }
+    .pane-details-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--s-lg);
+    }
+    .pane-details-title {
+      font-size: var(--font-size-sm);
+      color: var(--theme-fg);
+      font-weight: 500;
+    }
+    .pane-details-close {
+      color: var(--theme-fg-less);
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .pane-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--s-lg);
+    }
+    .pane-form select {
+      width: 100%;
+      padding: var(--s-sm) var(--s-md);
+      background: var(--theme-bg-more);
+      border: 1px solid var(--theme-border);
+      border-radius: var(--r-sm);
+      color: var(--theme-fg);
+      font-size: var(--font-size-sm);
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--s-xl);
+      border-top: 1px solid var(--theme-border);
+      margin-top: var(--s-xl);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: var(--s-sm);
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+    }
+    .checkbox-group label {
+      font-size: var(--font-size-sm);
+      color: var(--theme-fg);
+    }
+
+    .action-buttons-right {
+      display: flex;
+      gap: var(--s-md);
+    }
+    .action-buttons-right .btn {
+      padding: var(--s-sm) var(--s-lg);
+      font-size: var(--font-size-sm);
+      border-radius: var(--r-sm);
+    }
+  </style>
+</head>
+<body>
+  <div class="mockup-container">
+    <a href="index.html" class="back-link">
+      <i class="fa-solid fa-arrow-left"></i>
+      Back to variants
+    </a>
+
+    <div class="page-header">
+      <h1><i class="fa-solid fa-compress"></i> S1: Tight & Sharp</h1>
+      <p>Compact spacing, sharp corners, flat aesthetic. IDE-like density.</p>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab active">
+        <span class="tab-icon code"><i class="fa-solid fa-code"></i></span>
+        <span class="tab-name">Development</span>
+        <span class="tab-close"><i class="fa-solid fa-xmark"></i></span>
+      </div>
+      <div class="tab">
+        <span class="tab-icon server"><i class="fa-solid fa-server"></i></span>
+        <span class="tab-name">DevOps</span>
+        <span class="tab-close"><i class="fa-solid fa-xmark"></i></span>
+      </div>
+      <div class="tab">
+        <span class="tab-icon book"><i class="fa-solid fa-book"></i></span>
+        <span class="tab-name">Research</span>
+        <span class="tab-close"><i class="fa-solid fa-xmark"></i></span>
+      </div>
+      <div class="tab-new">
+        <i class="fa-solid fa-plus"></i>
+      </div>
+    </div>
+
+    <div class="tab-content">
+      <div class="editor-section">
+        <div class="section-title">
+          <i class="fa-solid fa-cog"></i>
+          Workspace Settings
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" value="Development" placeholder="Workspace name">
+          </div>
+          <div class="form-group auto-width">
+            <label>Icon</label>
+            <div class="dropdown-trigger">
+              <span class="dropdown-icon icon-blue"><i class="fa-solid fa-code"></i></span>
+              <span class="dropdown-chevron"><i class="fa-solid fa-chevron-down"></i></span>
+            </div>
+          </div>
+          <div class="form-group auto-width">
+            <label>Color</label>
+            <div class="dropdown-trigger">
+              <span class="dropdown-color" style="background: #3b82f6;"></span>
+              <span class="dropdown-chevron"><i class="fa-solid fa-chevron-down"></i></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-section">
+        <div class="section-title">
+          <i class="fa-solid fa-columns"></i>
+          Split Layout
+        </div>
+
+        <div class="split-preview-container">
+          <div class="preview-toolbar">
+            <button class="preview-btn" title="Edit pane"><i class="fa-solid fa-pen"></i></button>
+            <button class="preview-btn" title="Split H"><i class="fa-solid fa-grip-lines-vertical"></i></button>
+            <button class="preview-btn" title="Split V"><i class="fa-solid fa-grip-lines"></i></button>
+            <span class="toolbar-separator"></span>
+            <button class="preview-btn"><i class="fa-solid fa-arrow-left"></i></button>
+            <button class="preview-btn"><i class="fa-solid fa-arrow-right"></i></button>
+            <button class="preview-btn"><i class="fa-solid fa-arrow-up"></i></button>
+            <button class="preview-btn"><i class="fa-solid fa-arrow-down"></i></button>
+            <span class="toolbar-separator"></span>
+            <button class="preview-btn danger"><i class="fa-solid fa-trash"></i></button>
+          </div>
+
+          <div class="split-preview">
+            <div class="nested-split vertical">
+              <div class="preview-pane selected">
+                <i class="fa-solid fa-terminal pane-icon"></i>
+                <div class="pane-label">PowerShell</div>
+                <div class="pane-sublabel">C:\Projects\app</div>
+              </div>
+              <div class="preview-pane">
+                <i class="fa-solid fa-terminal pane-icon"></i>
+                <div class="pane-label">PowerShell</div>
+                <div class="pane-sublabel">C:\Projects\app</div>
+              </div>
+            </div>
+            <div class="preview-pane">
+              <i class="fa-solid fa-terminal pane-icon"></i>
+              <div class="pane-label">PowerShell</div>
+              <div class="pane-sublabel">C:\Projects\api</div>
+            </div>
+          </div>
+
+          <div class="pane-details">
+            <div class="pane-details-header">
+              <span class="pane-details-title">
+                <i class="fa-solid fa-terminal"></i> Pane 1 Configuration
+              </span>
+              <span class="pane-details-close">
+                <i class="fa-solid fa-xmark"></i> Close
+              </span>
+            </div>
+            <div class="pane-form">
+              <div class="form-group">
+                <label>Profile</label>
+                <select>
+                  <option selected>PowerShell</option>
+                  <option>CMD</option>
+                  <option>Git Bash</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Working Directory</label>
+                <input type="text" value="C:\Projects\app">
+              </div>
+              <div class="form-group">
+                <label>Tab Title</label>
+                <input type="text" placeholder="Optional">
+              </div>
+              <div class="form-group">
+                <label>Startup Command</label>
+                <input type="text" value="npm run dev">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <div class="checkbox-group">
+          <input type="checkbox" id="launchStartup">
+          <label for="launchStartup">Launch on startup</label>
+        </div>
+        <div class="action-buttons-right">
+          <button class="btn btn-ghost">
+            <i class="fa-solid fa-xmark"></i> Cancel
+          </button>
+          <button class="btn btn-success">
+            <i class="fa-solid fa-check"></i> Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="design-notes">
+    <h4><i class="fa-solid fa-lightbulb"></i> S1: Tight & Sharp</h4>
+    <ul>
+      <li><strong>Spacing:</strong> Minimal padding, compact layout</li>
+      <li><strong>Radius:</strong> 2-4px, sharp corners</li>
+      <li><strong>Borders:</strong> Thin 1px, subtle</li>
+      <li><strong>Shadows:</strong> None - completely flat</li>
+      <li><strong>Vibe:</strong> IDE/developer tool aesthetic</li>
+    </ul>
+  </div>
+</body>
+</html>

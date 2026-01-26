@@ -1,254 +1,322 @@
-// Workspace editor (inline)
-.workspace-editor-inline {
-  background: var(--theme-bg-more);
-  border-radius: 8px;
-  border: 1px solid var(--theme-border);
-  margin-bottom: 16px;
+@use '../styles/index' as *;
 
-  .editor-body {
-    padding: 16px;
-  }
-
-  .editor-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
-    border-top: 1px solid var(--theme-border);
-    background: var(--theme-bg);
-    border-radius: 0 0 8px 8px;
-
-    .startup-checkbox {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.85rem;
-      color: var(--theme-fg-more);
-      cursor: pointer;
-
-      input {
-        margin: 0;
-      }
-    }
-
-    .editor-actions {
-      display: flex;
-      gap: 8px;
-
-      .btn-success {
-        background: #10b981;
-        border-color: #10b981;
-        color: white;
-
-        &:hover {
-          background: #059669;
-          border-color: #059669;
-        }
-      }
-
-      .unsaved-indicator {
-        color: #f59e0b;
-        font-weight: bold;
-        margin-left: 2px;
-      }
-    }
-  }
+// Editor section
+.editor-section {
+  margin-bottom: $spacing-xl;
 }
 
-// Shared editor content
-.editor-top-row {
+.section-title {
+  font-size: 11px;
+  color: var(--theme-fg-more);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: $spacing-lg;
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 16px;
+  align-items: center;
+  gap: $spacing-sm;
 }
 
-.color-picker {
-  .color-input {
-    width: 40px;
-    height: 40px;
-    padding: 2px;
-    border: 1px solid var(--theme-border);
-    border-radius: 6px;
-    cursor: pointer;
-    background: var(--theme-bg);
+// Form layout
+.form-row {
+  display: flex;
+  gap: $spacing-lg;
+  align-items: flex-end;
+}
 
-    &::-webkit-color-swatch-wrapper {
-      padding: 2px;
-    }
+.form-group {
+  flex: 1;
+  position: relative;
 
-    &::-webkit-color-swatch {
-      border-radius: 4px;
-      border: none;
+  &.auto-width {
+    flex: none;
+  }
+
+  label {
+    @include form-label;
+  }
+
+  .form-control {
+    @include form-input(var(--theme-bg-more));
+    width: 100%;
+    font-size: $font-sm;
+    // Override Tabby's global border reset
+    border: 1px solid var(--theme-border, $fallback-border) !important;
+
+    &:focus {
+      border-color: var(--theme-primary) !important;
     }
   }
 }
 
-.name-input {
-  flex: 1;
-  min-width: 150px;
-  padding: 10px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--theme-border);
-  background: var(--theme-bg);
-  color: var(--theme-fg);
-  font-size: 1rem;
-  font-weight: 500;
+// Dropdown trigger (icon picker)
+.dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: var(--theme-bg-more);
+  border: 1px solid var(--theme-border, $fallback-border);
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: border-color $transition-fast;
+  height: 32px;
+  box-sizing: border-box;
 
-  &:focus {
-    outline: none;
+  &:hover {
+    border-color: var(--theme-fg-more);
+  }
+}
+
+.dropdown-icon {
+  font-size: 14px;
+}
+
+.dropdown-chevron {
+  color: var(--theme-fg-more);
+  font-size: 10px;
+}
+
+// Icon dropdown
+.icon-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: $spacing-sm;
+  padding: $spacing-md;
+  @include dropdown-panel;
+  z-index: $z-dropdown;
+  display: grid;
+  grid-template-columns: repeat(6, 28px);
+  gap: $spacing-sm;
+}
+
+.icon-option {
+  width: 28px;
+  height: 28px;
+  @include flex-center;
+  border: 1px solid transparent;
+  border-radius: $radius-sm;
+  background: transparent;
+  color: var(--theme-fg-more);
+  cursor: pointer;
+  transition: all $transition-fast;
+  font-size: 0.85rem;
+
+  &:hover {
+    background: var(--theme-bg-more-more);
+    color: var(--theme-fg);
+  }
+
+  &.selected {
+    border-color: currentColor;
+    background: var(--theme-bg);
+  }
+}
+
+// Color trigger (wraps native color input)
+.color-trigger {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: var(--theme-bg-more);
+  border: 1px solid var(--theme-border, $fallback-border);
+  border-radius: $radius-sm;
+  cursor: pointer;
+  position: relative;
+  transition: border-color $transition-fast;
+  height: 32px;
+  box-sizing: border-box;
+
+  &:hover {
+    border-color: var(--theme-fg-more);
+  }
+
+  &:focus-within {
     border-color: var(--theme-primary);
   }
 
-  &::placeholder {
-    color: var(--theme-fg-more);
-    font-weight: 400;
-  }
-}
-
-.icon-picker {
-  position: relative;
-
-  .icon-trigger {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--theme-border);
-    border-radius: 6px;
-    background: var(--theme-bg);
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: background 0.15s;
-
-    &:hover {
-      background: var(--theme-bg-more);
-    }
-  }
-
-  .icon-dropdown {
+  .color-input-hidden {
     position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: 4px;
-    padding: 8px;
-    background: var(--theme-bg-more);
-    border: 1px solid var(--theme-border);
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 100;
-    display: grid;
-    grid-template-columns: repeat(6, 28px);
-    gap: 4px;
-  }
-
-  .icon-option {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    background: transparent;
-    color: var(--theme-fg-more);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
     cursor: pointer;
-    transition: all 0.15s;
-    font-size: 0.85rem;
-
-    &:hover {
-      background: var(--theme-bg-more-more);
-      color: var(--theme-fg);
-    }
-
-    &.selected {
-      border-color: currentColor;
-      background: var(--theme-bg);
-    }
   }
 }
 
-// Layout section
-.layout-section {
-  .layout-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-
-  .layout-title {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--theme-fg-more);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
+.dropdown-color {
+  width: 16px;
+  height: 16px;
+  border-radius: $radius-xs;
 }
 
-// Layout toolbar
-.layout-toolbar {
+// Background picker
+.background-picker {
+  position: relative;
+}
+
+.background-trigger {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 8px 0;
-  margin-bottom: 8px;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: var(--theme-bg-more);
+  border: 1px solid var(--theme-border, $fallback-border);
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: border-color $transition-fast;
+  height: 32px;
+  box-sizing: border-box;
 
-  .toolbar-group {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-  }
-
-  .toolbar-label {
-    font-size: 0.75rem;
-    color: var(--theme-fg-more);
-    margin-right: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-  }
-
-  .toolbar-spacer {
-    flex: 1;
-  }
-
-  .toolbar-divider {
-    width: 1px;
-    height: 20px;
-    background: var(--theme-border);
-    margin: 0 4px;
-  }
-
-  .toolbar-btn {
-    padding: 4px 8px;
-    background: var(--theme-bg);
-    border: 1px solid var(--theme-border);
-    border-radius: 4px;
-    color: var(--theme-fg);
-    cursor: pointer;
-    transition: all 0.15s;
-    font-size: 0.85rem;
-
-    &:hover:not(:disabled) {
-      background: var(--theme-bg-more-more);
-    }
-
-    &:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    &.danger {
-      color: var(--theme-danger, #ef4444);
-    }
+  &:hover {
+    border-color: var(--theme-fg-more);
   }
 }
 
-.layout-preview-container {
+.background-preview {
+  width: 48px;
+  height: 18px;
+  border-radius: $radius-xs;
+  border: 1px solid var(--theme-border, $fallback-border);
+  @include flex-center;
+  color: var(--theme-fg-more, $fallback-fg-more);
+  font-size: 10px;
+}
+
+.background-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: $spacing-sm;
+  padding: $spacing-md;
+  @include dropdown-panel;
+  z-index: $z-dropdown;
+  min-width: 260px;
+}
+
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.preset-option {
+  aspect-ratio: 1.5;
+  height: 32px;
+  @include flex-center;
+  border: 1px solid var(--theme-border, $fallback-border);
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+  color: var(--theme-fg-more, $fallback-fg-more);
+  font-size: 10px;
+
+  &:hover {
+    border-color: var(--theme-fg-more);
+  }
+
+  &.selected {
+    border-color: var(--theme-primary);
+    border-width: 2px;
+  }
+}
+
+.custom-input-wrapper {
+  .custom-bg-input {
+    width: 100%;
+    font-size: $font-xs;
+  }
+}
+
+// Split preview container
+.split-preview-container {
+  background: var(--theme-bg-more);
+  border: 1px solid var(--theme-border, $fallback-border);
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+}
+
+// Preview toolbar
+.preview-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid var(--theme-border, $fallback-border);
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 18px;
+  background: var(--theme-border, $fallback-border);
+  margin: 0 $spacing-sm;
+  align-self: center;
+}
+
+.preview-btn {
+  @include icon-btn-sm;
+}
+
+// Layout preview area
+.layout-preview {
   background: var(--theme-bg);
-  border-radius: 6px;
-  padding: 8px;
-  min-height: 120px;
-  max-height: 180px;
+  border-radius: $radius-sm;
+  min-height: 150px;
+  max-height: 200px;
+  padding: $spacing-sm;
+}
+
+// Action buttons
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $spacing-xl;
+  border-top: 1px solid var(--theme-border, $fallback-border);
+  margin-top: $spacing-xl;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+  }
+
+  label {
+    font-size: $font-sm;
+    color: var(--theme-fg);
+    cursor: pointer;
+  }
+}
+
+.action-buttons-right {
+  display: flex;
+  gap: $spacing-md;
+
+  .btn-ghost {
+    @include btn-ghost;
+  }
+
+  .btn-success {
+    @include btn-base;
+    @include btn-success;
+  }
+
+  .unsaved-indicator {
+    color: $color-warning;
+    font-weight: bold;
+    margin-left: $spacing-xs;
+  }
 }

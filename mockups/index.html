@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TabbySpaces Design Mockups</title>
+  <link rel="stylesheet" href="shared/base.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .mockup-container {
+      padding: var(--space-4xl);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: var(--space-4xl);
+    }
+
+    header h1 {
+      font-size: var(--font-size-xl);
+      color: var(--theme-fg-more);
+      margin-bottom: var(--space-md);
+    }
+
+    header p {
+      color: var(--theme-fg-less);
+      font-size: var(--font-size-sm);
+    }
+
+    .variants-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+
+    .variant-card {
+      display: block;
+      background: var(--theme-bg-more);
+      border: 1px solid var(--theme-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      text-decoration: none;
+      color: inherit;
+      transition: all var(--transition-normal);
+    }
+
+    .variant-card:hover {
+      border-color: var(--theme-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .variant-badges {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    .variant-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+    }
+
+    .variant-badge.selected {
+      background: var(--theme-success);
+      color: white;
+    }
+
+    .variant-badge.layout {
+      background: rgba(0,120,212,0.15);
+      color: var(--theme-primary);
+    }
+
+    .variant-badge.style {
+      background: rgba(16,185,129,0.15);
+      color: var(--theme-success);
+    }
+
+    .variant-card h3 {
+      font-size: var(--font-size-md);
+      color: var(--theme-fg-more);
+      margin-bottom: var(--space-sm);
+    }
+
+    .variant-card p {
+      font-size: var(--font-size-sm);
+      color: var(--theme-fg-less);
+      margin-bottom: var(--space-md);
+    }
+
+    .variant-specs {
+      display: flex;
+      gap: var(--space-lg);
+      flex-wrap: wrap;
+      font-size: var(--font-size-xs);
+      color: var(--theme-fg-less);
+    }
+
+    .variant-specs span {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    footer {
+      margin-top: var(--space-4xl);
+      text-align: center;
+      color: var(--theme-fg-less);
+      font-size: var(--font-size-xs);
+    }
+  </style>
+</head>
+<body>
+  <div class="mockup-container">
+    <header>
+      <h1><i class="fa-solid fa-palette"></i> TabbySpaces Design</h1>
+      <p>Selected layout and style for implementation</p>
+    </header>
+
+    <div class="variants-list">
+      <a href="v06-tabbed.html" class="variant-card">
+        <div class="variant-badges">
+          <span class="variant-badge selected"><i class="fa-solid fa-check"></i> Selected</span>
+          <span class="variant-badge layout">Layout</span>
+        </div>
+        <h3>V06 - Tabbed Interface</h3>
+        <p>Browser-tab metaphor for workspace switching. Tab bar with icons + names, "+" for new workspace. Full editor below with inline pane config and nested splits.</p>
+        <div class="variant-specs">
+          <span><i class="fa-solid fa-folder"></i> Tab-based nav</span>
+          <span><i class="fa-solid fa-columns"></i> Nested splits</span>
+          <span><i class="fa-solid fa-sliders"></i> Inline editing</span>
+        </div>
+      </a>
+
+      <a href="s1-tight-sharp.html" class="variant-card">
+        <div class="variant-badges">
+          <span class="variant-badge selected"><i class="fa-solid fa-check"></i> Selected</span>
+          <span class="variant-badge style">Style</span>
+        </div>
+        <h3>S1 - Tight & Sharp</h3>
+        <p>Compact spacing, sharp corners, flat aesthetic. IDE-like density that maximizes information without clutter.</p>
+        <div class="variant-specs">
+          <span><i class="fa-solid fa-compress"></i> Tight spacing</span>
+          <span><i class="fa-solid fa-square"></i> 2-4px radius</span>
+          <span><i class="fa-solid fa-minus"></i> Flat / no shadows</span>
+        </div>
+      </a>
+    </div>
+
+    <footer>
+      <p>Constraints: max-width 876px | Dark theme | Static HTML/CSS</p>
+    </footer>
+  </div>
+</body>
+</html>

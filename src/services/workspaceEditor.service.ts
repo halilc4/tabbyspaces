@@ -6,6 +6,7 @@ import {
   WorkspaceSplit,
   isWorkspaceSplit,
   generateUUID,
+  deepClone,
   TabbyProfile,
   TabbyRecoveryToken,
   TabbySplitLayoutProfile,
@@ -15,7 +16,9 @@ import { PendingCommand } from './startupCommand.service'
 
 @Injectable({ providedIn: 'root' })
 export class WorkspaceEditorService {
-  private cachedProfiles: TabbyProfile[] = []
+  private cachedProfiles: TabbyProfile[] | null = null
+  private cacheTimestamp: number = 0
+  private readonly CACHE_TTL = 30000 // 30 seconds
 
   constructor(
     private config: ConfigService,
@@ -23,49 +26,78 @@ export class WorkspaceEditorService {
     private profilesService: ProfilesService
   ) {}
 
-  private async cacheProfiles(): Promise<void> {
-    this.cachedProfiles = (await this.profilesService.getProfiles()) as TabbyProfile[]
+  private async getCachedProfiles(): Promise<TabbyProfile[]> {
+    const now = Date.now()
+    if (!this.cachedProfiles || now - this.cacheTimestamp > this.CACHE_TTL) {
+      this.cachedProfiles = (await this.profilesService.getProfiles()) as TabbyProfile[]
+      this.cacheTimestamp = now
+    }
+    return this.cachedProfiles
   }
 
+  /** Returns all saved workspaces from config. */
   getWorkspaces(): Workspace[] {
     return this.config.store?.[CONFIG_KEY]?.workspaces ?? []
   }
 
-  async saveWorkspaces(workspaces: Workspace[]): Promise<boolean> {
+  /**
+   * Saves the workspace list to config.
+   * @throws Error if config store is not initialized
+   */
+  async saveWorkspaces(workspaces: Workspace[]): Promise<void> {
     if (!this.config.store?.[CONFIG_KEY]) {
-      return false
+      throw new Error('Config store not initialized')
     }
     this.config.store[CONFIG_KEY].workspaces = workspaces
-    return await this.saveConfig()
+    await this.saveConfig()
   }
 
+  /** Adds a new workspace and shows notification. */
   async addWorkspace(workspace: Workspace): Promise<void> {
-    const workspaces = this.getWorkspaces()
-    workspaces.push(workspace)
-    await this.saveWorkspaces(workspaces)
-    this.notifications.info(`Workspace "${workspace.name}" created`)
-  }
-
-  async updateWorkspace(workspace: Workspace): Promise<void> {
-    const workspaces = this.getWorkspaces()
-    const index = workspaces.findIndex((w) => w.id === workspace.id)
-    if (index !== -1) {
-      workspaces[index] = workspace
+    try {
+      const workspaces = this.getWorkspaces()
+      workspaces.push(workspace)
       await this.saveWorkspaces(workspaces)
-      this.notifications.info(`Workspace "${workspace.name}" updated`)
+      this.notifications.info(`Workspace "${workspace.name}" created`)
+    } catch (error) {
+      this.notifications.error(`Failed to create workspace "${workspace.name}"`)
+      throw error
     }
   }
 
+  /** Updates an existing workspace by ID and shows notification. */
+  async updateWorkspace(workspace: Workspace): Promise<void> {
+    try {
+      const workspaces = this.getWorkspaces()
+      const index = workspaces.findIndex((w) => w.id === workspace.id)
+      if (index !== -1) {
+        workspaces[index] = workspace
+        await this.saveWorkspaces(workspaces)
+        this.notifications.info(`Workspace "${workspace.name}" updated`)
+      }
+    } catch (error) {
+      this.notifications.error(`Failed to update workspace "${workspace.name}"`)
+      throw error
+    }
+  }
+
+  /** Deletes a workspace by ID and shows notification. */
   async deleteWorkspace(workspaceId: string): Promise<void> {
     const workspaces = this.getWorkspaces()
     const workspace = workspaces.find((w) => w.id === workspaceId)
-    const filtered = workspaces.filter((w) => w.id !== workspaceId)
-    await this.saveWorkspaces(filtered)
-    if (workspace) {
-      this.notifications.info(`Workspace "${workspace.name}" deleted`)
+    try {
+      const filtered = workspaces.filter((w) => w.id !== workspaceId)
+      await this.saveWorkspaces(filtered)
+      if (workspace) {
+        this.notifications.info(`Workspace "${workspace.name}" deleted`)
+      }
+    } catch (error) {
+      this.notifications.error(`Failed to delete workspace "${workspace?.name || workspaceId}"`)
+      throw error
     }
   }
 
+  /** Returns all local shell profiles available for use in workspaces. */
   async getAvailableProfiles(): Promise<TabbyProfile[]> {
     const allProfiles = await this.profilesService.getProfiles()
     return allProfiles.filter(
@@ -93,8 +125,9 @@ export class WorkspaceEditorService {
     }
   }
 
+  /** Generates a Tabby split-layout profile from a workspace for opening. */
   async generateTabbyProfile(workspace: Workspace): Promise<TabbySplitLayoutProfile> {
-    await this.cacheProfiles()
+    await this.getCachedProfiles()
     const safeName = this.sanitizeForProfileId(workspace.name)
     return {
       id: `split-layout:${CONFIG_KEY}:${safeName}:${workspace.id}`,
@@ -105,26 +138,27 @@ export class WorkspaceEditorService {
       color: workspace.color,
       isBuiltin: false,
       options: {
-        recoveryToken: this.generateRecoveryToken(workspace.root),
+        recoveryToken: this.generateRecoveryToken(workspace.root, workspace.name, workspace.id),
       },
     }
   }
 
-  private generateRecoveryToken(split: WorkspaceSplit): TabbyRecoveryToken {
+  private generateRecoveryToken(split: WorkspaceSplit, workspaceName: string, workspaceId: string): TabbyRecoveryToken {
     return {
       type: 'app:split-tab',
       orientation: split.orientation === 'horizontal' ? 'h' : 'v',
       ratios: split.ratios,
+      workspaceId,
       children: split.children.map((child) => {
         if (isWorkspaceSplit(child)) {
-          return this.generateRecoveryToken(child)
+          return this.generateRecoveryToken(child, workspaceName, workspaceId)
         }
-        return this.generatePaneToken(child)
+        return this.generatePaneToken(child, workspaceName, workspaceId)
       }),
     }
   }
 
-  private generatePaneToken(pane: WorkspacePane): TabbyRecoveryToken {
+  private generatePaneToken(pane: WorkspacePane, workspaceName: string, workspaceId: string): TabbyRecoveryToken {
     const baseProfile = this.getProfileById(pane.profileId)
 
     if (!baseProfile) {
@@ -162,7 +196,7 @@ export class WorkspaceEditorService {
       options,
       icon: baseProfile.icon || '',
       color: baseProfile.color || '',
-      disableDynamicTitle: false,
+      disableDynamicTitle: true,
       weight: 0,
       isBuiltin: false,
       isTemplate: false,
@@ -170,22 +204,25 @@ export class WorkspaceEditorService {
       behaviorOnSessionEnd: 'auto',
     }
 
-    // Use pane.id for matching in StartupCommandService
-    // Original title will be restored after command execution
+    // tabTitle: workspace name (what user sees)
+    // tabCustomTitle: pane.id (for matching in StartupCommandService)
+    // workspaceId: for duplicate detection after Tabby recovery
     const cwd = pane.cwd || baseProfile.options?.cwd || ''
     return {
       type: 'app:local-tab',
       profile,
       savedState: false,
-      tabTitle: pane.id,
+      tabTitle: workspaceName,
       tabCustomTitle: pane.id,
-      disableDynamicTitle: false,
+      workspaceId,
+      disableDynamicTitle: true,
       cwd,
     }
   }
 
+  /** Creates a deep copy of a workspace with new IDs. */
   duplicateWorkspace(workspace: Workspace): Workspace {
-    const clone = JSON.parse(JSON.stringify(workspace)) as Workspace
+    const clone = deepClone(workspace)
     clone.id = generateUUID()
     clone.name = `${workspace.name} (Copy)`
     clone.launchOnStartup = false
@@ -221,40 +258,40 @@ export class WorkspaceEditorService {
     if (found) return found
 
     // Fallback: check cached profiles (includes built-ins)
-    return this.cachedProfiles.find((p) => p.id === profileId && isLocalType(p.type))
+    return this.cachedProfiles?.find((p) => p.id === profileId && isLocalType(p.type))
   }
 
+  /** Collects all startup commands from panes in a workspace. */
   collectStartupCommands(workspace: Workspace): PendingCommand[] {
     const commands: PendingCommand[] = []
-    this.collectCommandsFromNode(workspace.root, commands)
+    this.collectCommandsFromNode(workspace.root, workspace.name, commands)
     return commands
   }
 
   private collectCommandsFromNode(
     node: WorkspacePane | WorkspaceSplit,
+    workspaceName: string,
     commands: PendingCommand[]
   ): void {
     if (isWorkspaceSplit(node)) {
       for (const child of node.children) {
-        this.collectCommandsFromNode(child, commands)
+        this.collectCommandsFromNode(child, workspaceName, commands)
       }
     } else if (node.startupCommand) {
       commands.push({
         paneId: node.id,
         command: node.startupCommand,
-        originalTitle: node.title || '',
+        originalTitle: workspaceName,
       })
     }
   }
 
-  private async saveConfig(): Promise<boolean> {
+  private async saveConfig(): Promise<void> {
     try {
       await this.config.save()
-      return true
     } catch (error) {
-      this.notifications.error('Failed to save configuration')
       console.error('TabbySpaces save error:', error)
-      return false
+      throw error
     }
   }
 }

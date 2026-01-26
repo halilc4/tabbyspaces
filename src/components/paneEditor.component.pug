@@ -1,46 +1,30 @@
-.pane-editor-overlay((click)='onOverlayClick($event)')
-  .pane-editor-modal(#modal)
-    .modal-header
-      h4 Edit Pane
-      button.btn.btn-link.close-btn(type='button', (click)='onCancel()')
-        i.fas.fa-times
+//- Inline pane editor panel (no modal overlay)
+.pane-details
+  .pane-details-header
+    span.pane-details-title
+      i.fas.fa-terminal
+      |  Pane Configuration
 
-    .modal-body
-      .form-group
-        label Base Profile
-        select.form-control([(ngModel)]='editedPane.profileId')
-          option(value='') -- Select Profile --
-          option(*ngFor='let profile of profiles', [value]='profile.id')
-            | {{ profile.name }}
+  .pane-form
+    .form-group
+      label Profile
+      select.form-control([(ngModel)]='pane.profileId')
+        option(value='') -- Select Profile --
+        option(*ngFor='let profile of profiles', [value]='profile.id')
+          | {{ profile.name }}
 
-      .form-group
-        label Working Directory
-        input.form-control(
-          type='text',
-          [(ngModel)]='editedPane.cwd',
-          placeholder='C:\\path\\to\\project'
-        )
+    .form-group
+      label Working Directory
+      input.form-control(
+        type='text',
+        [(ngModel)]='pane.cwd',
+        placeholder='C:\\path\\to\\project'
+      )
 
-      .form-group
-        label Startup Command
-        input.form-control(
-          type='text',
-          [(ngModel)]='editedPane.startupCommand',
-          placeholder='e.g., npm run dev'
-        )
-        small.help-text
-          | Command to execute when the pane opens. For Nushell, use commands like: uv run serve
-
-      .form-group
-        label Pane Title (optional)
-        input.form-control(
-          type='text',
-          [(ngModel)]='editedPane.title',
-          placeholder='Custom tab title'
-        )
-
-    .modal-footer
-      button.btn.btn-secondary(type='button', (click)='onCancel()') Cancel
-      button.btn.btn-primary(type='button', (click)='onSave()')
-        i.fas.fa-check
-        |  Apply
+    .form-group
+      label Startup Command
+      input.form-control(
+        type='text',
+        [(ngModel)]='pane.startupCommand',
+        placeholder='e.g., npm run dev'
+      )

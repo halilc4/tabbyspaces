@@ -1,6 +1,6 @@
 {
   "name": "tabby-tabbyspaces",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Workspaces for Tabby - Visual split-layout workspace editor",
   "keywords": [
     "tabby",
@@ -30,6 +30,7 @@
     "@angular/compiler-cli": "^15.0.0",
     "@angular/core": "^15.0.0",
     "@angular/forms": "^15.0.0",
+    "@ng-bootstrap/ng-bootstrap": "^14.2.0",
     "@ngtools/webpack": "^15.0.0",
     "apply-loader": "^2.0.0",
     "css-loader": "^6.8.0",

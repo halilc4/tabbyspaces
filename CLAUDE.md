@@ -44,12 +44,25 @@ src/
 │   ├── config.provider.ts
 │   ├── settings.provider.ts
 │   └── toolbar.provider.ts
+├── styles/                  # Shared SCSS (modular DRY)
+│   ├── _variables.scss      # Spacing, radius, colors, z-index
+│   └── _mixins.scss         # Reusable patterns
 └── components/              # Angular components (.ts, .pug, .scss)
     ├── workspaceList        # Main settings UI
     ├── workspaceEditor      # Single workspace editor
     ├── paneEditor           # Pane configuration
     └── splitPreview         # Visual split preview
 ```
+
+## Styles
+
+Modular DRY SCSS architecture. All components load shared styles via `@use '../styles/index' as *;`.
+
+- **Variables**: `$spacing-*`, `$radius-*`, `$color-*`, `$z-*`, `$transition-*`
+- **Mixins**: Layout, form, card, and button patterns. See `src/styles/_mixins.scss` for the available mixins.
+- **Theming**: Uses Tabby's `--theme-*` CSS variables
+
+See `docs/DESIGN.md` for details.
 
 ## Build
 
@@ -290,6 +303,26 @@ document.querySelectorAll('.preview-pane')[0].click();
 await new Promise(r => setTimeout(r, 100));
 return document.querySelectorAll('.preview-pane.selected').length;
 ```
+
+## Angular Change Detection
+
+**KRITIČNO**: NE koristi `OnPush` strategiju na komponentama koje primaju mutirane objekte.
+
+### Pravilo
+- **NE koristi `OnPush`** ako parent komponenta mutira objekte umesto da kreira nove reference
+- Angular default strategija automatski detektuje sve promene
+- `OnPush` je samo za leaf komponente koje emituju events bez lokalnog state-a
+
+### Zašto
+- `OnPush` osvežava view samo kada se `@Input` referenca promeni
+- Mutacija objekta (npr. `workspace.root.children.push()`) NE menja referencu
+- Bez nove reference, Angular ne zna da treba re-renderovati
+
+### Komponente u ovom projektu
+- `workspaceEditor` - **default CD** (mutira workspace)
+- `workspaceList` - **default CD** (koristi `detectChanges()` za async operacije)
+- `splitPreview` - **default CD** (prima mutirane objekte)
+- `paneEditor` - može biti `OnPush` (samo emituje, nema mutacija)
 
 ## Known Issues
 

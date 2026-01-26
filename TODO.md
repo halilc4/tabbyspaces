@@ -13,10 +13,14 @@
 - [ ] List: add small layout preview
 - [ ] Better input for command
 - [ ] Better input for cwd
+- [ ] Editor workspace + pane editor autosave
+- [ ] Undo/redo for editor changes
 
 ### Bugs
 - [~] Resize panes in Tabby reverts to original values (ratio problem) - WATCH: happens only on one workspace
 - [ ] Layout preview responsive - nested splits don't adapt well to smaller sizes
+- [ ] Launch on startup - Tabby remembers open tabs, check if we can detect if workspace is already open; if not, kill the feature
+- [x] Tab titles are a mess - keep only workspace name or default to Tabby behavior (verify no caching/lookup by tab name)
 
 ### Other
 - [ ] Update screenshots in README
@@ -60,6 +64,7 @@
 - [x] Refactoring: Remove profile persistence, shell-aware CWD, dead code cleanup
 
 ### Bugs
+- [x] Focus lost after deleting workspace (native confirm() steals focus from Electron) - fix: use NgbModal instead
 - [x] Audit async functions - check if `detectChanges()` is missing after async operations that change state
 - [x] Split pane runs command (in-memory profiles) - fix: clear profile.options.args after command execution
 - [x] Pane editor modal bug - mouseup outside dialog closes modal. Dialog should close only on Esc or close/cancel/save button

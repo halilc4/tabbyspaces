@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core'
 import { AppService, BaseTabComponent, SplitTabComponent } from 'tabby-core'
 import { BaseTerminalTabComponent } from 'tabby-terminal'
-import { Subscription, first, timer, switchMap } from 'rxjs'
+import { first, timeout, of } from 'rxjs'
+import { catchError } from 'rxjs/operators'
 
 export interface PendingCommand {
   paneId: string
@@ -9,13 +10,21 @@ export interface PendingCommand {
   originalTitle: string
 }
 
+/**
+ * Handles startup commands for workspace panes.
+ *
+ * This service listens to tab open events and sends startup commands
+ * to terminals that match registered pane IDs.
+ *
+ * NOTE: This is a module-level singleton that lives for the app lifetime.
+ * The tabOpened$ subscription intentionally runs forever - no cleanup needed.
+ */
 @Injectable()
 export class StartupCommandService {
   private pendingCommands: Map<string, PendingCommand> = new Map()
-  private subscription: Subscription
 
   constructor(private app: AppService) {
-    this.subscription = this.app.tabOpened$.subscribe((tab) => this.onTabOpened(tab))
+    this.app.tabOpened$.subscribe((tab) => this.onTabOpened(tab))
   }
 
   registerCommands(commands: PendingCommand[]): void {
@@ -84,40 +93,27 @@ export class StartupCommandService {
 
     console.log('[TabbySpaces] Command matched, waiting for shell output...:', fullCommand)
 
+    // Unified command sender - reduces duplication
+    const sendCommand = () => {
+      console.log('[TabbySpaces] Shell ready, sending command:', fullCommand)
+      terminalTab.sendInput(fullCommand + '\r')
+      this.clearProfileArgs(terminalTab)
+      this.setTabTitle(terminalTab, pending.originalTitle)
+    }
+
     // Wait for shell to emit first output (prompt), then send command
     if (terminalTab.session?.output$) {
       terminalTab.session.output$.pipe(
-        first(),                      // Wait for first output (shell prompt)
-        switchMap(() => timer(100))   // Small buffer after prompt renders
+        first(),
+        timeout(2000),  // Prevent infinite wait if shell doesn't emit
+        catchError(() => of(null))  // Fallback on timeout/error
       ).subscribe(() => {
-        console.log('[TabbySpaces] Shell ready, sending command:', fullCommand)
-        terminalTab.sendInput(fullCommand + '\r')
-
-        // Clear profile args to prevent native splits from re-running command
-        this.clearProfileArgs(terminalTab)
-
-        // Reset title - either to original or clear for dynamic shell title
-        if (pending.originalTitle) {
-          terminalTab.setTitle(pending.originalTitle)
-        } else {
-          terminalTab.customTitle = ''
-        }
+        // Small delay after prompt renders
+        setTimeout(sendCommand, 100)
       })
     } else {
       console.log('[TabbySpaces] No session.output$, falling back to timeout')
-      // Fallback if session not available yet
-      setTimeout(() => {
-        terminalTab.sendInput(fullCommand + '\r')
-
-        // Clear profile args to prevent native splits from re-running command
-        this.clearProfileArgs(terminalTab)
-
-        if (pending.originalTitle) {
-          terminalTab.setTitle(pending.originalTitle)
-        } else {
-          terminalTab.customTitle = ''
-        }
-      }, 500)
+      setTimeout(sendCommand, 500)
     }
   }
 
@@ -136,7 +132,9 @@ export class StartupCommandService {
     }
   }
 
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private setTabTitle(terminalTab: BaseTerminalTabComponent<any>, title: string): void {
+    terminalTab.setTitle(title)
+    terminalTab.customTitle = title
   }
 }
