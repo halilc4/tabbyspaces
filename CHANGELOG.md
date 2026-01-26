@@ -1,5 +1,51 @@
 # Changelog
 
+## [0.2.0] - 2026-01-26
+
+### Design
+
+- **S1 "Tight & Sharp" UI redesign**
+  - Tab bar navigation replaces vertical workspace list
+  - Inline pane editor replaces modal overlay
+  - Section-based layout with uppercase titles
+  - Reorganized preview toolbar with icon buttons
+  - 2-column form grid in pane editor
+- Refactor SCSS to modular DRY architecture
+  - Shared variables: spacing scale, border radius, colors, z-index
+  - Reusable mixins: flex-row, form-input, interactive-card, toolbar-btn
+  - All components migrated to use shared styles
+- Add design system documentation (docs/DESIGN.md)
+- Add HTML mockups for design exploration
+
+### Reliability
+
+- Improved duplicate workspace detection on Tabby restart
+  - Add workspaceId to recovery tokens
+  - Two-strategy detection (restored tabs + freshly opened)
+- Better shell initialization with 2s timeout and error handling
+- Wait for Tabby recovery before launching startup workspaces
+- Type-safe workspace detection with proper type guards
+
+### Bug Fixes
+
+- Fix focus lost after workspace delete (NgbModal replaces native confirm)
+- Fix split preview change detection (remove OnPush strategy)
+- Fix race condition in shell initialization
+
+### Infrastructure
+
+- Add CI/CD workflows (GitHub Actions for build + release)
+- Add dev branch workflow documentation
+
+### Technical
+
+- Code review cleanup and fixes
+- Consistent use of deepClone helper
+- Add deleteConfirmModal component
+- Improve singleton service patterns
+
+---
+
 ## [0.1.0] - 2026-01-13
 
 ### Features
