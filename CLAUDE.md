@@ -56,10 +56,10 @@ src/
 
 ## Styles
 
-Modular DRY SCSS architecture. All components import `@import '../styles/index'`.
+Modular DRY SCSS architecture. All components load shared styles via `@use '../styles/index' as *;`.
 
 - **Variables**: `$spacing-*`, `$radius-*`, `$color-*`, `$z-*`, `$transition-*`
-- **Mixins**: `flex-row`, `form-input`, `interactive-card`, `toolbar-btn`, `btn-success`, etc.
+- **Mixins**: Layout, form, card, and button patterns. See `src/styles/_mixins.scss` for the available mixins.
 - **Theming**: Uses Tabby's `--theme-*` CSS variables
 
 See `docs/DESIGN.md` for details.
