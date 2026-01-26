@@ -98,16 +98,13 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   createWorkspace(): void {
-    console.log('[L5 DEBUG] createWorkspace called, cachedProfiles:', this.cachedProfiles.length)
     const defaultProfileId = this.cachedProfiles[0]?.id || ''
     const workspace = createDefaultWorkspace()
     this.setProfileForAllPanes(workspace.root, defaultProfileId)
     this.selectedWorkspace = null
     this.editingWorkspace = workspace
     this.isCreatingNew = true
-    console.log('[L5 DEBUG] before updateDisplayTabs, isCreatingNew:', this.isCreatingNew, 'editingWorkspace:', !!this.editingWorkspace)
     this.updateDisplayTabs()
-    console.log('[L5 DEBUG] after updateDisplayTabs, displayTabs.length:', this.displayTabs.length)
     this.cdr.detectChanges()
   }
 

@@ -16,12 +16,12 @@ src/styles/
 All component SCSS files import shared styles:
 
 ```scss
-@import '../styles/index';
+@use '../styles/index' as *;
 
 .my-component {
   padding: $spacing-md;
   border-radius: $radius-lg;
-  @include flex-row($spacing-sm);
+  @include flex-center;
 }
 ```
 
@@ -35,15 +35,15 @@ Key mixins available:
 
 | Mixin | Purpose |
 |-------|---------|
-| `flex-row($gap)` | Horizontal flex with gap |
-| `flex-col($gap)` | Vertical flex with gap |
-| `flex-center` | Center content |
-| `flex-between` | Space between |
-| `form-input($bg)` | Styled input field |
-| `interactive-card($radius)` | Clickable card with hover/selected states |
-| `toolbar-btn` | Small toolbar button |
+| `flex-center` | Center content with flexbox |
+| `form-input($bg)` | Styled input field with focus state |
+| `form-label` | Uppercase compact label (S1 design) |
+| `toolbar-btn` | Small toolbar button with hover state |
 | `btn-success` | Green success button |
-| `icon-btn-opacity` | Icon with hover opacity |
+| `btn-base` | Base button styling with flex layout |
+| `btn-ghost` | Ghost button with border |
+| `btn-primary` | Primary button with theme color |
+| `icon-btn-sm($size)` | Small icon button with border |
 | `full-overlay($z)` | Fixed fullscreen overlay |
 | `dropdown-panel` | Dropdown with border/shadow |
 | `text-ellipsis` | Truncate text with ellipsis |

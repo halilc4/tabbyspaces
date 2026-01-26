@@ -8,7 +8,7 @@ Visual workspace editor for [Tabby](https://tabby.sh). Create split-layout termi
 
 - **Visual split editor** - Design layouts inline, not in modal dialogs. Split horizontally, vertically, nest to any depth
 - **Layout toolbar** - Select a pane, then split, add adjacent panes, or delete with toolbar buttons
-- **Per-pane configuration** - Set profile, working directory, startup command, and custom title for each pane
+- **Per-pane configuration** - Set profile, working directory, and startup command for each pane
 - **One-click launch** - Open workspaces instantly from the toolbar dropdown
 - **Launch on startup** - Auto-open multiple workspaces when Tabby starts
 - **Any shell** - Works with Bash, Zsh, PowerShell, Nushell, cmd, WSL, and any other shell Tabby supports
@@ -47,7 +47,7 @@ Restart Tabby after installation.
 1. **Open settings** - Settings > TabbySpaces
 2. **Create workspace** - Click "New Workspace", name it
 3. **Design layout** - Click a pane to select it, use toolbar to split (horizontal/vertical)
-4. **Configure panes** - Hover over a pane, click the edit icon to set profile, cwd, startup command
+4. **Configure panes** - Click a pane (or use its context menu) to set profile, cwd, startup command
 5. **Save and launch** - Save changes, then click "Open" or use the toolbar dropdown
 
 ## Roadmap
