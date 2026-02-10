@@ -123,6 +123,46 @@ export class WorkspaceEditorService {
       this.config.save()
       console.log(`[${DISPLAY_NAME}] Cleaned up ${profiles.length - filtered.length} orphaned profiles`)
     }
+
+    // Repair any workspaces with corrupted ratios (from pre-0.2.3 bug where
+    // Tabby's normalize() mutated config ratios via shared array reference)
+    this.repairCorruptedRatios()
+  }
+
+  /** Repairs workspaces where ratios array length doesn't match children count. */
+  private repairCorruptedRatios(): void {
+    const workspaces = this.getWorkspaces()
+    let repaired = false
+
+    for (const workspace of workspaces) {
+      if (this.repairSplitRatios(workspace.root)) {
+        repaired = true
+        console.log(`[${DISPLAY_NAME}] Repaired corrupted ratios in workspace "${workspace.name}"`)
+      }
+    }
+
+    if (repaired) {
+      this.config.save()
+    }
+  }
+
+  private repairSplitRatios(split: WorkspaceSplit): boolean {
+    let changed = false
+
+    // Recursively repair children first
+    for (const child of split.children) {
+      if (isWorkspaceSplit(child) && this.repairSplitRatios(child)) {
+        changed = true
+      }
+    }
+
+    // Fix ratios/children count mismatch
+    if (split.ratios.length !== split.children.length) {
+      split.ratios = split.children.map(() => 1 / split.children.length)
+      changed = true
+    }
+
+    return changed
   }
 
   /** Generates a Tabby split-layout profile from a workspace for opening. */
@@ -147,7 +187,7 @@ export class WorkspaceEditorService {
     return {
       type: 'app:split-tab',
       orientation: split.orientation === 'horizontal' ? 'h' : 'v',
-      ratios: split.ratios,
+      ratios: [...split.ratios],
       workspaceId,
       children: split.children.map((child) => {
         if (isWorkspaceSplit(child)) {
