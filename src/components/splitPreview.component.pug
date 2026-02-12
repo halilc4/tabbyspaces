@@ -1,5 +1,14 @@
 .split-preview([class.horizontal]='split.orientation === "horizontal"', [class.vertical]='split.orientation === "vertical"', [class.nested]='depth > 0')
   ng-container(*ngFor='let child of split.children; let i = index')
+    //- Resize handle between children
+    .resize-handle(
+      *ngIf='i > 0',
+      [class.horizontal]='split.orientation === "horizontal"',
+      [class.vertical]='split.orientation === "vertical"',
+      [class.dragging]='resizing && resizeIndex === i - 1',
+      (mousedown)='onResizeStart($event, i - 1)'
+    )
+
     //- Pane
     .preview-pane(
       *ngIf='isPane(child)',
@@ -9,15 +18,18 @@
       (contextmenu)='onContextMenu($event, asPane(child))'
     )
       .pane-content
-        .pane-label
-          | {{ getPaneLabel(asPane(child)) }}
-        .pane-details
-          .pane-detail(*ngIf='asPane(child).cwd', [title]='asPane(child).cwd')
-            i.fas.fa-folder
-            span {{ truncate(asPane(child).cwd, 20) }}
-          .pane-detail(*ngIf='asPane(child).startupCommand', [title]='asPane(child).startupCommand')
-            i.fas.fa-terminal
-            span {{ truncate(asPane(child).startupCommand, 20) }}
+        .pane-title
+          span.pane-name(*ngIf='asPane(child).name') {{ asPane(child).name }}
+          span.pane-sep(*ngIf='asPane(child).name')  -
+          span.pane-profile {{ getPaneLabel(asPane(child)) }}
+        .pane-path(*ngIf='asPane(child).cwd') {{ asPane(child).cwd }}
+        .pane-command(*ngIf='asPane(child).startupCommand')
+          i.fas.fa-terminal
+          |  {{ asPane(child).startupCommand }}
+      .pane-dimensions
+        span.dim-value {{ getPaneGlobalWidth(i) }}
+        span.dim-sep  :
+        span.dim-value {{ getPaneGlobalHeight(i) }}
 
     //- Nested split
     split-preview(
@@ -26,6 +38,8 @@
       [depth]='depth + 1',
       [selectedPaneId]='selectedPaneId',
       [profiles]='profiles',
+      [globalWidthRatio]='getChildGlobalWidth(i)',
+      [globalHeightRatio]='getChildGlobalHeight(i)',
       [style.flex-basis]='getFlexStyle(i)',
       (paneEdit)='onNestedPaneEdit($event)',
       (splitHorizontal)='onNestedSplitH($event)',
@@ -34,7 +48,9 @@
       (addRight)='onNestedAddRight($event)',
       (addTop)='onNestedAddTop($event)',
       (addBottom)='onNestedAddBottom($event)',
-      (removePane)='onNestedRemove($event)'
+      (removePane)='onNestedRemove($event)',
+      (ratioChange)='onNestedRatioChange()',
+      (resizeEnd)='onNestedResizeEnd()'
     )
 
 //- Context menu

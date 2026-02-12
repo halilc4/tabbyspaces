@@ -69,7 +69,7 @@
             )
 
 //- Section 2: Split Layout
-.editor-section
+.editor-section.layout-section
   .section-title
     i.fas.fa-columns
     |  Split Layout
@@ -142,7 +142,9 @@
         (addRight)='addPaneFromEvent($event, "right")',
         (addTop)='addPaneFromEvent($event, "top")',
         (addBottom)='addPaneFromEvent($event, "bottom")',
-        (removePane)='removePane($event)'
+        (removePane)='removePane($event)',
+        (ratioChange)='onRatioChange()',
+        (resizeEnd)='onResizeEnd()'
       )
 
     //- Inline pane editor
