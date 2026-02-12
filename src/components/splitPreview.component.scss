@@ -3,8 +3,7 @@
 .split-preview {
   display: flex;
   width: 100%;
-  height: $preview-height;
-  gap: $spacing-sm;
+  height: 100%;
   border-radius: $radius-md;
   overflow: hidden;
   background: var(--theme-bg);
@@ -20,10 +19,55 @@
 
   &.nested {
     height: auto;
-    border: 1px dashed var(--theme-fg-more);
+    border: 1px dashed rgba(255, 255, 255, 0.08);
     background: $nested-split-bg;
     padding: $spacing-sm;
     border-radius: $radius-sm;
+  }
+}
+
+.resize-handle {
+  flex: 0 0 6px;
+  position: relative;
+  z-index: 1;
+  user-select: none;
+
+  &.horizontal {
+    cursor: col-resize;
+  }
+
+  &.vertical {
+    cursor: row-resize;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    border-radius: 1px;
+    background: var(--theme-border, $fallback-border);
+    transition: background $transition-fast;
+  }
+
+  &.horizontal::after {
+    top: 20%;
+    bottom: 20%;
+    left: 2px;
+    width: 2px;
+  }
+
+  &.vertical::after {
+    left: 20%;
+    right: 20%;
+    top: 2px;
+    height: 2px;
+  }
+
+  &:hover::after {
+    background: var(--theme-fg-more, rgba(255, 255, 255, 0.4));
+  }
+
+  &.dragging::after {
+    background: var(--theme-primary);
   }
 }
 
@@ -53,47 +97,73 @@
 }
 
 .pane-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
   text-align: center;
-  padding: $spacing-md;
+  padding: $spacing-sm $spacing-md;
   color: var(--theme-fg);
   max-width: 100%;
   overflow: hidden;
 }
 
-.pane-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: $spacing-sm;
-  @include text-ellipsis;
-}
-
-.pane-title,
-.pane-profile {
-  font-size: 0.8rem;
+.pane-title {
+  font-size: 0.75rem;
   font-weight: 500;
-  margin-bottom: $spacing-xs;
-  @include text-ellipsis;
+  overflow-wrap: break-word;
+
+  .pane-name {
+    font-weight: 600;
+  }
+
+  .pane-sep {
+    opacity: 0.4;
+  }
+
+  .pane-profile {
+    opacity: 0.8;
+  }
 }
 
-.pane-details {
-  font-size: 0.7rem;
+.pane-path {
+  font-size: 0.6rem;
+  opacity: 0.6;
+  word-break: break-all;
+}
+
+.pane-command {
+  font-size: 0.55rem;
+  opacity: 0.5;
+  overflow-wrap: break-word;
+
+  i {
+    font-size: 0.5rem;
+  }
+}
+
+.pane-dimensions {
+  position: absolute;
+  bottom: $spacing-xs;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: baseline;
+  font-size: 0.65rem;
+  pointer-events: none;
+  color: var(--theme-primary);
+  white-space: nowrap;
   opacity: 0.7;
-  margin-top: $spacing-sm;
 
-  .pane-detail {
-    @include flex-center;
-    gap: $spacing-sm;
+  .dim-value {
+    min-width: 2.5em;
+    text-align: center;
+  }
 
-    i {
-      width: 12px;
-      text-align: center;
-      font-size: 0.65rem;
-    }
-
-    span {
-      @include text-ellipsis;
-      max-width: 100px;
-    }
+  .dim-sep {
+    opacity: 0.5;
+    margin: 0 2px;
   }
 }
 

@@ -34,6 +34,7 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
   @ViewChild('nameInput') nameInput!: ElementRef<HTMLInputElement>
 
   selectedPaneId: string | null = null
+  wasResizing = false
   editingPane: WorkspacePane | null = null
   showPaneEditor = false
   profiles: TabbyProfile[] = []
@@ -202,11 +203,23 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
   }
 
   onPreviewBackgroundClick(): void {
+    if (this.wasResizing) return
     this.deselectPane()
     this.closePaneEditor()
   }
 
+  onResizeEnd(): void {
+    this.wasResizing = true
+    setTimeout(() => { this.wasResizing = false }, 0)
+  }
+
   editPane(pane: WorkspacePane): void {
+    if (this.wasResizing) return
+    if (this.selectedPaneId === pane.id) {
+      this.selectedPaneId = null
+      this.closePaneEditor()
+      return
+    }
     this.selectedPaneId = pane.id
     this.editingPane = pane
     this.showPaneEditor = true
@@ -299,7 +312,6 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
           children: [ctx.child, newPane],
         }
         ctx.node.children[ctx.index] = newSplit
-        this.recalculateRatios(ctx.node)
         return true
       }
       return false
@@ -382,6 +394,10 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
     this.cdr.detectChanges()
   }
 
+  onRatioChange(): void {
+    this.cdr.detectChanges()
+  }
+
   // Add pane operations
   addPane(direction: 'left' | 'right' | 'top' | 'bottom'): void {
     if (!this.selectedPaneId) return
@@ -411,10 +427,12 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
       newPane.profileId = (ctx.child as WorkspacePane).profileId
 
       if (ctx.node.orientation === targetOrientation) {
-        // Same orientation: add as sibling
+        // Same orientation: split the target pane's ratio in half
         const insertIndex = isBefore ? ctx.index : ctx.index + 1
+        const originalRatio = ctx.node.ratios[ctx.index]
+        const halfRatio = originalRatio / 2
         ctx.node.children.splice(insertIndex, 0, newPane)
-        this.recalculateRatios(ctx.node)
+        ctx.node.ratios.splice(ctx.index, 1, halfRatio, halfRatio)
       } else {
         // Different orientation: wrap entire node in new split
         const nodeCopy: WorkspaceSplit = {

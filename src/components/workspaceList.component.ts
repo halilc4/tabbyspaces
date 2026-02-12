@@ -16,7 +16,7 @@ import {
   isWorkspaceSplit,
 } from '../models/workspace.model'
 
-const SETTINGS_MAX_WIDTH = '876px'
+const SETTINGS_MAX_WIDTH = 'none'
 
 @Component({
   selector: 'workspace-list',
@@ -54,12 +54,26 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   ngAfterViewInit(): void {
-    // Hack: Override Tabby's settings-tab-body max-width restriction
+    // Hack: Override Tabby's settings layout restrictions to fill entire page
     setTimeout(() => {
-      const parent = this.elementRef.nativeElement.closest('settings-tab-body') as HTMLElement
-      if (parent) {
-        parent.style.maxWidth = SETTINGS_MAX_WIDTH
+      const settingsTabBody = this.elementRef.nativeElement.closest('settings-tab-body') as HTMLElement
+      if (settingsTabBody) {
+        settingsTabBody.style.maxWidth = SETTINGS_MAX_WIDTH
+        settingsTabBody.style.height = '100%'
+
+        // .tab-pane needs height instead of just min-height
+        const tabPane = settingsTabBody.closest('.tab-pane') as HTMLElement
+        if (tabPane) {
+          tabPane.style.height = '100%'
+          tabPane.style.boxSizing = 'border-box'
+        }
       }
+
+      // Make our host element fill the container
+      const host = this.elementRef.nativeElement as HTMLElement
+      host.style.display = 'flex'
+      host.style.flexDirection = 'column'
+      host.style.height = '100%'
     }, 0)
   }
 

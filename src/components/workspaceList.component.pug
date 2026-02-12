@@ -1,6 +1,6 @@
 .workspace-list-container
   //- Tab bar navigation
-  .tab-bar
+  .tab-bar(*ngIf='workspaces.length > 0 || editingWorkspace')
     .tab(
       *ngFor='let tab of displayTabs; trackBy: trackByTab',
       [class.active]='isTabSelected(tab)',
@@ -30,8 +30,11 @@
     )
 
   //- Empty state (when no workspaces)
-  .tab-content.empty-state(*ngIf='!editingWorkspace && workspaces.length === 0')
-    p No workspaces configured yet.
-    p Click
-      strong +
-      | to create your first workspace.
+  .empty-state(*ngIf='!editingWorkspace && workspaces.length === 0')
+    .empty-state-icon
+      i.fas.fa-columns
+    h2.empty-state-title TabbySpaces
+    p.empty-state-description Create custom split layouts with profiles, working directories, and startup commands.
+    button.empty-state-cta((click)='createWorkspace()')
+      i.fas.fa-plus
+      | Create Workspace

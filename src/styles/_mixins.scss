@@ -173,6 +173,7 @@
 // ======================
 
 @mixin dropdown-panel {
+  background-color: #1e1e1e;
   background: var(--theme-bg-more);
   border: 1px solid var(--theme-border, $fallback-border);
   border-radius: $radius-md;

@@ -58,6 +58,7 @@ export interface TabbySplitLayoutProfile {
 // Workspace interfaces
 export interface WorkspacePane {
   id: string
+  name?: string
   profileId: string
   cwd?: string
   startupCommand?: string

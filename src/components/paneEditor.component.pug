@@ -7,6 +7,14 @@
 
   .pane-form
     .form-group
+      label Name
+      input.form-control(
+        type='text',
+        [(ngModel)]='pane.name',
+        placeholder='Optional pane name'
+      )
+
+    .form-group
       label Profile
       select.form-control([(ngModel)]='pane.profileId')
         option(value='') -- Select Profile --
