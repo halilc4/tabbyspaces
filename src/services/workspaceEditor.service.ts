@@ -177,7 +177,7 @@ export class WorkspaceEditorService {
       restoreFromPTYID: false,
       command: baseProfile.options?.command || '',
       args: baseProfile.options?.args || [],
-      cwd: pane.cwd || baseProfile.options?.cwd || '',
+      cwd: this.resolveWslCwd(pane.cwd || baseProfile.options?.cwd || '', baseProfile),
       env: baseProfile.options?.env || {},
       width: null,
       height: null,
@@ -207,7 +207,7 @@ export class WorkspaceEditorService {
     // tabTitle: workspace name (what user sees)
     // tabCustomTitle: pane.id (for matching in StartupCommandService)
     // workspaceId: for duplicate detection after Tabby recovery
-    const cwd = pane.cwd || baseProfile.options?.cwd || ''
+    const cwd = this.resolveWslCwd(pane.cwd || baseProfile.options?.cwd || '', baseProfile)
     return {
       type: 'app:local-tab',
       profile,
@@ -247,6 +247,42 @@ export class WorkspaceEditorService {
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '')
       || 'workspace'
+  }
+
+  private isWslProfile(profile: TabbyProfile): boolean {
+    return profile.type?.startsWith('local:wsl') ?? false
+  }
+
+  private getWslDistroName(profile: TabbyProfile): string | null {
+    // From type: 'local:wsl-Ubuntu-22.04' → 'Ubuntu-22.04'
+    if (profile.type?.startsWith('local:wsl-')) {
+      return profile.type.substring('local:wsl-'.length)
+    }
+    // From args: ['-d', 'Ubuntu']
+    const args = profile.options?.args || []
+    const dIdx = args.indexOf('-d')
+    if (dIdx >= 0 && dIdx + 1 < args.length) {
+      return args[dIdx + 1]
+    }
+    return null
+  }
+
+  /**
+   * Converts Unix CWD paths to Windows UNC format for WSL profiles.
+   * Tabby validates CWD with fsSync.existsSync() which fails for Unix paths on Windows.
+   * UNC paths (\\wsl.localhost\<distro>\<path>) are resolved by Windows via WSL filesystem.
+   */
+  private resolveWslCwd(cwd: string, profile: TabbyProfile): string {
+    if (!cwd || !cwd.startsWith('/') || !this.isWslProfile(profile)) {
+      return cwd
+    }
+    const distro = this.getWslDistroName(profile)
+    if (!distro) {
+      return cwd
+    }
+    // /home/user/project → \\wsl.localhost\Ubuntu\home\user\project
+    const winPath = cwd.replace(/\//g, '\\')
+    return `\\\\wsl.localhost\\${distro}${winPath}`
   }
 
   private getProfileById(profileId: string): TabbyProfile | undefined {
