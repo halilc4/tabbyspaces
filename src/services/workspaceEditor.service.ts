@@ -212,12 +212,18 @@ export class WorkspaceEditorService {
       }
     }
 
+    const rawCwd = pane.cwd || baseProfile.options?.cwd || ''
+    const isWsl = this.isWslProfile(baseProfile)
+    const baseArgs = baseProfile.options?.args || []
+
     // Build complete profile object like Tabby expects
     const options = {
       restoreFromPTYID: false,
       command: baseProfile.options?.command || '',
-      args: baseProfile.options?.args || [],
-      cwd: pane.cwd || baseProfile.options?.cwd || '',
+      // WSL: inject --cd to set Linux CWD directly (bypasses fs.existsSync validation)
+      args: isWsl && rawCwd ? [...baseArgs, '--cd', rawCwd] : baseArgs,
+      // WSL: don't set cwd (Unix paths fail fs.existsSync on Windows)
+      cwd: isWsl ? '' : rawCwd,
       env: baseProfile.options?.env || {},
       width: null,
       height: null,
@@ -247,7 +253,6 @@ export class WorkspaceEditorService {
     // tabTitle: workspace name (what user sees)
     // tabCustomTitle: pane.id (for matching in StartupCommandService)
     // workspaceId: for duplicate detection after Tabby recovery
-    const cwd = pane.cwd || baseProfile.options?.cwd || ''
     return {
       type: 'app:local-tab',
       profile,
@@ -256,7 +261,7 @@ export class WorkspaceEditorService {
       tabCustomTitle: pane.id,
       workspaceId,
       disableDynamicTitle: true,
-      cwd,
+      cwd: isWsl ? '' : rawCwd,
     }
   }
 
@@ -287,6 +292,11 @@ export class WorkspaceEditorService {
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '')
       || 'workspace'
+  }
+
+  /** Detects WSL profiles by ID prefix (type is always 'local' for all built-in shells). */
+  private isWslProfile(profile: TabbyProfile): boolean {
+    return profile.id?.startsWith('local:wsl') ?? false
   }
 
   private getProfileById(profileId: string): TabbyProfile | undefined {
