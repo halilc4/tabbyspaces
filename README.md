@@ -13,12 +13,6 @@ Visual workspace editor for [Tabby](https://tabby.sh). Create split-layout termi
 - **Launch on startup** - Auto-open multiple workspaces when Tabby starts
 - **Any shell** - Works with Bash, Zsh, PowerShell, Nushell, cmd, WSL, and any other shell Tabby supports
 
-## Screenshots
-
-| Editor with selected pane | Pane configuration |
-|---------------------------|-------------------|
-| ![Editor](screenshots/editor.png) | ![Pane Edit](screenshots/pane-edit.png) |
-
 ## About this project
 
 This plugin was written 100% by [Claude Code](https://claude.ai/code).

@@ -3,10 +3,9 @@
 .split-preview {
   display: flex;
   width: 100%;
-  height: $preview-height;
+  min-height: $preview-height;
   gap: $spacing-sm;
   border-radius: $radius-md;
-  overflow: hidden;
   background: var(--theme-bg);
   border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.1));
 
@@ -19,7 +18,7 @@
   }
 
   &.nested {
-    height: auto;
+    min-height: 0;
     border: 1px dashed var(--theme-fg-more);
     background: $nested-split-bg;
     padding: $spacing-sm;
