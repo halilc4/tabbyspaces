@@ -1,8 +1,22 @@
 @use '../styles/index' as *;
 
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 // Editor section
 .editor-section {
   margin-bottom: $spacing-xl;
+
+  &.layout-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
 }
 
 .section-title {
@@ -80,7 +94,7 @@
 .icon-dropdown {
   position: absolute;
   top: 100%;
-  left: 0;
+  right: 0;
   margin-top: $spacing-sm;
   padding: $spacing-md;
   @include dropdown-panel;
@@ -189,7 +203,6 @@
 .background-dropdown {
   position: absolute;
   top: 100%;
-  left: 0;
   right: 0;
   margin-top: $spacing-sm;
   padding: $spacing-md;
@@ -235,6 +248,10 @@
 
 // Split preview container
 .split-preview-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   background: var(--theme-bg-more);
   border: 1px solid var(--theme-border, $fallback-border);
   border-radius: $radius-md;
@@ -266,6 +283,8 @@
 
 // Layout preview area
 .layout-preview {
+  flex: 1;
+  display: flex;
   background: var(--theme-bg);
   border-radius: $radius-sm;
   min-height: 150px;
@@ -277,9 +296,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: $spacing-xl;
+  padding-top: $spacing-lg;
   border-top: 1px solid var(--theme-border, $fallback-border);
-  margin-top: $spacing-xl;
+  margin-top: auto;
 }
 
 .checkbox-group {
@@ -303,6 +322,7 @@
 .action-buttons-right {
   display: flex;
   gap: $spacing-md;
+  align-items: stretch;
 
   .btn-ghost {
     @include btn-ghost;
@@ -311,6 +331,7 @@
   .btn-success {
     @include btn-base;
     @include btn-success;
+    border: 1px solid $color-success;
   }
 
   .unsaved-indicator {

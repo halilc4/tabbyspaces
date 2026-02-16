@@ -16,7 +16,7 @@ import {
   isWorkspaceSplit,
 } from '../models/workspace.model'
 
-const SETTINGS_MAX_WIDTH = '876px'
+const SETTINGS_MAX_WIDTH = 'none'
 
 @Component({
   selector: 'workspace-list',
@@ -53,12 +53,22 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     })
   }
 
+  private originalStyles: { element: HTMLElement; maxWidth: string; height: string }[] = []
+
   ngAfterViewInit(): void {
-    // Hack: Override Tabby's settings-tab-body max-width restriction
+    // Hack: Override Tabby's settings-tab-body to allow full-height layout.
+    // Only touches settingsTabBody — host styles are in SCSS :host block.
+    // Parent elements (like .tab-pane) are NOT modified to avoid affecting other tabs.
     setTimeout(() => {
-      const parent = this.elementRef.nativeElement.closest('settings-tab-body') as HTMLElement
-      if (parent) {
-        parent.style.maxWidth = SETTINGS_MAX_WIDTH
+      const settingsTabBody = this.elementRef.nativeElement.closest('settings-tab-body') as HTMLElement
+      if (settingsTabBody) {
+        this.originalStyles.push({
+          element: settingsTabBody,
+          maxWidth: settingsTabBody.style.maxWidth,
+          height: settingsTabBody.style.height,
+        })
+        settingsTabBody.style.maxWidth = SETTINGS_MAX_WIDTH
+        settingsTabBody.style.height = '100%'
       }
     }, 0)
   }
@@ -82,6 +92,12 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
 
   ngOnDestroy(): void {
     this.configSubscription?.unsubscribe()
+    // Restore original styles on parent elements to avoid affecting other settings tabs
+    for (const entry of this.originalStyles) {
+      entry.element.style.maxWidth = entry.maxWidth
+      entry.element.style.height = entry.height
+    }
+    this.originalStyles = []
   }
 
   loadWorkspaces(): void {
