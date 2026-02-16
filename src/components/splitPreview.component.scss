@@ -155,14 +155,18 @@
   white-space: nowrap;
   opacity: 0.7;
 
+  .dim-label {
+    opacity: 0.5;
+    font-size: 0.55rem;
+  }
+
   .dim-value {
-    min-width: 2.5em;
+    min-width: 2em;
     text-align: center;
   }
 
   .dim-sep {
-    opacity: 0.5;
-    margin: 0 2px;
+    width: $spacing-sm;
   }
 }
 

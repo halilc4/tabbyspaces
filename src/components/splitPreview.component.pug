@@ -27,8 +27,10 @@
           i.fas.fa-terminal
           |  {{ asPane(child).startupCommand }}
       .pane-dimensions
+        span.dim-label W:
         span.dim-value {{ getPaneGlobalWidth(i) }}
-        span.dim-sep  :
+        span.dim-sep
+        span.dim-label H:
         span.dim-value {{ getPaneGlobalHeight(i) }}
 
     //- Nested split

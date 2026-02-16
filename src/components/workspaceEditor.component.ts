@@ -216,8 +216,14 @@ export class WorkspaceEditorComponent implements OnInit, OnChanges, AfterViewIni
   editPane(pane: WorkspacePane): void {
     if (this.wasResizing) return
     if (this.selectedPaneId === pane.id) {
-      this.selectedPaneId = null
-      this.closePaneEditor()
+      // Toggle editor visibility while keeping selection
+      if (this.showPaneEditor) {
+        this.closePaneEditor()
+      } else {
+        this.editingPane = pane
+        this.showPaneEditor = true
+      }
+      this.cdr.detectChanges()
       return
     }
     this.selectedPaneId = pane.id

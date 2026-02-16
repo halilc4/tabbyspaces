@@ -198,6 +198,11 @@ export class SplitPreviewComponent implements OnChanges, OnDestroy {
     const containerSize = isHorizontal ? this.resizeContainerRect.width : this.resizeContainerRect.height
     const mousePos = isHorizontal ? event.clientX : event.clientY
 
+    // Subtract handle widths for accurate ratio calculation
+    const HANDLE_SIZE = 6 // matches CSS flex: 0 0 6px
+    const handleCount = this.split.children.length - 1
+    const effectiveSize = containerSize - (handleCount * HANDLE_SIZE)
+
     // Calculate offset: sum of ratios before the left child
     let offset = 0
     for (let i = 0; i < k; i++) {
@@ -205,7 +210,9 @@ export class SplitPreviewComponent implements OnChanges, OnDestroy {
     }
 
     const combined = this.split.ratios[k] + this.split.ratios[k + 1]
-    const mouseRatio = (mousePos - containerStart) / containerSize
+    // Adjust mouse position by removing pixel space taken by handles before this point
+    const adjustedPos = mousePos - containerStart - ((k + 0.5) * HANDLE_SIZE)
+    const mouseRatio = adjustedPos / effectiveSize
 
     // Snap to nearest 0.1
     let newLeft = Math.round((mouseRatio - offset) / 0.1) * 0.1

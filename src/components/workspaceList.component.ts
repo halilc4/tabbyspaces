@@ -53,27 +53,23 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
     })
   }
 
+  private originalStyles: { element: HTMLElement; maxWidth: string; height: string }[] = []
+
   ngAfterViewInit(): void {
-    // Hack: Override Tabby's settings layout restrictions to fill entire page
+    // Hack: Override Tabby's settings-tab-body to allow full-height layout.
+    // Only touches settingsTabBody — host styles are in SCSS :host block.
+    // Parent elements (like .tab-pane) are NOT modified to avoid affecting other tabs.
     setTimeout(() => {
       const settingsTabBody = this.elementRef.nativeElement.closest('settings-tab-body') as HTMLElement
       if (settingsTabBody) {
+        this.originalStyles.push({
+          element: settingsTabBody,
+          maxWidth: settingsTabBody.style.maxWidth,
+          height: settingsTabBody.style.height,
+        })
         settingsTabBody.style.maxWidth = SETTINGS_MAX_WIDTH
         settingsTabBody.style.height = '100%'
-
-        // .tab-pane needs height instead of just min-height
-        const tabPane = settingsTabBody.closest('.tab-pane') as HTMLElement
-        if (tabPane) {
-          tabPane.style.height = '100%'
-          tabPane.style.boxSizing = 'border-box'
-        }
       }
-
-      // Make our host element fill the container
-      const host = this.elementRef.nativeElement as HTMLElement
-      host.style.display = 'flex'
-      host.style.flexDirection = 'column'
-      host.style.height = '100%'
     }, 0)
   }
 
@@ -96,6 +92,12 @@ export class WorkspaceListComponent implements OnInit, OnDestroy, AfterViewInit 
 
   ngOnDestroy(): void {
     this.configSubscription?.unsubscribe()
+    // Restore original styles on parent elements to avoid affecting other settings tabs
+    for (const entry of this.originalStyles) {
+      entry.element.style.maxWidth = entry.maxWidth
+      entry.element.style.height = entry.height
+    }
+    this.originalStyles = []
   }
 
   loadWorkspaces(): void {
