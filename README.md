@@ -44,6 +44,8 @@ Restart Tabby after installation.
 4. **Configure panes** - Click a pane (or use its context menu) to set profile, cwd, startup command
 5. **Save and launch** - Save changes, then click "Open" or use the toolbar dropdown
 
+![Split Layout Editor](screenshots/workspace-editor.png)
+
 ## Roadmap
 
 - Hotkey support for quick workspace switching
