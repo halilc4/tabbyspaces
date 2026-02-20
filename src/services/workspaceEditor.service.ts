@@ -97,13 +97,11 @@ export class WorkspaceEditorService {
     }
   }
 
-  /** Returns all local shell profiles available for use in workspaces. */
+  /** Returns all profiles available for use in workspaces (local, SSH, serial, etc.). */
   async getAvailableProfiles(): Promise<TabbyProfile[]> {
     const allProfiles = await this.profilesService.getProfiles()
     return allProfiles.filter(
-      (p) =>
-        (p.type === 'local' || p.type?.startsWith('local:')) &&
-        !p.id?.startsWith('split-layout:')
+      (p) => !p.id?.startsWith('split-layout:')
     ) as TabbyProfile[]
   }
 
@@ -212,11 +210,27 @@ export class WorkspaceEditorService {
       }
     }
 
+    // Non-local profiles (SSH, serial, telnet): pass profile through, Tabby handles the rest
+    if (!this.isLocalProfile(baseProfile)) {
+      return {
+        type: `app:${baseProfile.type}-tab`,
+        profile: {
+          ...baseProfile,
+          disableDynamicTitle: true,
+        },
+        savedState: false,
+        tabTitle: workspaceName,
+        tabCustomTitle: pane.id,
+        workspaceId,
+        disableDynamicTitle: true,
+      }
+    }
+
+    // Local profiles: build options with CWD/WSL handling
     const rawCwd = pane.cwd || baseProfile.options?.cwd || ''
     const isWsl = this.isWslProfile(baseProfile)
     const baseArgs = baseProfile.options?.args || []
 
-    // Build complete profile object like Tabby expects
     const options = {
       restoreFromPTYID: false,
       command: baseProfile.options?.command || '',
@@ -294,21 +308,24 @@ export class WorkspaceEditorService {
       || 'workspace'
   }
 
+  /** Checks if a profile is a local shell (local, local:wsl, local:powershell, etc.). */
+  private isLocalProfile(profile: TabbyProfile): boolean {
+    return profile.type === 'local' || profile.type?.startsWith('local:') || false
+  }
+
   /** Detects WSL profiles by ID prefix (type is always 'local' for all built-in shells). */
   private isWslProfile(profile: TabbyProfile): boolean {
     return profile.id?.startsWith('local:wsl') ?? false
   }
 
   private getProfileById(profileId: string): TabbyProfile | undefined {
-    const isLocalType = (type: string) => type === 'local' || type?.startsWith('local:')
-
     // First: check user profiles in config
     const userProfiles: TabbyProfile[] = this.config.store?.profiles ?? []
-    const found = userProfiles.find((p) => p.id === profileId && isLocalType(p.type))
+    const found = userProfiles.find((p) => p.id === profileId)
     if (found) return found
 
     // Fallback: check cached profiles (includes built-ins)
-    return this.cachedProfiles?.find((p) => p.id === profileId && isLocalType(p.type))
+    return this.cachedProfiles?.find((p) => p.id === profileId)
   }
 
   /** Collects all startup commands from panes in a workspace. */

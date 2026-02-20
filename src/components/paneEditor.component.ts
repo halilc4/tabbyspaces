@@ -16,6 +16,20 @@ export class PaneEditorComponent {
     this.close.emit()
   }
 
+  get localProfiles(): TabbyProfile[] {
+    return this.profiles.filter((p) => p.type === 'local' || p.type?.startsWith('local:'))
+  }
+
+  get sshProfiles(): TabbyProfile[] {
+    return this.profiles.filter((p) => p.type === 'ssh')
+  }
+
+  get otherProfiles(): TabbyProfile[] {
+    return this.profiles.filter((p) =>
+      p.type !== 'local' && !p.type?.startsWith('local:') && p.type !== 'ssh'
+    )
+  }
+
   getProfileName(profileId: string): string {
     const profile = this.profiles.find((p) => p.id === profileId)
     return profile?.name ?? 'Unknown'
