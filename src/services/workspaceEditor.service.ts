@@ -313,9 +313,15 @@ export class WorkspaceEditorService {
     return profile.type === 'local' || profile.type?.startsWith('local:') || false
   }
 
-  /** Detects WSL profiles by ID prefix (type is always 'local' for all built-in shells). */
+  /** Detects WSL profiles by ID prefix (built-in) or command path (user-defined). */
   private isWslProfile(profile: TabbyProfile): boolean {
-    return profile.id?.startsWith('local:wsl') ?? false
+    // Built-in WSL profiles: id starts with 'local:wsl'
+    if (profile.id?.startsWith('local:wsl')) {
+      return true
+    }
+    // User-defined WSL profiles: type 'local' with command pointing to wsl.exe
+    const command = (profile.options?.command || '').toLowerCase()
+    return command === 'wsl.exe' || command === 'wsl' || command.endsWith('\\wsl.exe') || command.endsWith('/wsl.exe')
   }
 
   private getProfileById(profileId: string): TabbyProfile | undefined {
